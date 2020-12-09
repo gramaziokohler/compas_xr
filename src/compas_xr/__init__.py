@@ -19,7 +19,6 @@ Describe typical classes found in project
 
 
 """
+import os
 
-from .sample_module import SampleClassName
-
-__all__ = ['SampleClassName']
+DATA = os.path.join(os.path.dirname(__file__), "data")
