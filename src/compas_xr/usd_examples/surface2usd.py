@@ -7,7 +7,7 @@ from compas_xr import DATA
 
 filepath = os.path.join(DATA, "surface.usda")
 
-stage = Usd.Stage.CreateNew('surface.usda')
+stage = Usd.Stage.CreateNew(filepath)
 xformPrim = UsdGeom.Xform.Define(stage, '/hello')
 
 degree_u, degree_v = 3, 3
