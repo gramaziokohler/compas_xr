@@ -34,6 +34,7 @@ async def task():
     attr = camera.GetAttribute('xformOp:transform')
     print(attr)
     print(attr.Get())
+    # attr.Set(pose) # update from topic
     await omni.usd.get_context().save_as_stage_async(url)
 
 with RosClient() as client:
@@ -41,12 +42,4 @@ with RosClient() as client:
     topic.subscribe(topic_callback)
     asyncio.ensure_future(task())
     time.sleep(1)
-
-
-
-
-
-
-
-
 
