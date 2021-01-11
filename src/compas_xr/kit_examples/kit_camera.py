@@ -19,6 +19,7 @@ def topic_callback(msg):
     print(msg)
     frame = PoseStamped.from_msg(msg).pose.frame
     print(frame)
+    # >>> 1
 
 
 async def task():
@@ -34,6 +35,7 @@ async def task():
     attr = camera.GetAttribute('xformOp:transform')
     print(attr)
     print(attr.Get())
+    # <<< 2
     # attr.Set(pose) # update from topic
     await omni.usd.get_context().save_as_stage_async(url)
 
