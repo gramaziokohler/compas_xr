@@ -7,8 +7,6 @@ from compas_xr.pxr import translate_and_rotateZYX_from_frame
 from compas_xr.semiramis.communication import subscribe
 
 url = "omniverse://localhost/Users/rr/semiramis/semiramis.project.usd"
-#tree_url = "omniverse://localhost/Users/rr/persons/person_standing_hoddie/person_standing_hoddie_animations.usd"
-
 
 async def open_stage(url):
     """Opens the stage.
@@ -26,6 +24,7 @@ async def update_camera_pose(stage, queue):
     camera = stage.GetPrimAtPath('/UserView')
     # omni.client.usd_live_wait_for_pending_updates() # needed?
     while True:
+        #omni.client.usd_live_wait_for_pending_updates()
         frame = await queue.get()
         # M = gfmatrix4d_from_transformation(Transformation.from_frame(frame))
         # camera.GetAttribute('xformOp:transform').Set(M)
@@ -35,6 +34,7 @@ async def update_camera_pose(stage, queue):
         stage.Save()
         omni.client.usd_live_process()
         queue.task_done()
+        
 
 
 async def update_trees_poses(stage, queue):
@@ -61,7 +61,7 @@ async def run():
     trees_queue = asyncio.Queue()
     # omniverse stage
     stage = await open_stage(url)
-    # tree_stage = await open_stage(tree_url)
+    print("Stage opened")
     # schedule consumers
     consumer1 = asyncio.ensure_future(update_camera_pose(stage, camera_queue))
     consumer2 = asyncio.ensure_future(update_trees_poses(stage, trees_queue))
