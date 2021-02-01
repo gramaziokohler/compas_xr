@@ -22,16 +22,16 @@ for k, topic in button_talkers.items():
 
 openvr.init(openvr.VRApplication_Scene)
 
-def get_model_name(vrsys, device_class):
+def get_model_name(vrsys, dix, device_class):
     """
     """
     if device_class == openvr.TrackedDeviceClass_Controller:
-        if vrsys.getControllerRoleForTrackedDeviceIndex(i) == openvr.TrackedControllerRole_RightHand:
+        if vrsys.getControllerRoleForTrackedDeviceIndex(dix) == openvr.TrackedControllerRole_RightHand:
             model_name = 'controller_right'
         else:
             model_name = 'controller_left'
     else:
-        model_name = vrsys.getStringTrackedDeviceProperty(i, openvr.Prop_RenderModelName_String)
+        model_name = vrsys.getStringTrackedDeviceProperty(dix, openvr.Prop_RenderModelName_String)
     return model_name
 
 
@@ -48,7 +48,7 @@ while client.is_connected:
         is_controller = device_class == openvr.TrackedDeviceClass_Controller
         is_beacon = device_class == openvr.TrackedDeviceClass_TrackingReference
 
-        model_name = get_model_name(vrsys, device_class)
+        model_name = get_model_name(vrsys, i, device_class)
 
         """
         pose = poses[i]
@@ -78,7 +78,7 @@ while client.is_connected:
         # We only want to watch controller events
         if device_class != openvr.TrackedDeviceClass_Controller:
             continue
-        model_name = get_model_name(vrsys, device_class)
+        model_name = get_model_name(vrsys, dix, device_class)
         bix = new_event.data.controller.button
         # Pay attention to trigger presses only
         if bix != openvr.k_EButton_SteamVR_Trigger:
