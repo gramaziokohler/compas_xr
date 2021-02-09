@@ -1,5 +1,3 @@
-import xr_paths  # noqa F401
-
 import omni.usd
 import asyncio
 
