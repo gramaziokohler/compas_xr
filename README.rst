@@ -55,7 +55,8 @@ Find :code:`kit-core.json` file. For example:
     C:\Users\3duser\AppData\Local\ov\pkg\create 2020.3.2\_build\kit_release\_build\windows-x86_64\release\config\kit-core.json
 
 
-It has the :code:`/plugins/carb.scripting-python.plugin/pythonHome` key set to embedded python, change it to your python installation, for instance:
+It has the :code:`/plugins/carb.scripting-python.plugin/pythonHome` key set to use its embedded python.
+Change it to your python installation, for instance:
 
 ::
 
