@@ -48,7 +48,7 @@ Installation
 
 Tell Kit to use your python instead: https://docs.omniverse.nvidia.com/py/kit/docs/guide/faq.html
 
-Find kit-core.json file. For example:
+Find :code:`kit-core.json` file. For example:
 
 ::
 
