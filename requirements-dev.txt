@@ -8,4 +8,6 @@ pylint
 pytest
 isort
 twine
+compas_fab
+openvr
 -e .
