@@ -46,6 +46,21 @@ Requirements
 Installation
 ------------
 
+Kit to use your python instead: https://docs.omniverse.nvidia.com/py/kit/docs/guide/faq.html
+
+Find kit-core.json file. For example 
+
+    C:\Users\3duser\AppData\Local\ov\pkg\create 2020.3.2\_build\kit_release\_build\windows-x86_64\release\config\kit-core.json
+
+
+It has the /plugins/carb.scripting-python.plugin/pythonHome key set to embedded python, change it to your python installation, for instance:
+
+    "pythonHome": "C:/Users/3duser/.conda/envs/xr",
+.
+
+
+
+
 .. Write installation instructions here
 
 
