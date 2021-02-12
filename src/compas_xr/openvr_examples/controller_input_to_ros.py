@@ -11,7 +11,7 @@ from compas.geometry import Transformation, Frame
 client = Ros(host='localhost', port=9090)
 client.run()
 
-model_names = ['generic_hmd', 'controller_left', 'controller_right']
+model_names = ['generic_hmd', 'controller_left', 'controller_right', 'OptiTrackRigidBody', 'lh_basestation_valve_gen2']
 position_talkers = dict(zip(model_names, [Topic(client, '/position_%s' % name, 'geometry_msgs/PoseStamped') for name in model_names]))
 button_talkers = dict(zip(model_names, [Topic(client, '/button_%s' % name, 'std_msgs/String') for name in model_names]))
 
@@ -82,7 +82,7 @@ while client.is_connected:
         bix = new_event.data.controller.button
         # Pay attention to trigger presses only
         if bix != openvr.k_EButton_SteamVR_Trigger:
-            #print("bix", bix)
+            print("bix", bix)
             continue
         device_index = dix
         t = new_event.eventType
