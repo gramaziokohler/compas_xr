@@ -76,6 +76,18 @@ class Float32MultiArray(ROSmsg):
         return cls(layout, msg['data'])
 
 
+class Int32(ROSmsg):
+    """http://docs.ros.org/en/melodic/api/std_msgs/html/msg/Int32.html
+    """
+
+    def __init__(self, data=None):
+        self.data = data or 0
+
+    @classmethod
+    def from_msg(cls, msg):
+        return cls(msg['data'])
+
+
 if __name__ == "__main__":
     from roslibpy import Topic
     from roslibpy import Ros
