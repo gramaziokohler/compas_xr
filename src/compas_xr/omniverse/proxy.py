@@ -9,3 +9,5 @@ def start(port, autoreload, **kwargs):
 
 if __name__ == '__main__':
     start(port=1753, autoreload=True)
+
+# kit.exe  --enable omni.client --exec proxy.py
