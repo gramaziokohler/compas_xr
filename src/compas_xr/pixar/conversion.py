@@ -15,7 +15,13 @@ def translate_and_rotateZYX_from_frame(frame):
     rotzyx = [math.degrees(a) for a in Rotation.from_frame(frame).euler_angles(False, 'xyz')]
     return Gf.Vec3f(*frame.point), Gf.Vec3f(*rotzyx)
 
+def translate_and_orient_from_frame(frame):
+    w, x, y, z = Rotation.from_frame(frame).quaternion.wxyz
+    return Gf.Vec3f(*frame.point), Gf.Quatd(w, x, y, z)
+
 
 def frame_from_translate_and_rotateZYX(translate, rotateZYX):
     rotateZYX_radians = [math.radians(a) for a in list(rotateZYX)]
     return Frame.from_euler_angles(rotateZYX_radians, static=False, axes='xyz', point=translate)
+
+
