@@ -8,12 +8,11 @@ from pxr import UsdGeom
 from compas.utilities import flatten
 from compas.geometry import Transformation, Frame, Scale, Translation
 from compas_xr.pixar import frame_from_translate_and_rotateZYX
+from compas_xr.pixar import translate_and_rotateZYX_from_frame
 
 def open_stage(url):
     return Usd.Stage.Open(url)
 
-stage = open_stage("omniverse://localhost/Projects/UE4_Semiramis_USD/Main2.usda")
-print(stage)
 
 async def open_stage_live(url):
     """Opens the stage.
@@ -74,16 +73,27 @@ def add_mesh(stage_url, mesh, prim_path):
     omni.client.usd_live_process()
 
 
-def add_text(meshes):
+def add_text(stage_url, meshes):
+    stage = open_stage(stage_url)
+
     camera = stage.GetPrimAtPath('/Root/Camera')
     T = camera.GetAttribute('xformOp:translate').Get()
+    print(T)
     R = camera.GetAttribute('xformOp:rotateZYX').Get()
+
+    frame = Frame((-5034.429, -3264.127, 160.000), (0.544, -0.839, 0.000), (-0.176, -0.114, 0.978))
+    translate, rotateZYX = translate_and_rotateZYX_from_frame(frame)
+    camera.GetAttribute('xformOp:translate').Set(translate)
+    camera.GetAttribute('xformOp:rotateZYX').Set(rotateZYX)
+
+
+    stage.RemovePrim("/root/text")
 
     T = Transformation.from_frame_to_frame(Frame.worldXY(), frame_from_translate_and_rotateZYX(T, R))
     
     for i, mesh in enumerate(meshes):
         mesh.transform(Scale.from_factors([0.1] * 3))
-        mesh.transform(Translation.from_vector([-21,-7.5,-50]))
+        mesh.transform(Translation.from_vector([-21,-5.5,-50]))
         
         mesh.transform(T)
         meshPrim = UsdGeom.Mesh.Define(stage, "/root/text/text%i" % i)
@@ -93,7 +103,8 @@ def add_text(meshes):
         meshPrim.CreateFaceVertexCountsAttr([len(f) for f in faces])
         meshPrim.CreateFaceVertexIndicesAttr(list(flatten(faces)))
         color = meshPrim.GetDisplayColorAttr()
-        color.Set([(0,0,0)])
+        #color.Set([(0,0,0)])
+        color.Set([(1,1,1)])
     
     stage.Save()
     omni.client.usd_live_process()
