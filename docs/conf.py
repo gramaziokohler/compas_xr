@@ -49,7 +49,7 @@ html_last_updated_fmt = '%b %d, %Y'
 html_split_index = False
 html_static_path = ['_static']
 html_sidebars = {
-   '**': ['about.html', 'navigation.html', 'searchbox.html'],
+    '**': ['about.html', 'navigation.html', 'searchbox.html'],
 }
 html_short_title = '%s-%s' % (project, version)
 
