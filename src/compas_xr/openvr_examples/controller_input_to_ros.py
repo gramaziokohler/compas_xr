@@ -52,8 +52,8 @@ from compas_fab.backends.ros.messages import PoseStamped
 from compas.geometry import Transformation
 from compas.geometry import Frame
 
-from compas_xr.messages import Int8MultiArray
-from compas_xr.messages import Float32MultiArray
+from semiramis_xr.messages import Int8MultiArray
+from semiramis_xr.messages import Float32MultiArray
 
 # ros
 client = Ros(host='localhost', port=9090)
