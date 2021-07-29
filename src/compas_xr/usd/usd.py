@@ -23,6 +23,23 @@ def apply_frame_transformation_on_prim(prim, frame):
     transform.Set(matrix)
 
 
+def apply_rotate_and_translate_on_prim(prim, frame):
+    from pxr import UsdGeom
+    _, _, _, _, rotOrder = UsdGeom.XformCommonAPI(prim).GetXformVectors(0)
+
+    switcher = {UsdGeom.XformCommonAPI.RotationOrderXYZ: "xyz",
+                UsdGeom.XformCommonAPI.RotationOrderXZY: "xzy",
+                UsdGeom.XformCommonAPI.RotationOrderYXZ: "yxz",
+                UsdGeom.XformCommonAPI.RotationOrderYZX: "yzx",
+                UsdGeom.XformCommonAPI.RotationOrderZXY: "zxy",
+                UsdGeom.XformCommonAPI.RotationOrderZYX: "zyx"}
+
+    axes = switcher.get(rotOrder, None)
+    euler_angles = [math.degrees(a) for a in frame.euler_angles(False, axes)]
+    UsdGeom.XformCommonAPI(prim).SetRotate(euler_angles)
+    UsdGeom.XformCommonAPI(prim).SetTranslate(tuple(frame.point))
+
+
 def prim_from_box(stage, path, box):
     """Returns a `UsdGeom.Cube`
 
@@ -34,7 +51,7 @@ def prim_from_box(stage, path, box):
     prim = UsdGeom.Cube.Define(stage, path)
     prim.GetPrim().GetAttribute('size').Set(1.0)
     UsdGeom.XformCommonAPI(prim).SetScale((box.xsize, box.ysize, box.zsize))
-    apply_frame_transformation_on_prim(prim, box.frame)
+    apply_rotate_and_translate_on_prim(prim, box.frame)
     return prim
 
 
