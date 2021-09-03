@@ -146,6 +146,7 @@ class Scene(Graph):  # or scenegraoh
                         prim = prim_default(stage, path, frame)
                         path += '/element'
 
+                    #print("path", path)
                     if element:
                         if type(element) == Box:
                             prim = prim_from_box(stage, path, element)
