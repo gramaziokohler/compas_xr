@@ -8,6 +8,7 @@ from compas.datastructures import Mesh
 from compas.datastructures.network.core import Graph
 
 from compas.geometry import Box
+from compas.geometry import Cylinder
 
 from compas.topology import breadth_first_ordering
 
@@ -21,8 +22,8 @@ from compas_xr.usd import prim_instance
 from compas_xr.usd import reference_filename
 
 
-from .gltf_helpers import gltf_add_node_to_content
-from .gltf_helpers import gltf_add_material_to_content
+from compas_xr.datastructures.gltf_helpers import gltf_add_node_to_content
+from compas_xr.datastructures.gltf_helpers import gltf_add_material_to_content
 
 
 __all__ = [
@@ -101,6 +102,36 @@ class Scene(Graph):  # or scenegraoh
         exporter = GLTFExporter(filepath, content, embed_data=True)
         exporter.export()
 
+    def basename(self, key):
+        return key[key.rfind("/") + 1:]
+
+    def subscene(self, key):
+
+        subscene = Scene()
+
+        def _add_branch(scene, key, parent):
+            element = self.node_attribute(key, 'element')
+            # TODO: what to do if we have another reference?
+            scene.add_layer(key, parent=parent, element=element)  # more attr?
+            for child in self.nodes_where({'parent': key}):
+                _add_branch(scene, child, key)
+
+        _add_branch(subscene, key, None)
+        return subscene
+
+    def _all_children(self, key, include_key=True):
+
+        def children(key, array):
+            array.append(key)
+            for child in self.nodes_where({'parent': key}):
+                children(child, array)
+
+        array = []
+        children(key, array)
+        if not include_key:
+            array = array[1:]
+        return array
+
     def to_usd(self, filepath):
         from pxr import Usd
         from pxr import UsdGeom
@@ -110,16 +141,17 @@ class Scene(Graph):  # or scenegraoh
         UsdGeom.SetStageUpAxis(stage, "Z")  # take the one which is in stage
 
         # 1. Add those that are references first
+        visited = []
         for key in self.nodes_where({'is_reference': True}):
-            element = self.node_attribute(key, 'element')
-            scene_reference = Scene()
-            scene_reference.add_layer('world', parent=None)
-            scene_reference.add_layer(key, parent='world', element=element)  # more attr?
+            subscene = self.subscene(key)
+            children = self._all_children(key, include_key=True)
+            visited += children
             reference_filepath = reference_filename(stage, key, fullpath=True)
-            scene_reference.to_usd(reference_filepath)
+            subscene.to_usd(reference_filepath)
 
         for key in self.ordered_keys:
-
+            if key in visited:
+                continue
             parent = self.node_attribute(key, 'parent')
             is_reference = self.node_attribute(key, 'is_reference')
             frame = self.node_attribute(key, 'frame')
@@ -146,14 +178,17 @@ class Scene(Graph):  # or scenegraoh
                         prim = prim_default(stage, path, frame)
                         path += '/element'
 
-                    #print("path", path)
+                    # print("path", path)
                     if element:
                         if type(element) == Box:
                             prim = prim_from_box(stage, path, element)
                             # prim = prim_from_mesh(stage, path, Mesh.from_shape(element))
                         elif type(element) == Mesh:
                             prim = prim_from_mesh(stage, path, element)
+                        elif type(element) == Cylinder:
+                            pass  # <class 'compas.geometry.shapes.cylinder.Cylinder'>
                         else:
+                            print(type(element))
                             raise NotImplementedError
 
                     if not frame and not element:
@@ -167,3 +202,12 @@ class Scene(Graph):  # or scenegraoh
 
 class Animation(object):
     pass
+
+
+if __name__ == "__main__":
+    scene = Scene()
+    world = scene.add_node("world")
+    scene.add_node("element", parent=world)
+
+    scene.add_node("element", parent=None)
+    print(scene.data)
