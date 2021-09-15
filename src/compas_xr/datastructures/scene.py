@@ -102,8 +102,6 @@ class Scene(Graph):  # or scenegraoh
         exporter = GLTFExporter(filepath, content, embed_data=True)
         exporter.export()
 
-    def basename(self, key):
-        return key[key.rfind("/") + 1:]
 
     def subscene(self, key):
 
