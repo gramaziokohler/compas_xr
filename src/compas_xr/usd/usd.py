@@ -142,19 +142,51 @@ def reference_filename(stage, reference_name, fullpath=True):
         return filename
 
 
-def prim_instance(stage, path, reference_name):
+def prim_instance(stage, path, reference_name, xform=False):
     from pxr import UsdGeom
-    ref = stage.OverridePrim(path)
     reference_filepath = reference_filename(stage, reference_name, fullpath=False)
-    ref.GetReferences().AddReference('./%s' % reference_filepath)
+    if not xform:
+        ref = stage.OverridePrim(path)
+        ref.GetReferences().AddReference('./%s' % reference_filepath)
+    else:
+        ref = UsdGeom.Xform.Define(stage, path)
+        ref.GetPrim().GetReferences().AddReference('./%s' % reference_filepath)
+
     ref_xform = UsdGeom.Xformable(ref)
     ref_xform.SetXformOpOrder([])
     return ref
 
 
 def gfmatrix4d_from_transformation(transformation):
+    """
+
+    Examples
+    --------
+    >>> frame = Frame((0, 3, 4), (0.27, 0.95, 0.13), (-0.95, 0.28, -0.09))
+    >>> t1 = Transformation.from_frame(frame)
+    >>> gf = gfmatrix4d_from_transformation(t1)
+    >>> t2 = transformation_from_gfmatrix4d(gf)
+    >>> t1 == t2
+    True
+    """
     from pxr import Gf
     return Gf.Matrix4d(*[v for col in transpose_matrix(transformation.matrix) for v in col])
+
+
+def transformation_from_gfmatrix4d(gfmatrix4d):
+    """
+
+    Examples
+    --------
+    >>> frame = Frame((0, 3, 4), (0.27, 0.95, 0.13), (-0.95, 0.28, -0.09))
+    >>> t1 = Transformation.from_frame(frame)
+    >>> gf = gfmatrix4d_from_transformation(t1)
+    >>> t2 = transformation_from_gfmatrix4d(gf)
+    >>> t1 == t2
+    True
+    """
+    matrix = [[v for v in column] for column in gfmatrix4d]
+    return Transformation(transpose_matrix(matrix))
 
 
 def translate_and_orient_from_frame(frame):
@@ -169,6 +201,7 @@ def frame_from_translate_and_rotateZYX(translate, rotateZYX):
 
 
 if __name__ == "__main__":
+
     import doctest
     from pxr import Usd
     from compas.geometry import Box  # noqa F401
