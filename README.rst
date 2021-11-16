@@ -84,6 +84,9 @@ Install packages into the python used by kit. Navigate to your kit, eg.
 ::
 
     .\python.exe -m pip install zmq
+    .\python.exe -m pip install numpy
+    .\python.exe -m pip install scipy
+    .\python.exe -m pip install matplotlib
 
 
 
