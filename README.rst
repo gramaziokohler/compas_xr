@@ -63,8 +63,10 @@ Edit: with newer `create` versions you find the file here:
 
 
 It has the :code:`/plugins/carb.scripting-python.plugin/pythonHome` key set to use its embedded python.
-Change it to your python installation, for instance:
 
+
+Change it to your python installation, for instance:
+    "pythonHome": "../../target-deps/python",
 ::
 
     "pythonHome": "C:/Users/3duser/.conda/envs/xr"
