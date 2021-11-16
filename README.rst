@@ -75,6 +75,17 @@ Change it to your python installation, for instance:
     "pythonHome": "C:/Users/3duser/.conda/envs/xr"
 
 
+Install packages into the python used by kit. Navigate to your kit, eg.
+
+::
+
+    cd C:\Users\3duser\AppData\Local\ov\pkg\create-2021.3.2\kit\python
+    
+::
+
+    .\python.exe -m pip install zmq
+
+
 
 .. Write installation instructions here
 
