@@ -66,7 +66,10 @@ It has the :code:`/plugins/carb.scripting-python.plugin/pythonHome` key set to u
 
 
 Change it to your python installation, for instance:
+::
+
     "pythonHome": "../../target-deps/python",
+    
 ::
 
     "pythonHome": "C:/Users/3duser/.conda/envs/xr"
