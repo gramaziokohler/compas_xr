@@ -63,11 +63,30 @@ Edit: with newer `create` versions you find the file here:
 
 
 It has the :code:`/plugins/carb.scripting-python.plugin/pythonHome` key set to use its embedded python.
-Change it to your python installation, for instance:
 
+
+Change it to your python installation, for instance:
+::
+
+    "pythonHome": "../../target-deps/python",
+    
 ::
 
     "pythonHome": "C:/Users/3duser/.conda/envs/xr"
+
+
+Install packages into the python used by kit. Navigate to your kit, eg.
+
+::
+
+    cd C:\Users\3duser\AppData\Local\ov\pkg\create-2021.3.2\kit\python
+    
+::
+
+    .\python.exe -m pip install zmq
+    .\python.exe -m pip install numpy
+    .\python.exe -m pip install scipy
+    .\python.exe -m pip install matplotlib
 
 
 
