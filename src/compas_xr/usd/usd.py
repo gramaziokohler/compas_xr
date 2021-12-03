@@ -54,6 +54,20 @@ def prim_from_box(stage, path, box):
     apply_rotate_and_translate_on_prim(prim, box.frame)
     return prim
 
+def prim_from_cylinder(stage, path, cylinder):
+    """Returns a `UsdGeom.Cylinder`
+
+    >>> 
+    """
+    from pxr import UsdGeom
+    prim = UsdGeom.Cylinder.Define(stage, path)
+    prim.GetHeightAttr().Set(cylinder.height)
+    prim.GetRadiusAttr().Set(cylinder.radius)
+    prim.GetAxisAttr().Set("Z")
+    #UsdImagingDelegate.SetRefineLevel(path, 2)
+    apply_rotate_and_translate_on_prim(prim, Frame.from_plane(cylinder.plane))
+    return prim
+
 
 def prim_from_sphere(stage, path, sphere):
     """Returns a ``pxr.UsdGeom.Sphere``
@@ -132,9 +146,10 @@ def prim_default(stage, path, frame=None):
     return prim
 
 
-def reference_filename(stage, reference_name, fullpath=True):
+def reference_filename(stage, reference_name, fullpath=True, extension=None):
     filepath = str(stage.GetRootLayer().resolvedPath)  # .realPath
-    _, extension = os.path.splitext(filepath)
+    if not extension:
+        _, extension = os.path.splitext(filepath)
     filename = "%s%s" % (reference_name, extension)
     if fullpath:
         return os.path.join(os.path.dirname(filepath), filename)
@@ -142,9 +157,9 @@ def reference_filename(stage, reference_name, fullpath=True):
         return filename
 
 
-def prim_instance(stage, path, reference_name, xform=False):
+def prim_instance(stage, path, reference_name, xform=False, extension=None):
     from pxr import UsdGeom
-    reference_filepath = reference_filename(stage, reference_name, fullpath=False)
+    reference_filepath = reference_filename(stage, reference_name, fullpath=False, extension=extension)
     if not xform:
         ref = stage.OverridePrim(path)
         ref.GetReferences().AddReference('./%s' % reference_filepath)

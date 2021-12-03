@@ -5,7 +5,11 @@ from __future__ import print_function
 
 
 from compas.datastructures import Mesh
-from compas.datastructures.network.core import Graph
+
+try:
+    from compas.datastructures.network.core import Graph
+except ImportError:
+    from compas.datastructures import Graph
 
 from compas.geometry import Box
 from compas.geometry import Cylinder
@@ -19,6 +23,7 @@ from compas_xr.usd import prim_from_box
 from compas_xr.usd import prim_from_mesh
 from compas_xr.usd import prim_default
 from compas_xr.usd import prim_instance
+from compas_xr.usd import prim_from_cylinder
 from compas_xr.usd import reference_filename
 
 
@@ -184,7 +189,7 @@ class Scene(Graph):  # or scenegraoh
                         elif type(element) == Mesh:
                             prim = prim_from_mesh(stage, path, element)
                         elif type(element) == Cylinder:
-                            pass  # <class 'compas.geometry.shapes.cylinder.Cylinder'>
+                            prim = prim_from_cylinder(stage, path, element)
                         else:
                             print(type(element))
                             raise NotImplementedError
@@ -192,8 +197,8 @@ class Scene(Graph):  # or scenegraoh
                     if not frame and not element:
                         prim = prim_default(stage, path)
 
-            if is_root:
-                stage.SetDefaultPrim(prim.GetPrim())
+            if is_root and key != "references":
+                stage.SetDefaultPrim(prim.GetPrim()) # dont use references as default layer
 
         stage.GetRootLayer().Save()
 
