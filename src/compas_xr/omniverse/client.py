@@ -5,6 +5,8 @@ from pxr import UsdGeom
 
 from compas.utilities import flatten
 
+# C:\Users\rustr\AppData\Local\ov\pkg\connectsample-103.1.0\source\pyHelloWorld
+
 
 def open_stage(url):
     return Usd.Stage.Open(url)
@@ -16,10 +18,15 @@ async def open_stage_live(url):
     omni.client.usd_live_set_default_enabled(True)
     context = omni.usd.get_context()
     stage = Usd.Stage.Open(url)
-    # await context.open_stage_async(url)
-    # return context.get_stage()
     context.set_stage_live(omni.usd.StageLiveModeType.ALWAYS_ON)
     return stage
+    # await context.open_stage_async(url)
+    # return context.get_stage()
+
+
+async def save_stage(stage):
+    stage.GetRootLayer().Save()
+    omni.client.usd_live_process()
 
 
 def start_omniverse():

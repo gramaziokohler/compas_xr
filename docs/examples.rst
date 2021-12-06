@@ -63,3 +63,20 @@ Scene in USD
 .. figure:: /_images/scene_instances_usd.jpg
     :figclass: figure
     :class: figure-img img-fluid
+
+
+
+
+********************************************************************************
+Working with omniverse
+********************************************************************************
+
+.. literalinclude:: /examples/omniverse_connect.py
+    :language: python
+
+Scene in GLTF
+=============
+
+.. figure:: /_images/omniverse_connect.jpg
+    :figclass: figure
+    :class: figure-img img-fluid
