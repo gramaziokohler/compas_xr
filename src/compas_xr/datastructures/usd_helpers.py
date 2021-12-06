@@ -1,9 +1,8 @@
 from enum import Enum
 
-from pxr import Gf, Sdf, UsdGeom, UsdShade
+from pxr import Gf, Sdf, UsdShade
 
-from gltf2 import Material, GLTFImage
-from _gltf2usd.gltf2usdUtils import GLTF2USDUtils
+from gltf2 import GLTFImage
 from gltf2.Material import AlphaMode
 from gltf2loader import TextureWrap
 
@@ -150,7 +149,7 @@ class USDPreviewSurface(object):
 
     def _set_khr_material_pbr_specular_glossiness(self, gltf_material):
         extensions = gltf_material.get_extensions()
-        if not 'KHR_materials_pbrSpecularGlossiness' in extensions:
+        if 'KHR_materials_pbrSpecularGlossiness' not in extensions:
             self._set_pbr_metallic_roughness(gltf_material)
         else:
             self._use_specular_workflow.Set(True)

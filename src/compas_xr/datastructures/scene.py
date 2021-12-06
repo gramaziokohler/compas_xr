@@ -107,7 +107,6 @@ class Scene(Graph):  # or scenegraoh
         exporter = GLTFExporter(filepath, content, embed_data=True)
         exporter.export()
 
-
     def subscene(self, key):
 
         subscene = Scene()
@@ -198,7 +197,7 @@ class Scene(Graph):  # or scenegraoh
                         prim = prim_default(stage, path)
 
             if is_root and key != "references":
-                stage.SetDefaultPrim(prim.GetPrim()) # dont use references as default layer
+                stage.SetDefaultPrim(prim.GetPrim())  # dont use references as default layer
 
         stage.GetRootLayer().Save()
 

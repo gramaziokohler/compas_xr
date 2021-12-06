@@ -54,17 +54,18 @@ def prim_from_box(stage, path, box):
     apply_rotate_and_translate_on_prim(prim, box.frame)
     return prim
 
+
 def prim_from_cylinder(stage, path, cylinder):
     """Returns a `UsdGeom.Cylinder`
 
-    >>> 
+    >>>
     """
     from pxr import UsdGeom
     prim = UsdGeom.Cylinder.Define(stage, path)
     prim.GetHeightAttr().Set(cylinder.height)
     prim.GetRadiusAttr().Set(cylinder.radius)
     prim.GetAxisAttr().Set("Z")
-    #UsdImagingDelegate.SetRefineLevel(path, 2)
+    # UsdImagingDelegate.SetRefineLevel(path, 2)
     apply_rotate_and_translate_on_prim(prim, Frame.from_plane(cylinder.plane))
     return prim
 

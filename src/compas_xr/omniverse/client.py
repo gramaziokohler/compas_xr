@@ -16,9 +16,9 @@ async def open_stage_live(url):
     omni.client.usd_live_set_default_enabled(True)
     context = omni.usd.get_context()
     stage = Usd.Stage.Open(url)
-    #await context.open_stage_async(url)
+    # await context.open_stage_async(url)
+    # return context.get_stage()
     context.set_stage_live(omni.usd.StageLiveModeType.ALWAYS_ON)
-    #return context.get_stage()
     return stage
 
 
