@@ -17,7 +17,7 @@ box_key = scene.add_layer("box", element=box, is_reference=True, parent="referen
 
 for i, angle in enumerate(range(0, 360, 60)):
     T = Translation.from_vector((2, 0, 0))
-    R = Rotation.from_axis_and_angle((0,0,1), math.radians(angle))
+    R = Rotation.from_axis_and_angle((0, 0, 1), math.radians(angle))
     frame = Frame.from_transformation(R * T)
     scene.add_layer("box%d" % i, instance_of=box_key, frame=frame, parent="world")
 
