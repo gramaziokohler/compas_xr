@@ -9,5 +9,5 @@ mesh = Mesh.from_polyhedron(8)
 world = scene.add_layer("world")
 poly = scene.add_layer("poly", element=mesh, parent="world")
 
-scene.to_gltf(os.path.join(DATA, "poly.gltf"))
-scene.to_usd(os.path.join(DATA, "poly.usda"))
+scene.to_gltf(os.path.join(DATA, "scene_mesh.gltf"))
+scene.to_usd(os.path.join(DATA, "scene_mesh.usda"))
