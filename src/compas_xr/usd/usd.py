@@ -9,6 +9,7 @@ from compas.utilities import flatten
 
 from compas.geometry import transpose_matrix
 from compas.geometry import Frame
+from compas.geometry import Scale
 from compas.geometry import Rotation
 from compas.geometry import Transformation
 
@@ -20,6 +21,16 @@ def apply_frame_transformation_on_prim(prim, frame):
     xform = UsdGeom.Xformable(prim)
     transform = xform.AddTransformOp()
     matrix = gfmatrix4d_from_transformation(Transformation.from_frame(frame))
+    transform.Set(matrix)
+
+
+def apply_transformation_on_prim(prim, transformation):
+    """
+    """
+    from pxr import UsdGeom
+    xform = UsdGeom.Xformable(prim)
+    transform = xform.AddTransformOp()
+    matrix = gfmatrix4d_from_transformation(transformation)
     transform.Set(matrix)
 
 
@@ -137,13 +148,17 @@ def prim_from_surface(stage, path, surface):
     return prim
 
 
-def prim_default(stage, path, frame=None):
+def prim_default(stage, path, frame=None, scale=None):  # TODO should be transform
     """
     """
     from pxr import UsdGeom
     prim = UsdGeom.Xform.Define(stage, path)
     if frame:
-        apply_frame_transformation_on_prim(prim, frame)
+        T = Transformation.from_frame(frame)
+        if scale:
+            print(scale)
+            T = T * Scale.from_factors(scale)
+        apply_transformation_on_prim(prim, T)
     return prim
 
 

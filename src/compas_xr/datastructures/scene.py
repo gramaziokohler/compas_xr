@@ -159,6 +159,7 @@ class Scene(Graph):  # or scenegraoh
             frame = self.node_attribute(key, 'frame')
             element = self.node_attribute(key, 'element')
             instance_of = self.node_attribute(key, 'instance_of')
+            scale = self.node_attribute(key, 'scale')
 
             is_root = True if not parent else False
             path = '/' + '/'.join(reversed(self.node_to_root(key)))
@@ -168,7 +169,7 @@ class Scene(Graph):  # or scenegraoh
 
                 if instance_of:
                     if frame:
-                        prim_default(stage, path, frame)
+                        prim_default(stage, path, frame, scale=scale)
                         path += '/element'
                     prim = prim_instance(stage, path, self.node_attribute(key, 'instance_of'))
                     # if frame:
@@ -177,7 +178,7 @@ class Scene(Graph):  # or scenegraoh
                 else:
 
                     if frame:
-                        prim = prim_default(stage, path, frame)
+                        prim = prim_default(stage, path, frame, scale=scale)
                         path += '/element'
 
                     # print("path", path)
@@ -194,7 +195,7 @@ class Scene(Graph):  # or scenegraoh
                             raise NotImplementedError
 
                     if not frame and not element:
-                        prim = prim_default(stage, path)
+                        prim = prim_default(stage, path, scale=scale)
 
             if is_root and key != "references":
                 stage.SetDefaultPrim(prim.GetPrim())  # dont use references as default layer
