@@ -1,9 +1,6 @@
 import omni.client
 import omni.usd
 from pxr import Usd
-from pxr import UsdGeom
-
-from compas.utilities import flatten
 
 # C:\Users\rustr\AppData\Local\ov\pkg\connectsample-103.1.0\source\pyHelloWorld
 
@@ -60,4 +57,3 @@ def remove_mesh(stage_url, prim_path):
     stage.RemovePrim(prim_path)
     stage.Save()
     omni.client.usd_live_process()
-
