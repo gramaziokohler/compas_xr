@@ -27,8 +27,11 @@ from compas_xr.usd import prim_from_cylinder
 from compas_xr.usd import reference_filename
 
 
-from compas_xr.datastructures.gltf_helpers import gltf_add_node_to_content
-from compas_xr.datastructures.gltf_helpers import gltf_add_material_to_content
+from compas_xr.gltf.helpers import gltf_add_node_to_content
+from compas_xr.gltf.helpers import gltf_add_material_to_content
+
+from compas_xr.gltf import GLTFMaterial
+from compas_xr.usd import USDMaterial
 
 
 __all__ = [
@@ -58,6 +61,16 @@ class Scene(Graph):  # or scenegraoh
         if parent:
             self.add_edge(parent, key)
         return key
+
+    def add_material(self, material):
+        self.materials.append(material)
+        return len(self.materials) - 1
+
+    # @property
+    # def data(self):
+    #    data_dict = super(Scene, self).data
+    #    data_dict['materials'] = [m.data for m in self.materials]
+    #    return data_dict
 
     @classmethod
     def from_gltf(cls, filepath):
@@ -89,7 +102,8 @@ class Scene(Graph):  # or scenegraoh
         scene = content.add_scene(self.name)
 
         for material in self.materials:
-            gltf_add_material_to_content(content, material)
+            gltf_material = GLTFMaterial.from_material(content, material)
+            gltf_add_material_to_content(content, gltf_material)
 
         # 1. Add those that are references first
         visited = []
@@ -137,10 +151,15 @@ class Scene(Graph):  # or scenegraoh
     def to_usd(self, filepath):
         from pxr import Usd
         from pxr import UsdGeom
+        from pxr import UsdShade
 
         stage = Usd.Stage.CreateNew(filepath)
 
         UsdGeom.SetStageUpAxis(stage, "Z")  # take the one which is in stage
+
+        usd_materials = []
+        for material in self.materials:
+            usd_materials.append(USDMaterial.from_material(stage, material))
 
         # 1. Add those that are references first
         visited = []
@@ -161,6 +180,8 @@ class Scene(Graph):  # or scenegraoh
             instance_of = self.node_attribute(key, 'instance_of')
             scale = self.node_attribute(key, 'scale')
 
+            mkey = self.node_attribute(key, 'material')
+
             is_root = True if not parent else False
             path = '/' + '/'.join(reversed(self.node_to_root(key)))
 
@@ -174,6 +195,8 @@ class Scene(Graph):  # or scenegraoh
                     prim = prim_instance(stage, path, self.node_attribute(key, 'instance_of'))
                     # if frame:
                     #    apply_frame_transformation_on_prim(ref, frame)
+                    if mkey is not None:
+                        UsdShade.MaterialBindingAPI(prim).Bind(usd_materials[mkey].material)
 
                 else:
 
@@ -193,6 +216,9 @@ class Scene(Graph):  # or scenegraoh
                         else:
                             print(type(element))
                             raise NotImplementedError
+
+                    if mkey is not None:
+                        UsdShade.MaterialBindingAPI(prim).Bind(usd_materials[mkey].material)
 
                     if not frame and not element:
                         prim = prim_default(stage, path, scale=scale)
