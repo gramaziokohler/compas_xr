@@ -1,8 +1,21 @@
 from compas.datastructures import Mesh
 from compas.geometry import Rotation
 
+# TODO: upstream to GLTF
 
-def gltf_get_node_by_name(content, name):  # TODO: upstream to GLTF
+
+class AlphaMode(object):
+    BLEND = 'BLEND'
+    MASK = 'MASK'
+    OPAQUE = 'OPAQUE'
+
+
+def mesh_add_material(mesh_data, material_key):  # needed?
+    # TODO: GLTFMesh.add_material
+    mesh_data.primitive_data_list[0].material = material_key
+
+
+def gltf_get_node_by_name(content, name):
     for key in content.nodes:
         if content.nodes[key].name == name:
             return content.nodes[key]
@@ -39,11 +52,9 @@ def gltf_add_node_to_content(graph, content, scene, key):
         mesh.quads_to_triangles()
         content.add_mesh_to_node(node, mesh)
 
-    if material:
-
-        key = gltf_material_index_by_name(content, material)
-        if key:
-            node.mesh_data.primitive_data_list[0].material = key
+    if material is not None:  # == key
+        # key = gltf_material_index_by_name(content, material)
+        node.mesh_data.primitive_data_list[0].material = material
 
 
 def gltf_add_image_to_content():
@@ -51,6 +62,7 @@ def gltf_add_image_to_content():
 
 
 def gltf_add_material_to_content(content, material):
+    # TODO: content.add_material(material)
     key = len(content.materials)
     while key in content.materials:
         key += 1
@@ -58,7 +70,7 @@ def gltf_add_material_to_content(content, material):
     return key
 
 
-def gltf_material_index_by_name(content, name):
+def gltf_material_index_by_name(content, name):  # needed?
     for key in content.materials:
         if content.materials[key].name == name:
             return key
