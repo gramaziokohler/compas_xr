@@ -157,8 +157,8 @@ def check(ctx):
     #log.write('Checking python imports...')
     #ctx.run('isort --check-only --diff --recursive src tests setup.py')
 
-    log.write('Checking MANIFEST.in...')
-    ctx.run('check-manifest')
+    #log.write('Checking MANIFEST.in...')
+    #ctx.run('check-manifest')
 
 
 @task(help={
@@ -168,7 +168,7 @@ def test(ctx, checks=True):
     if checks:
         check(ctx)
 
-    ctx.run('pytest --doctest-module')
+    ctx.run('pytest --doctest-modules')
 
 
 @task(help={

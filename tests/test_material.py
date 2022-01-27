@@ -29,3 +29,6 @@ def test_material():
     scene.to_gltf(gltf_filepath)
     scene.to_gltf(glb_filepath, embed_data=True)
     scene.to_usd(usd_filepath)
+
+if __name__ == "__main__":
+    test_material()

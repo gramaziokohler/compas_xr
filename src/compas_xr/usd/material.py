@@ -1,7 +1,11 @@
-from enum import Enum
-from pxr import Gf, Sdf, UsdShade
+import compas
 from compas_xr.gltf import AlphaMode
 from compas_xr.gltf.image import GLTFImage
+
+if not compas.IPY:
+    from enum import Enum
+    from pxr import Gf, Sdf, UsdShade
+
 
 # https://github.com/kcoley/gltf2usd/blob/master/Source/_gltf2usd/usd_material.py
 # https://github.com/ColinKennedy/USD-Cookbook/blob/master/concepts/mesh_with_materials/python/material.py

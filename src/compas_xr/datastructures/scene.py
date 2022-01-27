@@ -3,7 +3,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-
+import compas
 from compas.datastructures import Mesh
 
 try:
@@ -19,19 +19,21 @@ from compas.topology import breadth_first_ordering
 from compas.files import GLTFContent
 from compas.files import GLTFExporter
 
-from compas_xr.usd import prim_from_box
-from compas_xr.usd import prim_from_mesh
-from compas_xr.usd import prim_default
-from compas_xr.usd import prim_instance
-from compas_xr.usd import prim_from_cylinder
-from compas_xr.usd import reference_filename
+if not compas.IPY:
+
+    from compas_xr.usd import prim_from_box
+    from compas_xr.usd import prim_from_mesh
+    from compas_xr.usd import prim_default
+    from compas_xr.usd import prim_instance
+    from compas_xr.usd import prim_from_cylinder
+    from compas_xr.usd import reference_filename
+    from compas_xr.usd import USDMaterial
 
 
 from compas_xr.gltf.helpers import gltf_add_node_to_content
 from compas_xr.gltf.helpers import gltf_add_material_to_content
-
 from compas_xr.gltf import GLTFMaterial
-from compas_xr.usd import USDMaterial
+
 
 
 __all__ = [
