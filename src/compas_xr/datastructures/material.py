@@ -33,27 +33,27 @@ class Material(Data):
     def data(self):
         return {'name': self.name,
                 'extras': self.extras,
-                'pbr_metallic_roughness': self.pbr_metallic_roughness.data,
-                'normal_texture': self.normal_texture,
-                'occlusion_texture': self.occlusion_texture,
-                'emissive_texture': self.emissive_texture,
+                'pbr_metallic_roughness': self.pbr_metallic_roughness.data if self.pbr_metallic_roughness else None,  # noqa E501
+                'normal_texture': self.normal_texture.data if self.normal_texture else None,  # noqa E501
+                'occlusion_texture': self.occlusion_texture.data if self.occlusion_texture else None,  # noqa E501
+                'emissive_texture': self.emissive_texture.data if self.emissive_texture else None,  # noqa E501
                 'emissive_factor': self.emissive_factor,
                 'alpha_mode': self.alpha_mode,
                 'alpha_cutoff': self.alpha_cutoff,
                 'double_sided': self.double_sided}
 
-    @classmethod
-    def from_data(cls, data):
-        return cls(name=data.get('name'),
-                   extras=data.get('extras'),
-                   pbr_metallic_roughness=PBRMetallicRoughness.from_data(data.get('pbrMetallicRoughness')),
-                   normal_texture=NormalTexture.from_data(data.get('normalTexture')),
-                   occlusion_texture=OcclusionTexture.from_data(data.get('occlusionTexture')),
-                   emissive_texture=Texture.from_data(data.get('emissiveTexture')),
-                   emissive_factor=data.get('emissiveFactor'),
-                   alpha_mode=data.get('alphaMode'),
-                   alpha_cutoff=data.get('alphaCutoff'),
-                   double_sided=data.get('doubleSided'))
+    @data.setter
+    def data(self, data):
+        self.name = data.get('name')
+        self.extras = data.get('extras')
+        self.pbr_metallic_roughness = PBRMetallicRoughness.from_data(data.get('pbr_metallic_roughness')) if data.get('pbr_metallic_roughness') else None  # noqa E501
+        self.normal_texture = NormalTexture.from_data(data.get('normal_texture')) if data.get('normal_texture') else None  # noqa E501
+        self.occlusion_texture = OcclusionTexture.from_data(data.get('occlusion_texture')) if data.get('occlusion_texture') else None  # noqa E501
+        self.emissive_texture = Texture.from_data(data.get('emissive_texture')) if data.get('emissive_texture') else None  # noqa E501
+        self.emissive_factor = data.get('emissive_factor')
+        self.alpha_mode = data.get('alpha_mode')
+        self.alpha_cutoff = data.get('alpha_cutoff')
+        self.double_sided = data.get('double_sided')
 
 
 class PBRMetallicRoughness(Data):
@@ -72,22 +72,22 @@ class PBRMetallicRoughness(Data):
     @property
     def data(self):
         return {'base_color_factor': self.base_color_factor,
-                'base_color_texture': self.base_color_texture,
+                'base_color_texture': self.base_color_texture.data if self.base_color_texture else None,  # noqa E501
                 'metallic_factor': self.metallic_factor,
                 'roughness_factor': self.roughness_factor,
-                'metallic_roughness_texture': self.metallic_roughness_texture}
+                'metallic_roughness_texture': self.metallic_roughness_texture.data if self.metallic_roughness_texture else None}  # noqa E501
 
-    @classmethod
-    def from_data(cls, data):
-        return cls(base_color_factor=data.get('base_color_factor'),
-                   base_color_texture=Texture.from_data(data.get('base_color_texture')),
-                   metallic_factor=data.get('metallic_factor'),
-                   roughness_factor=data.get('roughness_factor'),
-                   metallic_roughness_texture=Texture.from_data(data.get('metallic_roughness_texture')))
+    @data.setter
+    def data(self, data):
+        self.base_color_factor = data.get('base_color_factor')
+        self.base_color_texture = Texture.from_data(data.get('base_color_texture')) if data.get('base_color_texture') else None  # noqa E501
+        self.metallic_factor = data.get('metallic_factor')
+        self.roughness_factor = data.get('roughness_factor')
+        self.metallic_roughness_texture = Texture.from_data(data.get('metallic_roughness_texture')) if data.get('metallic_roughness_texture') else None  # noqa E501
 
 
 class Texture(Data):
-    def __init__(self, source=None, name=None, offset=None, rotation=None, scale=None, repeat=None):
+    def __init__(self, source=None, name=None, offset=None, rotation=None, scale=None, repeat=None):  # noqa E501
         self.source = source
         self.name = name
         self.offset = offset or [0.0, 0.0]
@@ -105,15 +105,15 @@ class Texture(Data):
                 'scale': self.scale,
                 }
 
-    @classmethod
-    def from_data(cls, data):
-        return cls(source=data.get('source'),
-                   name=data.get('name'),
-                   offset=data.get('offset'),
-                   rotation=data.get('rotation'),
-                   scale=data.get('scale'),
-                   repeat=data.get('repeat')
-                   )
+    @data.setter
+    def data(self, data):
+        if data:
+            self.source = data.get('source')
+            self.name = data.get('name')
+            self.offset = data.get('offset')
+            self.rotation = data.get('rotation')
+            self.scale = data.get('scale')
+            self.repeat = data.get('repeat')
 
 
 class NormalTexture(Texture):
@@ -127,11 +127,12 @@ class NormalTexture(Texture):
         data.update({'scale': self.scale})
         return data
 
-    @classmethod
-    def from_data(cls, data):
-        return cls(source=data.get('source'),
-                   name=data.get('name'),
-                   scale=data.get('scale'))
+    @data.setter
+    def data(self, data):
+        if data:
+            self.source = data.get('source')
+            self.name = data.get('name')
+            self.scale = data.get('scale')
 
 
 class OcclusionTexture(Texture):
@@ -145,11 +146,12 @@ class OcclusionTexture(Texture):
         data.update({'strength': self.strength})
         return data
 
-    @classmethod
-    def from_data(cls, data):
-        return cls(source=data.get('source'),
-                   name=data.get('name'),
-                   strength=data.get('strength'))
+    @data.setter
+    def data(self, data):
+        if data:
+            self.source = data.get('source')
+            self.name = data.get('name')
+            self.strength = data.get('strength')
 
 
 if __name__ == "__main__":
@@ -168,7 +170,7 @@ if __name__ == "__main__":
     material.name = 'Plaster'
     material.double_sided = True
     material.pbr_metallic_roughness = PBRMetallicRoughness()
-    material.pbr_metallic_roughness.base_color_factor = list(color) + [1.]  # [0, 1, 0, 1.0]
+    material.pbr_metallic_roughness.base_color_factor = list(color) + [1.]
     material.pbr_metallic_roughness.metallic_factor = 0.0
     material.pbr_metallic_roughness.roughness_factor = 0.5
 
