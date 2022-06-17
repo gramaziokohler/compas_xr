@@ -1,4 +1,3 @@
-
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
@@ -35,11 +34,7 @@ from compas_xr.gltf.helpers import gltf_add_material_to_content
 from compas_xr.gltf import GLTFMaterial
 
 
-
-__all__ = [
-    'Scene',
-    'Animation'
-]
+__all__ = ["Scene", "Animation"]
 
 
 class Scene(Graph):  # or scenegraoh
@@ -54,7 +49,7 @@ class Scene(Graph):  # or scenegraoh
         super(Scene, self).__init__()
         self.name = name
         self.up_axis = up_axis
-        self.update_default_node_attributes({'is_reference': False})
+        self.update_default_node_attributes({"is_reference": False})
         self.materials = materials or []
 
     def add_layer(self, key, parent=None, attr_dict=None, **kwattr):
@@ -84,22 +79,21 @@ class Scene(Graph):  # or scenegraoh
 
     @property
     def ordered_keys(self):
-        for root in self.nodes_where({'parent': None}):
+        for root in self.nodes_where({"parent": None}):
             for key in breadth_first_ordering(self.adjacency, root):
                 yield key
 
     def node_to_root(self, key):
         shortest_path = [key]
-        parent = self.node_attribute(key, 'parent')
+        parent = self.node_attribute(key, "parent")
         while parent:
             shortest_path.append(parent)
             key = parent
-            parent = self.node_attribute(key, 'parent')
+            parent = self.node_attribute(key, "parent")
         return shortest_path
 
     def to_gltf(self, filepath, embed_data=False):
-        """
-        """
+        """ """
         content = GLTFContent()
         scene = content.add_scene(self.name)
 
@@ -109,7 +103,7 @@ class Scene(Graph):  # or scenegraoh
 
         # 1. Add those that are references first
         visited = []
-        for key in self.nodes_where({'is_reference': True}):
+        for key in self.nodes_where({"is_reference": True}):
             shortest_path = self.node_to_root(key)
             for key in reversed(shortest_path):
                 if key not in visited:
@@ -120,7 +114,7 @@ class Scene(Graph):  # or scenegraoh
             if key not in visited:
                 gltf_add_node_to_content(self, content, scene, key)
 
-        exporter = GLTFExporter(filepath, content, embed_data=True)
+        exporter = GLTFExporter(filepath, content, embed_data=embed_data)
         exporter.export()
 
     def subscene(self, key):
@@ -128,20 +122,19 @@ class Scene(Graph):  # or scenegraoh
         subscene = Scene()
 
         def _add_branch(scene, key, parent):
-            element = self.node_attribute(key, 'element')
+            element = self.node_attribute(key, "element")
             # TODO: what to do if we have another reference?
             scene.add_layer(key, parent=parent, element=element)  # more attr?
-            for child in self.nodes_where({'parent': key}):
+            for child in self.nodes_where({"parent": key}):
                 _add_branch(scene, child, key)
 
         _add_branch(subscene, key, None)
         return subscene
 
     def _all_children(self, key, include_key=True):
-
         def children(key, array):
             array.append(key)
-            for child in self.nodes_where({'parent': key}):
+            for child in self.nodes_where({"parent": key}):
                 children(child, array)
 
         array = []
@@ -165,7 +158,7 @@ class Scene(Graph):  # or scenegraoh
 
         # 1. Add those that are references first
         visited = []
-        for key in self.nodes_where({'is_reference': True}):
+        for key in self.nodes_where({"is_reference": True}):
             subscene = self.subscene(key)
             children = self._all_children(key, include_key=True)
             visited += children
@@ -175,17 +168,17 @@ class Scene(Graph):  # or scenegraoh
         for key in self.ordered_keys:
             if key in visited:
                 continue
-            parent = self.node_attribute(key, 'parent')
-            is_reference = self.node_attribute(key, 'is_reference')
-            frame = self.node_attribute(key, 'frame')
-            element = self.node_attribute(key, 'element')
-            instance_of = self.node_attribute(key, 'instance_of')
-            scale = self.node_attribute(key, 'scale')
+            parent = self.node_attribute(key, "parent")
+            is_reference = self.node_attribute(key, "is_reference")
+            frame = self.node_attribute(key, "frame")
+            element = self.node_attribute(key, "element")
+            instance_of = self.node_attribute(key, "instance_of")
+            scale = self.node_attribute(key, "scale")
 
-            mkey = self.node_attribute(key, 'material')
+            mkey = self.node_attribute(key, "material")
 
             is_root = True if not parent else False
-            path = '/' + '/'.join(reversed(self.node_to_root(key)))
+            path = "/" + "/".join(reversed(self.node_to_root(key)))
 
             if not is_reference:
                 # if there is a frame in the node, we first have to add Xform
@@ -193,18 +186,22 @@ class Scene(Graph):  # or scenegraoh
                 if instance_of:
                     if frame:
                         prim_default(stage, path, frame, scale=scale)
-                        path += '/element'
-                    prim = prim_instance(stage, path, self.node_attribute(key, 'instance_of'))
+                        path += "/element"
+                    prim = prim_instance(
+                        stage, path, self.node_attribute(key, "instance_of")
+                    )
                     # if frame:
                     #    apply_frame_transformation_on_prim(ref, frame)
                     if mkey is not None:
-                        UsdShade.MaterialBindingAPI(prim).Bind(usd_materials[mkey].material)
+                        UsdShade.MaterialBindingAPI(prim).Bind(
+                            usd_materials[mkey].material
+                        )
 
                 else:
 
                     if frame:
                         prim = prim_default(stage, path, frame, scale=scale)
-                        path += '/element'
+                        path += "/element"
 
                     # print("path", path)
                     if element:
@@ -220,13 +217,17 @@ class Scene(Graph):  # or scenegraoh
                             raise NotImplementedError
 
                     if mkey is not None:
-                        UsdShade.MaterialBindingAPI(prim).Bind(usd_materials[mkey].material)
+                        UsdShade.MaterialBindingAPI(prim).Bind(
+                            usd_materials[mkey].material
+                        )
 
                     if not frame and not element:
                         prim = prim_default(stage, path, scale=scale)
 
             if is_root and key != "references":
-                stage.SetDefaultPrim(prim.GetPrim())  # dont use references as default layer
+                stage.SetDefaultPrim(
+                    prim.GetPrim()
+                )  # dont use references as default layer
 
         stage.GetRootLayer().Save()
 
