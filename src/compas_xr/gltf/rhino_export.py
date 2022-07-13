@@ -1,22 +1,26 @@
+from compas_xr.gltf.rhino_material import AddMaterial
+import sys
+from compas_rhino.conversions import xform_to_rhino
+from compas_rhino.conversions import RhinoMesh
+from compas.files.gltf.gltf import GLTF
+from compas.files.gltf import GLTFContent
+from compas.files.gltf.data_classes import PBRMetallicRoughnessData
+from compas.files.gltf.data_classes import MaterialData
+from compas.utilities import color_to_rgb
+from compas.geometry import Frame, Transformation
+import compas
+import os
 import Rhino
-import System
 import scriptcontext
 import rhinoscriptsyntax as rs
 
-from compas.utilities import color_to_rgb
-from compas.files.gltf.data_classes import MaterialData
-from compas.files.gltf.data_classes import PBRMetallicRoughnessData
-from compas.files.gltf import GLTFContent
-
-import sys
-
 from compas_rhino import unload_modules
 
-unload_modules("compas_xr")
+unload_modules("compas")
+
 
 sys.path.append(r"C:\Users\rustr\workspace\compas_xr\src")
 
-from compas_xr.gltf.rhino_material import AddMaterial
 
 # https://github.com/Stykka/glTF-Bin/blob/master/glTF-BinExporter/RhinoDocGltfConverter.cs
 
@@ -54,7 +58,7 @@ def GetLayerMaterial(layerIndex):
 
 
 def MeshIsValidForExport(mesh):
-    if mesh == None:
+    if mesh is None:
         return False
     if mesh.Vertices.Count == 0:
         return False
@@ -77,21 +81,18 @@ def GetMaterial(material, rhinoObject, options, gltf_content, materialsMap):
     print("material", material)
     if not options.ExportMaterials:
         return False
-    if material == None and options.UseDisplayColorForUnsetMaterials:
+    if material is None and options.UseDisplayColorForUnsetMaterials:
         objectColor = GetObjectColor(rhinoObject)
         return CreateSolidColorMaterial(objectColor, gltf_content)
-    elif material == None:
+    elif material is None:
         material = DefaultMaterial()
     materialId = material.Id
 
     if materialId not in materialsMap:
-        # materialConverter = RhinoMaterialGltfConverter(
-        #    options, binary, dummy, binaryBuffer, material, workflow
-        # )
-
         materialIndex = AddMaterial(gltf_content, material)
-        # materialIndex = materialConverter.AddMaterial()
         materialsMap[materialId] = materialIndex
+    else:
+        materialIndex = materialsMap[materialId]
 
     return materialIndex
 
@@ -152,256 +153,61 @@ def SanitizeRhinoObjects(rhinoObjects, options):
             data["RenderMaterial"] = GetObjectMaterial(rhinoObject)
             explodedObjects.append(data)
 
-        sanitized_objects = []
+    sanitized_objects = []
 
-        for data in explodedObjects:
+    for data in explodedObjects:
 
-            item = data["Object"]
-            trans = data["Transform"]
+        item = data["Object"]
+        trans = data["Transform"]
 
-            # Remove Unmeshable
-            if not item.IsMeshable(Rhino.Geometry.MeshType.Any):
-                continue
+        # Remove Unmeshable
+        if not item.IsMeshable(Rhino.Geometry.MeshType.Any):
+            continue
 
-            if type(item) is Rhino.Geometry.SubD:
+        if type(item) is Rhino.Geometry.SubD:
 
-                subd = item
+            subd = item
 
-                if options.SubDExportMode == SubDMode.ControlNet:
-                    mesh = Rhino.Geometry.Mesh.CreateFromSubDControlNet(subd)
-                    mesh.Transform(trans)  # item.Transform
-                    item.Meshes = Rhino.Geometry.Mesh(mesh)
-                else:
-                    level = options.SubDLevel
-                    mesh = Rhino.Geometry.Mesh.CreateFromSubD(subd, level)
-                    mesh.Transform(trans)  # item.Transform
-                    item.Meshes = Rhino.Geometry.Mesh(mesh)
-            else:
-                parameters = item.GetRenderMeshParameters()
-                if item.MeshCount(Rhino.Geometry.MeshType.Render, parameters) == 0:
-                    item.CreateMeshes(Rhino.Geometry.MeshType.Render, parameters, False)
+            level = options.SubDLevel
+            mesh = Rhino.Geometry.Mesh.CreateFromSubD(subd, level)
+            mesh.Transform(trans)  # item.Transform
+            item.Meshes = Rhino.Geometry.Mesh(mesh)
+        else:
+            parameters = item.GetRenderMeshParameters()
+            if item.MeshCount(Rhino.Geometry.MeshType.Render, parameters) == 0:
+                item.CreateMeshes(Rhino.Geometry.MeshType.Render, parameters, False)
 
-                meshes = []
+            meshes = []
 
-                for mesh in item.GetMeshes(Rhino.Geometry.MeshType.Render):
-                    mesh.EnsurePrivateCopy()
-                    mesh.Transform(trans)  # item.Transform
-                    # Remove bad meshes
-                    if MeshIsValidForExport(mesh):
-                        meshes.append(mesh)
+            for mesh in item.GetMeshes(Rhino.Geometry.MeshType.Render):
+                mesh.EnsurePrivateCopy()
+                mesh.Transform(trans)  # item.Transform
+                # Remove bad meshes
+                if MeshIsValidForExport(mesh):
+                    meshes.append(mesh)
 
-                data["Meshes"] = meshes
+            data["Meshes"] = meshes
 
         if len(data["Meshes"]):
             sanitized_objects.append(data)
 
-        return sanitized_objects
-
-
-"""
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Rhino.DocObjects;
-using Rhino;
-using glTFLoader.Schema;
-using Rhino.Render;
-using Rhino.Display;
-
-namespace glTF_BinExporter
-{
-    public class ObjectExportData
-    {
-        public Rhino.Geometry.Mesh[] Meshes = null;
-        public Rhino.Geometry.Transform Transform = Rhino.Geometry.Transform.Identity;
-        public RenderMaterial RenderMaterial = null;
-        public RhinoObject Object = null;
-    }
-
-    class RhinoDocGltfConverter
-    {
-        public RhinoDocGltfConverter(glTFExportOptions options, bool binary, RhinoDoc doc, IEnumerable<RhinoObject> objects, LinearWorkflow workflow)
-        {
-            this.doc = doc;
-            this.options = options;
-            this.binary = binary;
-            this.objects = objects;
-            this.workflow = workflow;
-        }
-
-        public RhinoDocGltfConverter(glTFExportOptions options, bool binary, RhinoDoc doc, LinearWorkflow workflow)
-        {
-            this.doc = doc;
-            this.options = options;
-            this.binary = binary;
-            this.objects = doc.Objects;
-            this.workflow = null;
-        }
-
-        private RhinoDoc doc = null;
-
-        private IEnumerable<RhinoObject> objects = null;
-
-        private bool binary = false;
-        private glTFExportOptions options = null;
-        private LinearWorkflow workflow = null;
-
-        private Dictionary<Guid, int> materialsMap = new Dictionary<Guid, int>();
-
-        private gltfSchemaDummy dummy = new gltfSchemaDummy();
-
-        private List<byte> binaryBuffer = new List<byte>();
-
-        private Dictionary<int, Node> layers = new Dictionary<int, Node>();
-
-        private RenderMaterial defaultMaterial = null;
-        private RenderMaterial DefaultMaterial
-        {
-            get
-            {
-                if(defaultMaterial == null)
-                {
-                    defaultMaterial = Rhino.DocObjects.Material.DefaultMaterial.RenderMaterial;
-                }
-
-                return defaultMaterial;
-            }
-        }
-        public Gltf ConvertToGltf()
-        {
-            dummy.Scene = 0;
-            dummy.Scenes.Add(new gltfSchemaSceneDummy());
-
-            dummy.Asset = new Asset()
-            {
-                Version = "2.0",
-            };
-
-            dummy.Samplers.Add(new Sampler()
-            {
-                MinFilter = Sampler.MinFilterEnum.LINEAR,
-                MagFilter = Sampler.MagFilterEnum.LINEAR,
-                WrapS = Sampler.WrapSEnum.REPEAT,
-                WrapT = Sampler.WrapTEnum.REPEAT,
-            });
-
-            if(options.UseDracoCompression)
-            {
-                dummy.ExtensionsUsed.Add(glTFExtensions.KHR_draco_mesh_compression.Tag);
-                dummy.ExtensionsRequired.Add(glTFExtensions.KHR_draco_mesh_compression.Tag);
-            }
-
-            dummy.ExtensionsUsed.Add(glTFExtensions.KHR_materials_transmission.Tag);
-            dummy.ExtensionsUsed.Add(glTFExtensions.KHR_materials_clearcoat.Tag);
-            dummy.ExtensionsUsed.Add(glTFExtensions.KHR_materials_ior.Tag);
-            dummy.ExtensionsUsed.Add(glTFExtensions.KHR_materials_specular.Tag);
-
-            var sanitized = SanitizeRhinoObjects(objects);
-
-            foreach(ObjectExportData exportData in sanitized)
-            {
-                int? materialIndex = GetMaterial(exportData.RenderMaterial, exportData.Object);
-
-                RhinoMeshGltfConverter meshConverter = new RhinoMeshGltfConverter(exportData, materialIndex, options, binary, dummy, binaryBuffer);
-                int meshIndex = meshConverter.AddMesh();
-
-                glTFLoader.Schema.Node node = new glTFLoader.Schema.Node()
-                {
-                    Mesh = meshIndex,
-                    Name = GetObjectName(exportData.Object),
-                };
-
-                int nodeIndex = dummy.Nodes.AddAndReturnIndex(node);
-
-                if(options.ExportLayers)
-                {
-                    AddToLayer(doc.Layers[exportData.Object.Attributes.LayerIndex], nodeIndex);
-                }
-                else
-                {
-                    dummy.Scenes[dummy.Scene].Nodes.Add(nodeIndex);
-                }
-            }
-
-            if (binary && binaryBuffer.Count > 0)
-            {
-                //have to add the empty buffer for the binary file header
-                dummy.Buffers.Add(new glTFLoader.Schema.Buffer()
-                {
-                    ByteLength = (int)binaryBuffer.Count,
-                    Uri = null,
-                });
-            }
-
-            return dummy.ToSchemaGltf();
-        }
-
-        private void AddToLayer(Layer layer, int child)
-        {
-            if(layers.TryGetValue(layer.Index, out Node node))
-            {
-                if (node.Children == null)
-                {
-                    node.Children = new int[1] { child };
-                }
-                else
-                {
-                    node.Children = node.Children.Append(child).ToArray();
-                }
-            }
-            else
-            {
-                node = new Node()
-                {
-                    Name = layer.Name,
-                    Children = new int[1] { child },
-                };
-                
-                layers.Add(layer.Index, node);
-
-                int nodeIndex = dummy.Nodes.AddAndReturnIndex(node);
-
-                Layer parentLayer = doc.Layers.FindId(layer.ParentLayerId);
-
-                if (parentLayer == null)
-                {
-                    dummy.Scenes[dummy.Scene].Nodes.Add(nodeIndex);
-                }
-                else
-                {
-                    AddToLayer(parentLayer, nodeIndex);
-                }
-            }
-        }
-
-        
-
-        public byte[] GetBinaryBuffer()
-        {
-            return binaryBuffer.ToArray();
-        }
-
-        
-
-    }
-}
-"""
+    return sanitized_objects
 
 
 class glTFExportOptions:
     ExportLayers = True
-    SubDExportMode = False
     ExportOpenMeshes = True
     SubDLevel = True
     ExportMaterials = True
-    UseDisplayColorForUnsetMaterials = True
+    UseDisplayColorForUnsetMaterials = False
+    ExportVertexNormals = True
+    ExportTextureCoordinates = True
+    ExportVertexColors = True
+    MapRhinoZToGltfY = True
+    UseDracoCompression = False  # TODO
 
 
 objects = rs.AllObjects()
-
-
 options = glTFExportOptions()
 
 sanitized = SanitizeRhinoObjects(objects, options)
@@ -409,29 +215,62 @@ sanitized = SanitizeRhinoObjects(objects, options)
 gltf_content = GLTFContent()
 materialsMap = {}
 
-print(sanitized)
+scene = gltf_content.add_scene()
 
-for data in sanitized:
+worldZX = Frame((0, 0, 0), (1, 0, 0), (0, 0, -1))
+ZtoYUp = Transformation.from_frame_to_frame(Frame.worldXY(), worldZX)
+ZtoYUp = xform_to_rhino(ZtoYUp)
 
-    print(data)
+for k, data in enumerate(sanitized):
 
+    # adds material to the content
     materialIndex = GetMaterial(
         data["RenderMaterial"], data["Object"], options, gltf_content, materialsMap
     )
 
-    content = GLTFContent()
-    scene = content.add_scene()
+    for i, rhino_mesh in enumerate(data["Meshes"]):
+        print("rhino_mesh", rhino_mesh)
+        node_name = "%04d_%s_%04d" % (k, GetObjectName(data["Object"]), i)
 
-    meshConverter = RhinoMeshGltfConverter(
-        exportData, materialIndex, options, binary, dummy, binaryBuffer
-    )
-    meshIndex = meshConverter.AddMesh()
+        print(node_name)
+        node = scene.add_child(node_name=node_name)
 
-    node = scene.add_child(node_name=GetObjectName(exportData.Object))
-    mesh_data = node.add_mesh(mesh)
+        # pre process mesh etc..
+        ok = rhino_mesh.Faces.ConvertQuadsToTriangles()
 
-    if options.ExportLayers:
-        AddToLayer(doc.Layers[exportData.Object.Attributes.LayerIndex], nodeIndex)
-    else:
-        # dummy.Scenes[dummy.Scene].Nodes.Add(nodeIndex)
-        pass
+        if options.MapRhinoZToGltfY:
+            rhino_mesh.Transform(ZtoYUp)
+            rhino_mesh.TextureCoordinates.ReverseTextureCoordinates(1)
+
+        mesh = RhinoMesh.from_geometry(rhino_mesh).to_compas()
+        # mesh.quads_to_triangles()
+        mesh_data = node.add_mesh(mesh)  # one mesh per node?
+        pd = mesh_data.primitive_data_list[0]  # only one
+        pd.material = materialIndex
+
+        # normals = [mesh.vertex_normal(k) for k in mesh.vertices()]
+
+        if rhino_mesh.Normals.Count > 0 and options.ExportVertexNormals:
+            pd.attributes["NORMAL"] = [
+                (float(v.X), float(v.Y), float(v.Z)) for v in rhino_mesh.Normals
+            ]
+
+        if rhino_mesh.TextureCoordinates.Count > 0 and options.ExportTextureCoordinates:
+            pd.attributes["TEXCOORD_0"] = [
+                (float(u), float(v)) for u, v in rhino_mesh.TextureCoordinates
+            ]
+
+        if rhino_mesh.VertexColors.Count > 0 and options.ExportVertexColors:
+            colors = []
+            for color in rhino_mesh.VertexColors:
+                r, g, b = color_to_rgb((color.R, color.G, color.B), normalize=True)
+                a, _, _ = color_to_rgb((color.A, 0, 0), normalize=True)
+                colors.append([r, g, b, a])
+            # pd.attributes["COLOR_0"] = colors
+
+
+gltf_filepath = os.path.join(compas.APPDATA, "data", "gltfs", "rhino_export.gltf")
+print(gltf_filepath)
+gltf = GLTF(gltf_filepath)
+gltf.content = gltf_content
+gltf.export(embed_data=False)
