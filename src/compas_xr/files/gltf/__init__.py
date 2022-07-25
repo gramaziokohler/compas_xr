@@ -1,5 +1,5 @@
 from .material import *  # noqa F403
-from .scene import GLTFScene
+from .scene import GLTFScene  # noqa F403
 
 """
 from enum import Enum
