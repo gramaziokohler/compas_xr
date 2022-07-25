@@ -1,7 +1,9 @@
 import os
-import Rhino
-import System.Drawing
 import compas
+
+if compas.IPY:
+    import Rhino
+    import System.Drawing
 
 from compas.files.gltf.data_classes import (
     MaterialData,
@@ -30,9 +32,7 @@ class RgbaChannel:
 
 
 def IsLinear(texture):
-    attribs = texture.GetType().GetCustomAttributes(
-        Rhino.Render.CustomRenderContentAttribute()
-    )  # correct?
+    attribs = texture.GetType().GetCustomAttributes(Rhino.Render.CustomRenderContentAttribute())  # correct?
     if attribs is not None and attribs.Length > 0:
         return attribs[0].IsLinear
     else:
@@ -81,9 +81,7 @@ def AddTextureNormal(gltf_content, normalTexture):
 
 def AddTextureOcclusion(gltf_content, texture):
     textureIdx = AddTextureToBuffers(gltf_content, texture.FileReference.FullPath)
-    return OcclusionTextureInfoData(
-        textureIdx, strength=GetTextureWeight(texture)
-    )  # tex_coord=0,
+    return OcclusionTextureInfoData(textureIdx, strength=GetTextureWeight(texture))  # tex_coord=0,
 
 
 def GetTextureFromFile(gltf_content, texturePath, minetype_gltf):
@@ -109,42 +107,26 @@ def AddTextureToBuffers(gltf_content, texturePath):
 
 
 def AddMetallicRoughnessTexture(gltf_content, rhinoMaterial, gltfMaterial):
-    metalTexture = rhinoMaterial.PhysicallyBased.GetTexture(
-        Rhino.DocObjects.TextureType.PBR_Metallic
-    )
-    roughnessTexture = rhinoMaterial.PhysicallyBased.GetTexture(
-        Rhino.DocObjects.TextureType.PBR_Roughness
-    )
+    metalTexture = rhinoMaterial.PhysicallyBased.GetTexture(Rhino.DocObjects.TextureType.PBR_Metallic)
+    roughnessTexture = rhinoMaterial.PhysicallyBased.GetTexture(Rhino.DocObjects.TextureType.PBR_Roughness)
     hasMetalTexture = False if metalTexture is None else metalTexture.Enabled
-    hasRoughnessTexture = (
-        False if roughnessTexture is None else roughnessTexture.Enabled
-    )
+    hasRoughnessTexture = False if roughnessTexture is None else roughnessTexture.Enabled
     mWidth, mHeight, rWidth, rHeight = 0, 0, 0, 0
     filepath = None
     if hasMetalTexture:
-        renderTextureMetal = rhinoMaterial.RenderMaterial.GetTextureFromUsage(
-            Rhino.Render.RenderMaterial.StandardChildSlots.PbrMetallic
-        )
+        renderTextureMetal = rhinoMaterial.RenderMaterial.GetTextureFromUsage(Rhino.Render.RenderMaterial.StandardChildSlots.PbrMetallic)
         mWidth, mHeight, _w0 = renderTextureMetal.PixelSize()
-        evalMetal = renderTextureMetal.CreateEvaluator(
-            Rhino.Render.RenderTexture.TextureEvaluatorFlags.Normal
-        )
+        evalMetal = renderTextureMetal.CreateEvaluator(Rhino.Render.RenderTexture.TextureEvaluatorFlags.Normal)
         filepath = os.path.dirname(metalTexture.FileName)
     if hasRoughnessTexture:
-        renderTextureRoughness = rhinoMaterial.RenderMaterial.GetTextureFromUsage(
-            Rhino.Render.RenderMaterial.StandardChildSlots.PbrRoughness
-        )
+        renderTextureRoughness = rhinoMaterial.RenderMaterial.GetTextureFromUsage(Rhino.Render.RenderMaterial.StandardChildSlots.PbrRoughness)
         rWidth, rHeight, _w1 = renderTextureRoughness.PixelSize()
-        evalRoughness = renderTextureRoughness.CreateEvaluator(
-            Rhino.Render.RenderTexture.TextureEvaluatorFlags.Normal
-        )
+        evalRoughness = renderTextureRoughness.CreateEvaluator(Rhino.Render.RenderTexture.TextureEvaluatorFlags.Normal)
         filepath = os.path.dirname(roughnessTexture.FileName)
     width = max(mWidth, rWidth)
     height = max(mHeight, rHeight)
     # Copy Metal to the blue channel, roughness to the green
-    bitmap = System.Drawing.Bitmap(
-        width, height, System.Drawing.Imaging.PixelFormat.Format32bppArgb
-    )
+    bitmap = System.Drawing.Bitmap(width, height, System.Drawing.Imaging.PixelFormat.Format32bppArgb)
     for j in range(height - 1):
         for i in range(width - 1):
             x = float(i) / (width - 1)
@@ -152,13 +134,9 @@ def AddMetallicRoughnessTexture(gltf_content, rhinoMaterial, gltfMaterial):
             uvw = Rhino.Geometry.Point3d(x, y, 0.0)
             g, b = 1.0, 1.0
             if hasMetalTexture:
-                b = evalMetal.GetColor(
-                    uvw, Rhino.Geometry.Vector3d.Zero, Rhino.Geometry.Vector3d.Zero
-                ).L  # grayscale maps, so we want lumonosity
+                b = evalMetal.GetColor(uvw, Rhino.Geometry.Vector3d.Zero, Rhino.Geometry.Vector3d.Zero).L  # grayscale maps, so we want lumonosity
             if hasRoughnessTexture:
-                g = evalRoughness.GetColor(
-                    uvw, Rhino.Geometry.Vector3d.ZAxis, Rhino.Geometry.Vector3d.Zero
-                ).L  # grayscale maps, so we want lumonosity
+                g = evalRoughness.GetColor(uvw, Rhino.Geometry.Vector3d.ZAxis, Rhino.Geometry.Vector3d.Zero).L  # grayscale maps, so we want lumonosity
             color = System.Drawing.Color.FromArgb(255, 0, int(g * 255), int(b * 255))
             bitmap.SetPixel(i, height - j - 1, color)
 
@@ -237,14 +215,10 @@ def CombineBaseColorAndAlphaTexture(
 
     if hasBaseColorTexture:
         baseColorWidth, baseColorHeight, _ = baseColorTexture.PixelSize()
-        baseColorEvaluator = baseColorTexture.CreateEvaluator(
-            Rhino.Render.RenderTexture.TextureEvaluatorFlags.Normal
-        )
+        baseColorEvaluator = baseColorTexture.CreateEvaluator(Rhino.Render.RenderTexture.TextureEvaluatorFlags.Normal)
     if hasAlphaTexture:
         alphaWidth, alphaHeight, _ = alphaTexture.PixelSize()
-        alphaTextureEvaluator = alphaTexture.CreateEvaluator(
-            Rhino.Render.RenderTexture.TextureEvaluatorFlags.Normal
-        )
+        alphaTextureEvaluator = alphaTexture.CreateEvaluator(Rhino.Render.RenderTexture.TextureEvaluatorFlags.Normal)
     width = max(baseColorWidth, alphaWidth)
     height = max(baseColorHeight, alphaHeight)
 
@@ -263,9 +237,7 @@ def CombineBaseColorAndAlphaTexture(
             uvw = Rhino.Geometry.Point3d(x, y, 0.0)
             baseColorOut = baseColor
             if hasBaseColorTexture:
-                baseColorOut = baseColorEvaluator.GetColor(
-                    uvw, Rhino.Geometry.Vector3d.Zero, Rhino.Geometry.Vector3d.Zero
-                )
+                baseColorOut = baseColorEvaluator.GetColor(uvw, Rhino.Geometry.Vector3d.Zero, Rhino.Geometry.Vector3d.Zero)
                 baseColorOut = [
                     float(baseColorOut.R),
                     float(baseColorOut.G),
@@ -285,9 +257,7 @@ def CombineBaseColorAndAlphaTexture(
 
             evaluatedAlpha = float(alpha)
             if hasAlphaTexture:
-                alphaColor = alphaTextureEvaluator.GetColor(
-                    uvw, Rhino.Geometry.Vector3d.Zero, Rhino.Geometry.Vector3d.Zero
-                )
+                alphaColor = alphaTextureEvaluator.GetColor(uvw, Rhino.Geometry.Vector3d.Zero, Rhino.Geometry.Vector3d.Zero)
                 evaluatedAlpha = alphaColor.L
             alphaFinal = baseColor.A * evaluatedAlpha
             hasAlpha = hasAlpha or (alpha != 1.0)
@@ -301,17 +271,11 @@ def CombineBaseColorAndAlphaTexture(
 def HandleBaseColor(gltf_content, rhinoMaterial, gltfMaterial):
     baseColorDoc = rhinoMaterial.GetTexture(Rhino.DocObjects.TextureType.PBR_BaseColor)
     alphaTextureDoc = rhinoMaterial.GetTexture(Rhino.DocObjects.TextureType.PBR_Alpha)
-    baseColorTexture = rhinoMaterial.RenderMaterial.GetTextureFromUsage(
-        Rhino.Render.RenderMaterial.StandardChildSlots.PbrBaseColor
-    )
-    alphaTexture = rhinoMaterial.RenderMaterial.GetTextureFromUsage(
-        Rhino.Render.RenderMaterial.StandardChildSlots.PbrAlpha
-    )
+    baseColorTexture = rhinoMaterial.RenderMaterial.GetTextureFromUsage(Rhino.Render.RenderMaterial.StandardChildSlots.PbrBaseColor)
+    alphaTexture = rhinoMaterial.RenderMaterial.GetTextureFromUsage(Rhino.Render.RenderMaterial.StandardChildSlots.PbrAlpha)
     hasBaseColorTexture = False if baseColorDoc is None else baseColorDoc.Enabled
     hasAlphaTexture = False if alphaTextureDoc is None else alphaTextureDoc.Enabled
-    baseColorDiffuseAlphaForTransparency = (
-        rhinoMaterial.PhysicallyBased.UseBaseColorTextureAlphaForObjectAlphaTransparencyTexture
-    )
+    baseColorDiffuseAlphaForTransparency = rhinoMaterial.PhysicallyBased.UseBaseColorTextureAlphaForObjectAlphaTransparencyTexture
     baseColor = rhinoMaterial.PhysicallyBased.BaseColor
     if not hasBaseColorTexture and not hasAlphaTexture:
         gltfMaterial.pbr_metallic_roughness.base_color_factor = [
@@ -353,15 +317,11 @@ def HandleBaseColor(gltf_content, rhinoMaterial, gltfMaterial):
 
 def AddMaterial(gltf_content, material):
 
-    rhinoMaterial = material.SimulatedMaterial(
-        Rhino.Render.RenderTexture.TextureGeneration.Allow
-    )
+    rhinoMaterial = material.SimulatedMaterial(Rhino.Render.RenderTexture.TextureGeneration.Allow)
     renderMaterial = material
 
     material = MaterialData()
-    material.name = (
-        renderMaterial.Name.replace(" ", "_") if renderMaterial.Name else "material"
-    )
+    material.name = renderMaterial.Name.replace(" ", "_") if renderMaterial.Name else "material"
     material.pbr_metallic_roughness = PBRMetallicRoughnessData()
 
     if not rhinoMaterial.IsPhysicallyBased:
@@ -375,25 +335,17 @@ def AddMaterial(gltf_content, material):
     emissiveTexture = pbr.GetTexture(Rhino.DocObjects.TextureType.PBR_Emission)
     opacityTexture = pbr.GetTexture(Rhino.DocObjects.TextureType.Opacity)
     clearcoatTexture = pbr.GetTexture(Rhino.DocObjects.TextureType.PBR_Clearcoat)
-    clearcoatRoughessTexture = pbr.GetTexture(
-        Rhino.DocObjects.TextureType.PBR_ClearcoatRoughness
-    )
-    clearcoatNormalTexture = pbr.GetTexture(
-        Rhino.DocObjects.TextureType.PBR_ClearcoatBump
-    )
+    clearcoatRoughessTexture = pbr.GetTexture(Rhino.DocObjects.TextureType.PBR_ClearcoatRoughness)
+    clearcoatNormalTexture = pbr.GetTexture(Rhino.DocObjects.TextureType.PBR_ClearcoatBump)
     specularTexture = pbr.GetTexture(Rhino.DocObjects.TextureType.PBR_Specular)
 
     HandleBaseColor(gltf_content, rhinoMaterial, material)
 
     hasMetalTexture = False if metallicTexture is None else metallicTexture.Enabled
-    hasRoughnessTexture = (
-        False if roughnessTexture is None else roughnessTexture.Enabled
-    )
+    hasRoughnessTexture = False if roughnessTexture is None else roughnessTexture.Enabled
 
     if hasMetalTexture or hasRoughnessTexture:
-        material.pbr_metallic_roughness.metallic_roughness_texture = (
-            AddMetallicRoughnessTexture(gltf_content, rhinoMaterial, material)
-        )
+        material.pbr_metallic_roughness.metallic_roughness_texture = AddMetallicRoughnessTexture(gltf_content, rhinoMaterial, material)
 
     material.pbr_metallic_roughness.metallic_factor = float(pbr.Metallic)
     material.pbr_metallic_roughness.roughness_factor = float(pbr.Roughness)
@@ -405,9 +357,7 @@ def AddMaterial(gltf_content, material):
         material.occlusion_texture = AddTextureOcclusion(gltf_content, occlusionTexture)
 
     if emissiveTexture is not None and emissiveTexture.Enabled:
-        material.emissive_texture = AddTexture(
-            gltf_content, emissiveTexture.FileReference.FullPath
-        )
+        material.emissive_texture = AddTexture(gltf_content, emissiveTexture.FileReference.FullPath)
         emissionMultiplier = 1.0
         param = rhinoMaterial.RenderMaterial.GetParameter("emission-multiplier")
         if param is not None:
@@ -431,9 +381,7 @@ def AddMaterial(gltf_content, material):
     if opacityTexture is not None and opacityTexture.Enabled:
         # Transmission texture is stored in an images R channel
         # https://github.com/KhronosGroup/glTF/blob/master/extensions/2.0/Khronos/KHR_materials_transmission/README.md#properties
-        transmission.transmission_texture = GetSingleChannelTexture(
-            gltf_content, opacityTexture, RgbaChannel.Red, True
-        )
+        transmission.transmission_texture = GetSingleChannelTexture(gltf_content, opacityTexture, RgbaChannel.Red, True)
         transmission.transmission_factor = GetTextureWeight(opacityTexture)
     else:
         transmission.transmission_factor = 1.0 - float(pbr.Opacity)
@@ -442,25 +390,17 @@ def AddMaterial(gltf_content, material):
     # Clearcoat => Clearcoat https://github.com/KhronosGroup/glTF/blob/master/extensions/2.0/Khronos/KHR_materials_clearcoat/README.md
     clearcoat = KHR_materials_clearcoat()
     if clearcoatTexture is not None and clearcoatTexture.Enabled:
-        clearcoat.clearcoat_texture = AddTexture(
-            gltf_content, clearcoatTexture.FileReference.FullPath
-        )
+        clearcoat.clearcoat_texture = AddTexture(gltf_content, clearcoatTexture.FileReference.FullPath)
         clearcoat.clearcoat_factor = GetTextureWeight(clearcoatTexture)
     else:
         clearcoat.clearcoat_factor = float(pbr.Clearcoat)
     if clearcoatRoughessTexture is not None and clearcoatRoughessTexture.Enabled:
-        clearcoat.clearcoat_roughness_texture = AddTexture(
-            gltf_content, clearcoatRoughessTexture.FileReference.FullPath
-        )
-        clearcoat.clearcoat_roughness_factor = GetTextureWeight(
-            clearcoatRoughessTexture
-        )
+        clearcoat.clearcoat_roughness_texture = AddTexture(gltf_content, clearcoatRoughessTexture.FileReference.FullPath)
+        clearcoat.clearcoat_roughness_factor = GetTextureWeight(clearcoatRoughessTexture)
     else:
         clearcoat.clearcoat_roughness_factor = float(pbr.ClearcoatRoughness)
     if clearcoatNormalTexture is not None and clearcoatNormalTexture.Enabled:
-        clearcoat.clearcoat_normal_texture = AddTextureNormal(
-            gltf_content, clearcoatNormalTexture
-        )
+        clearcoat.clearcoat_normal_texture = AddTextureNormal(gltf_content, clearcoatNormalTexture)
     material.add_extension(clearcoat)
 
     # Opacity IOR -> IOR https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Khronos/KHR_materials_ior
@@ -471,9 +411,7 @@ def AddMaterial(gltf_content, material):
     specular = KHR_materials_specular()
     if specularTexture is not None and specularTexture.Enabled:
         # Specular is stored in the textures alpha channel
-        specular.specular_texture = GetSingleChannelTexture(
-            gltf_content, specularTexture, RgbaChannel.Alpha, False
-        )
+        specular.specular_texture = GetSingleChannelTexture(gltf_content, specularTexture, RgbaChannel.Alpha, False)
         specular.specular_factor = GetTextureWeight(specularTexture)
     else:
         specular.specular_factor = float(pbr.Specular)
