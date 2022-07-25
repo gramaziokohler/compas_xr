@@ -1,12 +1,7 @@
-import sys
 import os
 import Rhino
 import scriptcontext
 import rhinoscriptsyntax as rs
-
-from compas_rhino import unload_modules
-
-unload_modules("compas")
 
 from compas_rhino.conversions import xform_to_rhino
 from compas_rhino.conversions import RhinoMesh
@@ -18,8 +13,6 @@ from compas.utilities import color_to_rgb
 from compas.geometry import Frame, Transformation
 import compas
 
-
-sys.path.append(r"C:\Users\rustr\workspace\compas_xr\src")
 from compas_xr.rhino.conversions.rhino_material import AddMaterial
 
 
