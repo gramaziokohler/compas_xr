@@ -2,42 +2,17 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import compas
-from compas.datastructures import Mesh
-
-try:
-    from compas.datastructures.network.core import Graph
-except ImportError:
-    from compas.datastructures import Graph
-
-from compas.geometry import Box
-from compas.geometry import Cylinder
-
 from compas.topology import breadth_first_ordering
+from compas.datastructures import Graph
 
-from compas.files import GLTFContent
-from compas.files import GLTFExporter
-
-if not compas.IPY:
-
-    from compas_xr.usd import prim_from_box
-    from compas_xr.usd import prim_from_mesh
-    from compas_xr.usd import prim_default
-    from compas_xr.usd import prim_instance
-    from compas_xr.usd import prim_from_cylinder
-    from compas_xr.usd import reference_filename
-    from compas_xr.usd import USDMaterial
-
-
-from compas_xr.gltf.helpers import gltf_add_node_to_content
-from compas_xr.gltf.helpers import gltf_add_material_to_content
-from compas_xr.gltf import GLTFMaterial
+from compas_xr.files.usd import USDScene
+from compas_xr.files.gltf import GLTFScene
 
 
 __all__ = ["Scene", "Animation"]
 
 
-class Scene(Graph):  # or scenegraoh
+class Scene(Graph):  # or scenegraph
     """Class for managing a Scene.
 
 
@@ -71,11 +46,11 @@ class Scene(Graph):  # or scenegraoh
 
     @classmethod
     def from_gltf(cls, filepath):
-        raise NotImplementedError
+        return GLTFScene.from_gltf(filepath).to_compas()
 
     @classmethod
     def from_usd(cls, filepath):
-        raise NotImplementedError
+        return USDScene.from_usd(filepath).to_compas()
 
     @property
     def ordered_keys(self):
@@ -92,33 +67,13 @@ class Scene(Graph):  # or scenegraoh
             parent = self.node_attribute(key, "parent")
         return shortest_path
 
+    def to_usd(self, filepath):
+        USDScene.from_scene(self).to_usd(filepath)
+
     def to_gltf(self, filepath, embed_data=False):
-        """ """
-        content = GLTFContent()
-        scene = content.add_scene(self.name)
-
-        for material in self.materials:
-            gltf_material = GLTFMaterial.from_material(content, material)
-            gltf_add_material_to_content(content, gltf_material)
-
-        # 1. Add those that are references first
-        visited = []
-        for key in self.nodes_where({"is_reference": True}):
-            shortest_path = self.node_to_root(key)
-            for key in reversed(shortest_path):
-                if key not in visited:
-                    gltf_add_node_to_content(self, content, scene, key)
-                    visited.append(key)
-
-        for key in self.ordered_keys:
-            if key not in visited:
-                gltf_add_node_to_content(self, content, scene, key)
-
-        exporter = GLTFExporter(filepath, content, embed_data=embed_data)
-        exporter.export()
+        GLTFScene.from_scene(self).to_gltf(filepath, embed_data=embed_data)
 
     def subscene(self, key):
-
         subscene = Scene()
 
         def _add_branch(scene, key, parent):
@@ -142,94 +97,6 @@ class Scene(Graph):  # or scenegraoh
         if not include_key:
             array = array[1:]
         return array
-
-    def to_usd(self, filepath):
-        from pxr import Usd
-        from pxr import UsdGeom
-        from pxr import UsdShade
-
-        stage = Usd.Stage.CreateNew(filepath)
-
-        UsdGeom.SetStageUpAxis(stage, "Z")  # take the one which is in stage
-
-        usd_materials = []
-        for material in self.materials:
-            usd_materials.append(USDMaterial.from_material(stage, material))
-
-        # 1. Add those that are references first
-        visited = []
-        for key in self.nodes_where({"is_reference": True}):
-            subscene = self.subscene(key)
-            children = self._all_children(key, include_key=True)
-            visited += children
-            reference_filepath = reference_filename(stage, key, fullpath=True)
-            subscene.to_usd(reference_filepath)
-
-        for key in self.ordered_keys:
-            if key in visited:
-                continue
-            parent = self.node_attribute(key, "parent")
-            is_reference = self.node_attribute(key, "is_reference")
-            frame = self.node_attribute(key, "frame")
-            element = self.node_attribute(key, "element")
-            instance_of = self.node_attribute(key, "instance_of")
-            scale = self.node_attribute(key, "scale")
-
-            mkey = self.node_attribute(key, "material")
-
-            is_root = True if not parent else False
-            path = "/" + "/".join(reversed(self.node_to_root(key)))
-
-            if not is_reference:
-                # if there is a frame in the node, we first have to add Xform
-
-                if instance_of:
-                    if frame:
-                        prim_default(stage, path, frame, scale=scale)
-                        path += "/element"
-                    prim = prim_instance(
-                        stage, path, self.node_attribute(key, "instance_of")
-                    )
-                    # if frame:
-                    #    apply_frame_transformation_on_prim(ref, frame)
-                    if mkey is not None:
-                        UsdShade.MaterialBindingAPI(prim).Bind(
-                            usd_materials[mkey].material
-                        )
-
-                else:
-
-                    if frame:
-                        prim = prim_default(stage, path, frame, scale=scale)
-                        path += "/element"
-
-                    # print("path", path)
-                    if element:
-                        if type(element) == Box:
-                            prim = prim_from_box(stage, path, element)
-                            # prim = prim_from_mesh(stage, path, Mesh.from_shape(element))
-                        elif type(element) == Mesh:
-                            prim = prim_from_mesh(stage, path, element)
-                        elif type(element) == Cylinder:
-                            prim = prim_from_cylinder(stage, path, element)
-                        else:
-                            print(type(element))
-                            raise NotImplementedError
-
-                    if mkey is not None:
-                        UsdShade.MaterialBindingAPI(prim).Bind(
-                            usd_materials[mkey].material
-                        )
-
-                    if not frame and not element:
-                        prim = prim_default(stage, path, scale=scale)
-
-            if is_root and key != "references":
-                stage.SetDefaultPrim(
-                    prim.GetPrim()
-                )  # dont use references as default layer
-
-        stage.GetRootLayer().Save()
 
 
 class Animation(object):

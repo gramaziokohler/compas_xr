@@ -17,7 +17,7 @@ class Material(Data):
         emissive_factor=None,
         alpha_mode=None,
         alpha_cutoff=None,
-        double_sided=None,
+        double_sided=True,
     ):
         self.name = name
         self.extras = extras
@@ -35,18 +35,10 @@ class Material(Data):
         return {
             "name": self.name,
             "extras": self.extras,
-            "pbr_metallic_roughness": self.pbr_metallic_roughness.data
-            if self.pbr_metallic_roughness
-            else None,  # noqa E501
-            "normal_texture": self.normal_texture.data
-            if self.normal_texture
-            else None,  # noqa E501
-            "occlusion_texture": self.occlusion_texture.data
-            if self.occlusion_texture
-            else None,  # noqa E501
-            "emissive_texture": self.emissive_texture.data
-            if self.emissive_texture
-            else None,  # noqa E501
+            "pbr_metallic_roughness": self.pbr_metallic_roughness.data if self.pbr_metallic_roughness else None,  # noqa E501
+            "normal_texture": self.normal_texture.data if self.normal_texture else None,  # noqa E501
+            "occlusion_texture": self.occlusion_texture.data if self.occlusion_texture else None,  # noqa E501
+            "emissive_texture": self.emissive_texture.data if self.emissive_texture else None,  # noqa E501
             "emissive_factor": self.emissive_factor,
             "alpha_mode": self.alpha_mode,
             "alpha_cutoff": self.alpha_cutoff,
@@ -57,26 +49,10 @@ class Material(Data):
     def data(self, data):
         self.name = data.get("name")
         self.extras = data.get("extras")
-        self.pbr_metallic_roughness = (
-            PBRMetallicRoughness.from_data(data.get("pbr_metallic_roughness"))
-            if data.get("pbr_metallic_roughness")
-            else None
-        )  # noqa E501
-        self.normal_texture = (
-            NormalTexture.from_data(data.get("normal_texture"))
-            if data.get("normal_texture")
-            else None
-        )  # noqa E501
-        self.occlusion_texture = (
-            OcclusionTexture.from_data(data.get("occlusion_texture"))
-            if data.get("occlusion_texture")
-            else None
-        )  # noqa E501
-        self.emissive_texture = (
-            Texture.from_data(data.get("emissive_texture"))
-            if data.get("emissive_texture")
-            else None
-        )  # noqa E501
+        self.pbr_metallic_roughness = PBRMetallicRoughness.from_data(data.get("pbr_metallic_roughness")) if data.get("pbr_metallic_roughness") else None  # noqa E501
+        self.normal_texture = NormalTexture.from_data(data.get("normal_texture")) if data.get("normal_texture") else None  # noqa E501
+        self.occlusion_texture = OcclusionTexture.from_data(data.get("occlusion_texture")) if data.get("occlusion_texture") else None  # noqa E501
+        self.emissive_texture = Texture.from_data(data.get("emissive_texture")) if data.get("emissive_texture") else None  # noqa E501
         self.emissive_factor = data.get("emissive_factor")
         self.alpha_mode = data.get("alpha_mode")
         self.alpha_cutoff = data.get("alpha_cutoff")
@@ -102,31 +78,19 @@ class PBRMetallicRoughness(Data):
     def data(self):
         return {
             "base_color_factor": self.base_color_factor,
-            "base_color_texture": self.base_color_texture.data
-            if self.base_color_texture
-            else None,  # noqa E501
+            "base_color_texture": self.base_color_texture.data if self.base_color_texture else None,  # noqa E501
             "metallic_factor": self.metallic_factor,
             "roughness_factor": self.roughness_factor,
-            "metallic_roughness_texture": self.metallic_roughness_texture.data
-            if self.metallic_roughness_texture
-            else None,
+            "metallic_roughness_texture": self.metallic_roughness_texture.data if self.metallic_roughness_texture else None,
         }  # noqa E501
 
     @data.setter
     def data(self, data):
         self.base_color_factor = data.get("base_color_factor")
-        self.base_color_texture = (
-            Texture.from_data(data.get("base_color_texture"))
-            if data.get("base_color_texture")
-            else None
-        )  # noqa E501
+        self.base_color_texture = Texture.from_data(data.get("base_color_texture")) if data.get("base_color_texture") else None  # noqa E501
         self.metallic_factor = data.get("metallic_factor")
         self.roughness_factor = data.get("roughness_factor")
-        self.metallic_roughness_texture = (
-            Texture.from_data(data.get("metallic_roughness_texture"))
-            if data.get("metallic_roughness_texture")
-            else None
-        )  # noqa E501
+        self.metallic_roughness_texture = Texture.from_data(data.get("metallic_roughness_texture")) if data.get("metallic_roughness_texture") else None  # noqa E501
 
 
 class Texture(Data):
@@ -220,7 +184,6 @@ if __name__ == "__main__":
     color = (1.0, 0.4, 0)
     material = Material()
     material.name = "Plaster"
-    material.double_sided = True
     material.pbr_metallic_roughness = PBRMetallicRoughness()
     material.pbr_metallic_roughness.base_color_factor = list(color) + [1.0]
     material.pbr_metallic_roughness.metallic_factor = 0.0
@@ -235,3 +198,5 @@ if __name__ == "__main__":
     scene.to_gltf(gltf_filepath, embed_data=False)
     scene.to_gltf(glb_filepath, embed_data=True)
     scene.to_usd(usd_filepath)
+
+    scene.from_gltf(gltf_filepath)
