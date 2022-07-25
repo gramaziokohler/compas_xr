@@ -80,7 +80,8 @@ class Material(Data):
         self.emissive_texture = emissive_texture
         self.emissive_factor = emissive_factor if emissive_factor else [0.0, 0.0, 0.0]
         self.alpha_mode = alpha_mode if alpha_mode is not None else AlphaMode.OPAQUE
-        self.alpha_cutoff = alpha_cutoff if alpha_cutoff is not None else 0.5
+        # self.alpha_cutoff = alpha_cutoff if alpha_cutoff is not None else 0.5
+        self.alpha_cutoff = alpha_cutoff
         self.double_sided = double_sided if double_sided is not None else True
 
     @property
