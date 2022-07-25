@@ -1,10 +1,13 @@
 import os
-import Rhino
-import scriptcontext
-import rhinoscriptsyntax as rs
+import compas
 
-from compas_rhino.conversions import xform_to_rhino
-from compas_rhino.conversions import RhinoMesh
+if compas.IPY:
+    import Rhino
+    import scriptcontext
+    import rhinoscriptsyntax as rs
+    from compas_rhino.conversions import xform_to_rhino
+    from compas_rhino.conversions import RhinoMesh
+
 from compas.files.gltf.gltf import GLTF
 from compas.files.gltf import GLTFContent
 from compas.files.gltf.data_classes import PBRMetallicRoughnessData
@@ -192,69 +195,69 @@ class glTFExportOptions:
     UseDracoCompression = False  # TODO
 
 
-objects = rs.AllObjects()
-options = glTFExportOptions()
+if __name__ == "__main__":
+    objects = rs.AllObjects()
+    options = glTFExportOptions()
 
-sanitized = SanitizeRhinoObjects(objects, options)
+    sanitized = SanitizeRhinoObjects(objects, options)
 
-gltf_content = GLTFContent()
-materialsMap = {}
+    gltf_content = GLTFContent()
+    materialsMap = {}
 
-scene = gltf_content.add_scene()
+    scene = gltf_content.add_scene()
 
-worldZX = Frame((0, 0, 0), (1, 0, 0), (0, 0, -1))
-ZtoYUp = Transformation.from_frame_to_frame(Frame.worldXY(), worldZX)
-ZtoYUp = xform_to_rhino(ZtoYUp)
+    worldZX = Frame((0, 0, 0), (1, 0, 0), (0, 0, -1))
+    ZtoYUp = Transformation.from_frame_to_frame(Frame.worldXY(), worldZX)
+    ZtoYUp = xform_to_rhino(ZtoYUp)
 
-for k, data in enumerate(sanitized):
+    for k, data in enumerate(sanitized):
 
-    # if k < 318:
-    #    continue
+        # if k < 318:
+        #    continue
 
-    # adds material to the content
-    materialIndex = GetMaterial(data["RenderMaterial"], data["Object"], options, gltf_content, materialsMap)
+        # adds material to the content
+        materialIndex = GetMaterial(data["RenderMaterial"], data["Object"], options, gltf_content, materialsMap)
 
-    print(gltf_content.materials)
+        print(gltf_content.materials)
 
-    for i, rhino_mesh in enumerate(data["Meshes"]):
-        print("rhino_mesh", rhino_mesh)
-        node_name = "%04d_%s_%04d" % (k, GetObjectName(data["Object"]), i)
+        for i, rhino_mesh in enumerate(data["Meshes"]):
+            print("rhino_mesh", rhino_mesh)
+            node_name = "%04d_%s_%04d" % (k, GetObjectName(data["Object"]), i)
 
-        print(node_name)
-        node = scene.add_child(node_name=node_name)
+            print(node_name)
+            node = scene.add_child(node_name=node_name)
 
-        # pre process mesh etc..
-        ok = rhino_mesh.Faces.ConvertQuadsToTriangles()
+            # pre process mesh etc..
+            ok = rhino_mesh.Faces.ConvertQuadsToTriangles()
 
-        if options.MapRhinoZToGltfY:
-            rhino_mesh.Transform(ZtoYUp)
-            rhino_mesh.TextureCoordinates.ReverseTextureCoordinates(1)
+            if options.MapRhinoZToGltfY:
+                rhino_mesh.Transform(ZtoYUp)
+                rhino_mesh.TextureCoordinates.ReverseTextureCoordinates(1)
 
-        mesh = RhinoMesh.from_geometry(rhino_mesh).to_compas()
-        # mesh.quads_to_triangles()
-        mesh_data = node.add_mesh(mesh)  # one mesh per node?
-        pd = mesh_data.primitive_data_list[0]  # only one
-        pd.material = materialIndex
+            mesh = RhinoMesh.from_geometry(rhino_mesh).to_compas()
+            # mesh.quads_to_triangles()
+            mesh_data = node.add_mesh(mesh)  # one mesh per node?
+            pd = mesh_data.primitive_data_list[0]  # only one
+            pd.material = materialIndex
 
-        # normals = [mesh.vertex_normal(k) for k in mesh.vertices()]
+            # normals = [mesh.vertex_normal(k) for k in mesh.vertices()]
 
-        if rhino_mesh.Normals.Count > 0 and options.ExportVertexNormals:
-            pd.attributes["NORMAL"] = [(float(v.X), float(v.Y), float(v.Z)) for v in rhino_mesh.Normals]
+            if rhino_mesh.Normals.Count > 0 and options.ExportVertexNormals:
+                pd.attributes["NORMAL"] = [(float(v.X), float(v.Y), float(v.Z)) for v in rhino_mesh.Normals]
 
-        if rhino_mesh.TextureCoordinates.Count > 0 and options.ExportTextureCoordinates:
-            pd.attributes["TEXCOORD_0"] = [(float(u), float(v)) for u, v in rhino_mesh.TextureCoordinates]
+            if rhino_mesh.TextureCoordinates.Count > 0 and options.ExportTextureCoordinates:
+                pd.attributes["TEXCOORD_0"] = [(float(u), float(v)) for u, v in rhino_mesh.TextureCoordinates]
 
-        if rhino_mesh.VertexColors.Count > 0 and options.ExportVertexColors:
-            colors = []
-            for color in rhino_mesh.VertexColors:
-                r, g, b = color_to_rgb((color.R, color.G, color.B), normalize=True)
-                a, _, _ = color_to_rgb((color.A, 0, 0), normalize=True)
-                colors.append([r, g, b, a])
-            # pd.attributes["COLOR_0"] = colors
+            if rhino_mesh.VertexColors.Count > 0 and options.ExportVertexColors:
+                colors = []
+                for color in rhino_mesh.VertexColors:
+                    r, g, b = color_to_rgb((color.R, color.G, color.B), normalize=True)
+                    a, _, _ = color_to_rgb((color.A, 0, 0), normalize=True)
+                    colors.append([r, g, b, a])
+                # pd.attributes["COLOR_0"] = colors
 
-
-gltf_filepath = os.path.join(compas.APPDATA, "data", "gltfs", "rhino_export.gltf")
-print(gltf_filepath)
-gltf = GLTF(gltf_filepath)
-gltf.content = gltf_content
-gltf.export(embed_data=False)
+    gltf_filepath = os.path.join(compas.APPDATA, "data", "gltfs", "rhino_export.gltf")
+    print(gltf_filepath)
+    gltf = GLTF(gltf_filepath)
+    gltf.content = gltf_content
+    gltf.export(embed_data=False)
