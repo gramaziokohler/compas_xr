@@ -4,6 +4,7 @@ from compas.files import GLTFExporter
 
 from compas.datastructures import Mesh
 from compas.geometry import Rotation
+from compas.geometry import Frame
 
 from compas_xr.files.gltf import GLTFMaterial
 
@@ -59,7 +60,6 @@ class GLTFScene(object):
             node = self.content.add_node_to_scene(scene, node_name=key)
         else:
             parent = self.content.get_node_by_name(parent)
-
             node = self.content.add_child_to_node(parent, key)
 
         if frame:  # TODO scale
@@ -79,7 +79,8 @@ class GLTFScene(object):
             self.content.add_mesh_to_node(node, mesh)
 
         if material is not None:  # == key
-            node.mesh_data.primitive_data_list[0].material = material
+            for pd in node.mesh_data.primitive_data_list:
+                pd.material = material
 
     def to_compas(self):
         # returns a :class:`Scene` object
@@ -90,21 +91,54 @@ class GLTFScene(object):
         if len(content.scenes) > 1:
             raise ValueError("More than one scene per content is currently not supported")
 
-        for key, scene in content.scenes.items():
+        for _, scene in content.scenes.items():
             scene = Scene(name=scene.name, up_axis="Z")
 
-        for mkey, mdata in content.materials.items():
-
+        # add materials
+        for _, mdata in content.materials.items():
             gmat = GLTFMaterial.from_material_data(content, mdata)
             material = gmat.to_compas()
+            _ = scene.add_material(material)  # does the key get mixed up?
+
+        # iter through nodes, add geometry
+        names, parents, frames, elements, materials = {}, {}, {}, {}, {}
+
+        for key, node in content.nodes.items():
+            names[key] = node.name
+            for child in node.children:
+                parents[child] = node.name
+
+            T = None
+            if node.translation:
+                print("node.translation", node.translation)
+            if node.rotation:
+                print("node.rotation", node.rotation)
+                # node.rotation = list(Rotation.from_frame(frame).quaternion.xyzw)
+            if T:
+                frames[key] = Frame.from_transformation(T)
+
+            if node.mesh_key is not None:
+                gltf_mesh = content.meshes[node.mesh_key]  # this won't check if already used.. so instances are not supported
+                mesh = Mesh.from_vertices_and_faces(gltf_mesh.vertices, gltf_mesh.faces)
+                elements[key] = mesh
+
+                for pd in gltf_mesh.primitive_data_list:
+                    if pd.material is not None:
+                        materials[key] = pd.material  # does the key get mixed up?
+
+        for key in content.nodes:
+            name = names.get(key, None)
+            parent = parents.get(key, None)
+            material = materials.get(key, None)
+            element = elements.get(key, None)
+            frame = frames.get(key, None)
+            # is_reference ?
+            # instance_of ?
+            print(name, parent, frame, element, material)
+            scene.add_layer(name, parent=parent, frame=frame, element=element, material=material)
+
+        return scene
 
     def to_gltf(self, filename, embed_data=False):
         exporter = GLTFExporter(filename, self.content, embed_data=embed_data)
         exporter.export()
-
-
-if __name__ == "__main__":
-    import os
-    from compas_xr import DATA
-
-    filepath = os.path.join(DATA)
