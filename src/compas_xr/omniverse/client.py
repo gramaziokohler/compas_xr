@@ -1,6 +1,10 @@
-import omni.client
-import omni.usd
+import compas_xr
 from pxr import Usd
+
+if compas_xr.IN_OMNI:
+    import omni.client
+    import omni.usd
+
 
 # C:\Users\rustr\AppData\Local\ov\pkg\connectsample-103.1.0\source\pyHelloWorld
 
