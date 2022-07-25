@@ -1,3 +1,4 @@
+import os
 from pxr import Usd
 from pxr import UsdGeom
 from pxr import UsdShade
@@ -12,6 +13,7 @@ from compas_usd.conversions import prim_from_box
 from compas_usd.conversions import prim_from_mesh
 from compas_usd.conversions import prim_default
 from compas_usd.conversions import prim_from_cylinder
+from compas_usd.conversions import frame_and_scale_from_prim
 from compas_usd.material import USDMaterial
 
 
@@ -138,16 +140,68 @@ class USDScene(object):
         return usd_scene
 
     def to_compas(self):
-        # returns a :class:`Scene` object
-        pass
+        from compas_xr.datastructures import Scene
+
+        stage = self.scene
+        scene = Scene(name="usd_scene", up_axis=UsdGeom.GetStageUpAxis(stage))
+
+        keys, names, parents, frames, scales, elements, materials = [], {}, {}, {}, {}, {}, {}
+        material_paths = []
+
+        for i, obj in enumerate(stage.TraverseAll()):  # Traverse()
+
+            typename = obj.GetTypeName()
+            if typename in ["Scope", "Material", "Shader"]:  # handled in materials
+                continue
+
+            path = str(obj.GetPath())
+            node_names = path.split("/")[1:]
+
+            keys.append(i)
+            names[i] = node_names[-1]
+            if len(node_names) > 1:
+                parents[i] = node_names[-2]
+
+            if obj.IsInstance():
+                raise NotImplementedError
+
+            if typename == "Xform":
+                frame, scale = frame_and_scale_from_prim(obj)
+                frames[i] = frame
+                scales[i] = scale
+
+            elif typename == "Cube":  # box from prim
+                size = obj.GetPrim().GetAttribute("size").Get()
+                frame, scale = frame_and_scale_from_prim(obj)
+                xsize, ysize, zsize = scale
+                elements[i] = Box(frame, xsize * size, ysize * size, zsize * size)
+
+            else:
+                raise NotImplementedError
+
+            if "material:binding" in obj.GetPropertyNames():
+                material_path = str(obj.GetRelationship("material:binding").GetTargets()[0])
+                if material_path not in material_paths:
+                    material_paths.append(material_path)
+                materials[i] = material_paths.index(material_path)
+
+        for key in keys:
+            name = names.get(key, None)
+            parent = parents.get(key, None)
+            material = materials.get(key, None)
+            element = elements.get(key, None)
+            frame = frames.get(key, None)
+            # is_reference ?
+            # instance_of ?
+            print(name, parent, frame, element, material)
+            scene.add_layer(name, parent=parent, frame=frame, element=element, material=material)
+
+        materials = []
+        for path in material_paths:
+            material = USDMaterial.from_path(stage, path).to_compas()
+            materials.append(material)
+
+        return scene
 
     def to_usd(self, filename):
         self.scene.Export(filename)
-
-
-if __name__ == "__main__":
-    import os
-    from compas_xr import DATA
-
-    filepath = os.path.join(DATA)
-    # stage = USDScene.from_scene(scene, filepath)
