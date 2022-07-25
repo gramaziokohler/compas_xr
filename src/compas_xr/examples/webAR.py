@@ -9,10 +9,6 @@ from compas_xr import DATA
 
 from compas_xr.examples import upload_to_idl
 
-from paramiko import SSHClient
-from paramiko.client import AutoAddPolicy
-from scp import SCPClient
-
 import qrcode
 import matplotlib.pyplot as plt
 import numpy as np
