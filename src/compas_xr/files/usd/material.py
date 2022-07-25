@@ -1,3 +1,6 @@
+"""
+TODO: This file should be removed and contents migrated to compas_usd
+"""
 import compas
 from compas_xr.files.gltf import AlphaMode
 from compas_xr.files.gltf.image import GLTFImage
@@ -9,26 +12,6 @@ if not compas.IPY:
 
 # https://github.com/kcoley/gltf2usd/blob/master/Source/_gltf2usd/usd_material.py
 # https://github.com/ColinKennedy/USD-Cookbook/blob/master/concepts/mesh_with_materials/python/material.py
-
-
-class USDMaterial(object):
-    def __init__(self, stage, name, materials_path="/Looks"):
-        self.stage = stage
-        # todo! create path if it does not exist yet
-        path = Sdf.Path("{0}/{1}".format(materials_path, name))
-        self.material = UsdShade.Material.Define(stage, path)
-        self.surface_output = self.material.CreateOutput("surface", Sdf.ValueTypeNames.Token)
-        self.displacement_output = self.material.CreateOutput("displacement", Sdf.ValueTypeNames.Token)
-
-    def GetPath(self):
-        return self.material.GetPath()
-
-    @classmethod
-    def from_material(cls, stage, material):
-        umat = USDMaterial(stage, material.name)
-        ps = USDPreviewSurface(stage, umat, "shader")
-        ps.initialize_from_material(material)
-        return umat
 
 
 class USDPreviewSurface(object):
