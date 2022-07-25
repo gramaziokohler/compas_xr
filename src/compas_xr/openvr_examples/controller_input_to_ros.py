@@ -49,114 +49,150 @@ from roslibpy import Ros
 
 from compas_fab.backends.ros.messages import Pose
 from compas_fab.backends.ros.messages import PoseStamped
+from compas_fab.backends.ros.messages import ROSmsg
 from compas.geometry import Transformation
 from compas.geometry import Frame
 
-from semiramis_xr.messages import Int8MultiArray
-from semiramis_xr.messages import Float32MultiArray
 
-# ros
-client = Ros(host='localhost', port=9090)
-client.run()
+class MultiArrayLayout(ROSmsg):
+    """http://docs.ros.org/en/api/std_msgs/html/msg/MultiArrayLayout.html"""
 
-model_names = ['generic_hmd', 'controller_left', 'controller_right', 'OptiTrackRigidBody', 'lh_basestation_valve_gen2']
-position_talkers = dict(zip(model_names, [Topic(client, '/position_%s' % name, 'geometry_msgs/PoseStamped') for name in model_names]))
-hands = ["left", "right"]
-hands_idx = dict(zip(hands, [None for _ in range(len(hands))]))
+    def __init__(self, dim=None, data_offset=None):
+        self.dim = dim or []
+        self.data_offset = data_offset or 0
 
-buttonpress_talker = dict(zip(hands, [Topic(client, '/buttonpress_%s' % hand, 'std_msgs/Int8MultiArray') for hand in hands]))
-trackpad_talker = dict(zip(hands, [Topic(client, '/trackpad_%s' % hand, 'std_msgs/Float32MultiArray') for hand in hands]))
-
-button_idx = [openvr.k_EButton_SteamVR_Trigger, openvr.k_EButton_SteamVR_Touchpad, openvr.k_EButton_Grip, openvr.k_EButton_A, openvr.k_EButton_IndexController_B]
-button_values = [0 for _ in range(len(button_idx))]
-
-for d in [position_talkers, buttonpress_talker, trackpad_talker]:
-    for k, topic in d.items():
-        topic.advertise()
-
-openvr.init(openvr.VRApplication_Scene)
+    @classmethod
+    def from_msg(cls, msg):
+        dim = msg["dim"]
+        return cls(dim, msg["data_offset"])
 
 
-def get_model_name(vrsys, dix, device_class):
-    if device_class == openvr.TrackedDeviceClass_Controller:
-        if vrsys.getControllerRoleForTrackedDeviceIndex(dix) == openvr.TrackedControllerRole_RightHand:
-            model_name = 'controller_right'
-        else:
-            model_name = 'controller_left'
-    else:
-        model_name = vrsys.getStringTrackedDeviceProperty(dix, openvr.Prop_RenderModelName_String)
-    return model_name
+class Int8MultiArray(ROSmsg):
+    """http://docs.ros.org/en/api/std_msgs/html/msg/Int8MultiArray.html"""
+
+    def __init__(self, layout=None, data=None):
+        self.layout = layout or MultiArrayLayout()
+        self.data = data or []
+
+    @classmethod
+    def from_msg(cls, msg):
+        layout = MultiArrayLayout.from_msg(msg["layout"])
+        return cls(layout, msg["data"])
 
 
-while client.is_connected:
+class Float32MultiArray(ROSmsg):
+    """http://docs.ros.org/en/api/std_msgs/html/msg/Float32MultiArray.html"""
 
-    poses, _ = openvr.VRCompositor().waitGetPoses([], None)
-    vrsys = openvr.VRSystem()
+    def __init__(self, layout=None, data=None):
+        self.layout = layout or MultiArrayLayout()
+        self.data = data or []
 
-    for i, pose in enumerate(poses):
+    @classmethod
+    def from_msg(cls, msg):
+        layout = MultiArrayLayout.from_msg(msg["layout"])
+        return cls(layout, msg["data"])
 
-        device_class = vrsys.getTrackedDeviceClass(i)
-        if device_class == openvr.TrackedDeviceClass_Invalid:
-            continue
-        is_controller = device_class == openvr.TrackedDeviceClass_Controller
-        is_beacon = device_class == openvr.TrackedDeviceClass_TrackingReference
 
-        # only once needed
+if __name__ == "__main__":
+    # ros
+    client = Ros(host="localhost", port=9090)
+    client.run()
+
+    model_names = ["generic_hmd", "controller_left", "controller_right", "OptiTrackRigidBody", "lh_basestation_valve_gen2"]
+    position_talkers = dict(zip(model_names, [Topic(client, "/position_%s" % name, "geometry_msgs/PoseStamped") for name in model_names]))
+    hands = ["left", "right"]
+    hands_idx = dict(zip(hands, [None for _ in range(len(hands))]))
+
+    buttonpress_talker = dict(zip(hands, [Topic(client, "/buttonpress_%s" % hand, "std_msgs/Int8MultiArray") for hand in hands]))
+    trackpad_talker = dict(zip(hands, [Topic(client, "/trackpad_%s" % hand, "std_msgs/Float32MultiArray") for hand in hands]))
+
+    button_idx = [openvr.k_EButton_SteamVR_Trigger, openvr.k_EButton_SteamVR_Touchpad, openvr.k_EButton_Grip, openvr.k_EButton_A, openvr.k_EButton_IndexController_B]
+    button_values = [0 for _ in range(len(button_idx))]
+
+    for d in [position_talkers, buttonpress_talker, trackpad_talker]:
+        for k, topic in d.items():
+            topic.advertise()
+
+    openvr.init(openvr.VRApplication_Scene)
+
+    def get_model_name(vrsys, dix, device_class):
         if device_class == openvr.TrackedDeviceClass_Controller:
-            if vrsys.getControllerRoleForTrackedDeviceIndex(i) == openvr.TrackedControllerRole_RightHand:
-                hands_idx["right"] = i
+            if vrsys.getControllerRoleForTrackedDeviceIndex(dix) == openvr.TrackedControllerRole_RightHand:
+                model_name = "controller_right"
             else:
-                hands_idx["left"] = i
+                model_name = "controller_left"
+        else:
+            model_name = vrsys.getStringTrackedDeviceProperty(dix, openvr.Prop_RenderModelName_String)
+        return model_name
 
-        model_name = get_model_name(vrsys, i, device_class)
+    while client.is_connected:
 
-        T = Transformation(list(poses[i].mDeviceToAbsoluteTracking) + [[0, 0, 0, 1]])
-        pose_msg = Pose.from_frame(Frame.from_transformation(T))
-        pose_stamped_msg = PoseStamped(pose=pose_msg)
-        position_talkers[model_name].publish(pose_stamped_msg.msg)
+        poses, _ = openvr.VRCompositor().waitGetPoses([], None)
+        vrsys = openvr.VRSystem()
 
-    hands_idx_inv = {v: k for k, v in hands_idx.items()}
-    vrsys = openvr.VRSystem()
+        for i, pose in enumerate(poses):
 
-    # controllers
-    for hand, dix in hands_idx.items():
-        result, pControllerState = vrsys.getControllerState(dix)
+            device_class = vrsys.getTrackedDeviceClass(i)
+            if device_class == openvr.TrackedDeviceClass_Invalid:
+                continue
+            is_controller = device_class == openvr.TrackedDeviceClass_Controller
+            is_beacon = device_class == openvr.TrackedDeviceClass_TrackingReference
 
-        trackpad_x = pControllerState.rAxis[0].x
-        trackpad_y = pControllerState.rAxis[0].y
-        trackpad_touched = bool(pControllerState.ulButtonTouched >> 32 & 1)
-        if trackpad_touched:
-            print(trackpad_x, trackpad_y)
-            msg = Float32MultiArray(data=[trackpad_x, trackpad_y])
-            trackpad_talker[hand].publish(msg.msg)
+            # only once needed
+            if device_class == openvr.TrackedDeviceClass_Controller:
+                if vrsys.getControllerRoleForTrackedDeviceIndex(i) == openvr.TrackedControllerRole_RightHand:
+                    hands_idx["right"] = i
+                else:
+                    hands_idx["left"] = i
 
-    # button presses
+            model_name = get_model_name(vrsys, i, device_class)
 
-    new_event = openvr.VREvent_t()
+            T = Transformation(list(poses[i].mDeviceToAbsoluteTracking) + [[0, 0, 0, 1]])
+            pose_msg = Pose.from_frame(Frame.from_transformation(T))
+            pose_stamped_msg = PoseStamped(pose=pose_msg)
+            position_talkers[model_name].publish(pose_stamped_msg.msg)
 
-    while vrsys.pollNextEvent(new_event):
+        hands_idx_inv = {v: k for k, v in hands_idx.items()}
+        vrsys = openvr.VRSystem()
 
-        dix = new_event.trackedDeviceIndex
-        device_class = vrsys.getTrackedDeviceClass(dix)
-        if device_class == openvr.TrackedDeviceClass_Controller:
-            hand = hands_idx_inv[dix]
-            bix = new_event.data.controller.button
-            if bix in button_idx:
-                i = button_idx.index(bix)
-                if new_event.eventType == openvr.VREvent_ButtonPress:
-                    button_values[i] = 1
-                if new_event.eventType == openvr.VREvent_ButtonUnpress:
-                    button_values[i] = 0
-                print(button_values)
-                # button_state_talker.publish()
-                msg = Int8MultiArray(data=button_values)
-                buttonpress_talker[hand].publish(msg.msg)
+        # controllers
+        for hand, dix in hands_idx.items():
+            result, pControllerState = vrsys.getControllerState(dix)
 
+            trackpad_x = pControllerState.rAxis[0].x
+            trackpad_y = pControllerState.rAxis[0].y
+            trackpad_touched = bool(pControllerState.ulButtonTouched >> 32 & 1)
+            if trackpad_touched:
+                print(trackpad_x, trackpad_y)
+                msg = Float32MultiArray(data=[trackpad_x, trackpad_y])
+                trackpad_talker[hand].publish(msg.msg)
 
-for d in [position_talkers, buttonpress_talker, trackpad_talker]:
-    for k, topic in d.items():
-        topic.unadvertise()
+        # button presses
 
-client.terminate()
+        new_event = openvr.VREvent_t()
 
-openvr.shutdown()
+        while vrsys.pollNextEvent(new_event):
+
+            dix = new_event.trackedDeviceIndex
+            device_class = vrsys.getTrackedDeviceClass(dix)
+            if device_class == openvr.TrackedDeviceClass_Controller:
+                hand = hands_idx_inv[dix]
+                bix = new_event.data.controller.button
+                if bix in button_idx:
+                    i = button_idx.index(bix)
+                    if new_event.eventType == openvr.VREvent_ButtonPress:
+                        button_values[i] = 1
+                    if new_event.eventType == openvr.VREvent_ButtonUnpress:
+                        button_values[i] = 0
+                    print(button_values)
+                    # button_state_talker.publish()
+                    msg = Int8MultiArray(data=button_values)
+                    buttonpress_talker[hand].publish(msg.msg)
+
+    for d in [position_talkers, buttonpress_talker, trackpad_talker]:
+        for k, topic in d.items():
+            topic.unadvertise()
+
+    client.terminate()
+
+    openvr.shutdown()
