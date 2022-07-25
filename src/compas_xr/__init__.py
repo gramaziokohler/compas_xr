@@ -22,3 +22,11 @@ Describe typical classes found in project
 import os
 
 DATA = os.path.join(os.path.dirname(__file__), "data")
+
+IN_OMNI = False
+try:
+    import omni  # noqa F401
+
+    IN_OMNI = True
+except ModuleNotFoundError:
+    IN_OMNI = False
