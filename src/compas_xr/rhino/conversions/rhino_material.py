@@ -205,8 +205,10 @@ def GetSingleChannelTexture(gltf_content, texture, channel, invert):
     for i in range(bmp.Width):
         for j in range(bmp.Height):
             color = bmp.GetPixel(i, j)
+            color4f = Rhino.Display.Color4f(color)
             print(color)  # should be 4 f
-            value = float(color.L)
+            print(color4f)  # should be 4 f
+            value = float(color4f.L)
             if invert:
                 value = 1.0 - value
             colorFinal = GetSingleChannelColor(value, channel)

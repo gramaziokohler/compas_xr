@@ -1,14 +1,4 @@
-from compas_xr.gltf.rhino_material import AddMaterial
 import sys
-from compas_rhino.conversions import xform_to_rhino
-from compas_rhino.conversions import RhinoMesh
-from compas.files.gltf.gltf import GLTF
-from compas.files.gltf import GLTFContent
-from compas.files.gltf.data_classes import PBRMetallicRoughnessData
-from compas.files.gltf.data_classes import MaterialData
-from compas.utilities import color_to_rgb
-from compas.geometry import Frame, Transformation
-import compas
 import os
 import Rhino
 import scriptcontext
@@ -18,8 +8,19 @@ from compas_rhino import unload_modules
 
 unload_modules("compas")
 
+from compas_rhino.conversions import xform_to_rhino
+from compas_rhino.conversions import RhinoMesh
+from compas.files.gltf.gltf import GLTF
+from compas.files.gltf import GLTFContent
+from compas.files.gltf.data_classes import PBRMetallicRoughnessData
+from compas.files.gltf.data_classes import MaterialData
+from compas.utilities import color_to_rgb
+from compas.geometry import Frame, Transformation
+import compas
+
 
 sys.path.append(r"C:\Users\rustr\workspace\compas_xr\src")
+from compas_xr.rhino.conversions.rhino_material import AddMaterial
 
 
 # https://github.com/Stykka/glTF-Bin/blob/master/glTF-BinExporter/RhinoDocGltfConverter.cs
@@ -29,9 +30,7 @@ def ExplodeRecursive(instanceObject, instanceTransform, pieces, transforms):
     for i in range(instanceObject.InstanceDefinition.ObjectCount):
         rhinoObject = instanceObject.InstanceDefinition.Object(i)
         if type(rhinoObject) == Rhino.Geometry.InstanceReferenceGeometry:
-            nestedObject = scriptcontext.doc.InstanceDefinitions.FindId(
-                rhinoObject.ParentIdefId
-            )
+            nestedObject = scriptcontext.doc.InstanceDefinitions.FindId(rhinoObject.ParentIdefId)
             nestedTransform = instanceTransform * nestedObject.InstanceXform
             ExplodeRecursive(nestedObject, nestedTransform, pieces, transforms)
         else:
@@ -107,10 +106,7 @@ def CreateSolidColorMaterial(color, gltf_content):
 
 
 def GetObjectColor(rhinoObject):
-    if (
-        rhinoObject.Attributes.ColorSource
-        == Rhino.DocObjects.ObjectColorSource.ColorFromLayer
-    ):
+    if rhinoObject.Attributes.ColorSource == Rhino.DocObjects.ObjectColorSource.ColorFromLayer:
         layerIndex = rhinoObject.Attributes.LayerIndex
         return rhinoObject.Document.Layers[layerIndex].Color  # convert to float?
     else:
@@ -133,12 +129,8 @@ def SanitizeRhinoObjects(rhinoObjects, options):
 
         if type(rhinoObject) == Rhino.Geometry.InstanceReferenceGeometry:
             pieces, transforms = [], []
-            instanceObject = scriptcontext.doc.InstanceDefinitions.FindId(
-                rhinoObject.ParentIdefId
-            )
-            ExplodeRecursive(
-                instanceObject, Rhino.Geometry.Transform.Identity, pieces, transforms
-            )
+            instanceObject = scriptcontext.doc.InstanceDefinitions.FindId(rhinoObject.ParentIdefId)
+            ExplodeRecursive(instanceObject, Rhino.Geometry.Transform.Identity, pieces, transforms)
             for item, trans in zip(pieces, transforms):
                 data = object_export_data.copy()
                 data["Object"] = item
@@ -223,10 +215,13 @@ ZtoYUp = xform_to_rhino(ZtoYUp)
 
 for k, data in enumerate(sanitized):
 
+    # if k < 318:
+    #    continue
+
     # adds material to the content
-    materialIndex = GetMaterial(
-        data["RenderMaterial"], data["Object"], options, gltf_content, materialsMap
-    )
+    materialIndex = GetMaterial(data["RenderMaterial"], data["Object"], options, gltf_content, materialsMap)
+
+    print(gltf_content.materials)
 
     for i, rhino_mesh in enumerate(data["Meshes"]):
         print("rhino_mesh", rhino_mesh)
@@ -251,14 +246,10 @@ for k, data in enumerate(sanitized):
         # normals = [mesh.vertex_normal(k) for k in mesh.vertices()]
 
         if rhino_mesh.Normals.Count > 0 and options.ExportVertexNormals:
-            pd.attributes["NORMAL"] = [
-                (float(v.X), float(v.Y), float(v.Z)) for v in rhino_mesh.Normals
-            ]
+            pd.attributes["NORMAL"] = [(float(v.X), float(v.Y), float(v.Z)) for v in rhino_mesh.Normals]
 
         if rhino_mesh.TextureCoordinates.Count > 0 and options.ExportTextureCoordinates:
-            pd.attributes["TEXCOORD_0"] = [
-                (float(u), float(v)) for u, v in rhino_mesh.TextureCoordinates
-            ]
+            pd.attributes["TEXCOORD_0"] = [(float(u), float(v)) for u, v in rhino_mesh.TextureCoordinates]
 
         if rhino_mesh.VertexColors.Count > 0 and options.ExportVertexColors:
             colors = []
