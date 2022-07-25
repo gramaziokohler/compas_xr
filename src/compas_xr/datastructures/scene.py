@@ -140,22 +140,23 @@ if __name__ == "__main__":
     print("=======================")
     print(scene.data)
 
-    """
-
-    scene = Scene.from_gltf(gltf_filename)
-    print("GLTF")
-    print("=======================")
-    print(scene.data)
+    # scene = Scene.from_gltf(gltf_filename)
+    # print("GLTF")
+    # print("=======================")
+    # print(scene.data)
 
     scene_data_after = scene.data
 
     print(scene_data_before["node"])
     print(scene_data_after["node"])
 
-    assert scene_data_before["materials"] == scene_data_after["materials"]
-    assert scene_data_before["attributes"] == scene_data_after["attributes"]
+    # assert scene_data_before["materials"] == scene_data_after["materials"]
+
+    print(scene_data_before["materials"])
+    print(scene_data_after["materials"])
+
+    # assert scene_data_before["attributes"] == scene_data_after["attributes"]
     assert scene_data_before["dna"] == scene_data_after["dna"]
     assert scene_data_before["dea"] == scene_data_after["dea"]
     assert scene_data_before["adjacency"] == scene_data_after["adjacency"]
     assert scene_data_before["edge"] == scene_data_after["edge"]
-    """
