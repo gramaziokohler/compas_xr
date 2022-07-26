@@ -55,5 +55,6 @@ class GLTFMaterial(MaterialData):
         from compas_xr.datastructures import Material
 
         texture_index_by_key = 0  # TODO
+        # TODO: extensions
         material_dict = replace_recursively(self.to_data(texture_index_by_key), replace_map_inv)
         return Material.from_data(material_dict)
