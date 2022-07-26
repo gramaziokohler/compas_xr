@@ -1,4 +1,5 @@
 import os
+from pxr import Sdf
 from pxr import Usd
 from pxr import UsdGeom
 from pxr import UsdShade
@@ -14,6 +15,7 @@ from compas_usd.conversions import prim_from_mesh
 from compas_usd.conversions import prim_default
 from compas_usd.conversions import prim_from_cylinder
 from compas_usd.conversions import frame_and_scale_from_prim
+from compas_usd.conversions import box_from_prim
 from compas_usd.material import USDMaterial
 
 
@@ -61,15 +63,12 @@ class USDScene(object):
         usd_scene.scene = Usd.Stage.CreateInMemory()
         stage = usd_scene.scene
 
-        UsdGeom.SetStageUpAxis(stage, scene.up_axis)
+        UsdGeom.SetStageUpAxis(stage, scene.up_axis)  # UsdGeom.Tokens.z
 
-        # UsdGeom.Tokens.z
-
+        image_uris = [image.uri for image in scene.images]
         usd_materials = []
         for material in scene.materials:
-
-            print(stage, material)
-            usd_materials.append(USDMaterial.from_material(stage, material))
+            usd_materials.append(USDMaterial.from_material(stage, material, image_uris=image_uris, textures=scene.textures))
 
         # 1. Add those that are references first
         visited = []
@@ -89,6 +88,8 @@ class USDScene(object):
             element = scene.node_attribute(key, "element")
             instance_of = scene.node_attribute(key, "instance_of")
             scale = scene.node_attribute(key, "scale")
+
+            tex_coords = scene.node_attribute(key, "tex_coords")
 
             mkey = scene.node_attribute(key, "material")
 
@@ -122,6 +123,10 @@ class USDScene(object):
                             prim = prim_from_box(stage, path, element)
                         elif type(element) == Mesh:
                             prim = prim_from_mesh(stage, path, element)
+                            if tex_coords:
+                                usd_tex_coords = prim.CreatePrimvar("st", Sdf.ValueTypeNames.TexCoord2fArray, UsdGeom.Tokens.varying)
+                                usd_tex_coords.Set(tex_coords)
+
                         elif type(element) == Cylinder:
                             prim = prim_from_cylinder(stage, path, element)
                         else:
@@ -170,11 +175,8 @@ class USDScene(object):
                 frames[i] = frame
                 scales[i] = scale
 
-            elif typename == "Cube":  # box from prim
-                size = obj.GetPrim().GetAttribute("size").Get()
-                frame, scale = frame_and_scale_from_prim(obj)
-                xsize, ysize, zsize = scale
-                elements[i] = Box(frame, xsize * size, ysize * size, zsize * size)
+            elif typename == "Cube":
+                elements[i] = box_from_prim(obj)
 
             else:
                 raise NotImplementedError
