@@ -65,6 +65,7 @@ class Material(Data):
         self,
         name=None,
         pbr_metallic_roughness=None,
+        pbr_specular_glossiness=None,
         normal_texture=None,
         occlusion_texture=None,
         emissive_texture=None,
@@ -75,6 +76,7 @@ class Material(Data):
     ):
         self.name = name
         self.pbr_metallic_roughness = pbr_metallic_roughness
+        self.pbr_specular_glossiness = pbr_specular_glossiness
         self.normal_texture = normal_texture
         self.occlusion_texture = occlusion_texture
         self.emissive_texture = emissive_texture
@@ -89,6 +91,7 @@ class Material(Data):
         return {
             "name": self.name,
             "pbr_metallic_roughness": self.pbr_metallic_roughness.data if self.pbr_metallic_roughness else None,  # noqa E501
+            "pbr_specular_glossiness": self.pbr_specular_glossiness.data if self.pbr_specular_glossiness else None,  # noqa E501
             "normal_texture": self.normal_texture.data if self.normal_texture else None,  # noqa E501
             "occlusion_texture": self.occlusion_texture.data if self.occlusion_texture else None,  # noqa E501
             "emissive_texture": self.emissive_texture.data if self.emissive_texture else None,  # noqa E501
@@ -102,9 +105,10 @@ class Material(Data):
     def data(self, data):
         self.name = data.get("name")
         self.pbr_metallic_roughness = PBRMetallicRoughness.from_data(data.get("pbr_metallic_roughness")) if data.get("pbr_metallic_roughness") else None  # noqa E501
+        self.pbr_specular_glossiness = PBRSpecularGlossiness.from_data(data.get("pbr_specular_glossiness")) if data.get("pbr_specular_glossiness") else None  # noqa E501
         self.normal_texture = NormalTexture.from_data(data.get("normal_texture")) if data.get("normal_texture") else None  # noqa E501
         self.occlusion_texture = OcclusionTexture.from_data(data.get("occlusion_texture")) if data.get("occlusion_texture") else None  # noqa E501
-        self.emissive_texture = Texture.from_data(data.get("emissive_texture")) if data.get("emissive_texture") else None  # noqa E501
+        self.emissive_texture = Texture.from_data(data.get("emissive_texture")) if data.get("emissive_texture") else None  # noqa E501 TODO: or TextureInfo?
         self.emissive_factor = data.get("emissive_factor")
         self.alpha_mode = data.get("alpha_mode")
         self.alpha_cutoff = data.get("alpha_cutoff")
@@ -120,10 +124,10 @@ class PBRMetallicRoughness(Data):
         roughness_factor=None,
         metallic_roughness_texture=None,
     ):
-        self.base_color_factor = base_color_factor
+        self.base_color_factor = base_color_factor  # [1.0, 1.0, 1.0, 1.0]
         self.base_color_texture = base_color_texture
-        self.metallic_factor = metallic_factor
-        self.roughness_factor = roughness_factor
+        self.metallic_factor = metallic_factor  # 1.0
+        self.roughness_factor = roughness_factor  # 1.0
         self.metallic_roughness_texture = metallic_roughness_texture
 
     @property
@@ -139,10 +143,53 @@ class PBRMetallicRoughness(Data):
     @data.setter
     def data(self, data):
         self.base_color_factor = data.get("base_color_factor")
-        self.base_color_texture = Texture.from_data(data.get("base_color_texture")) if data.get("base_color_texture") else None  # noqa E501
+
+        print("base_color_texture", data.get("base_color_texture"))
+
+        self.base_color_texture = TextureInfo.from_data(data.get("base_color_texture")) if data.get("base_color_texture") else None  # noqa E501
         self.metallic_factor = data.get("metallic_factor")
         self.roughness_factor = data.get("roughness_factor")
-        self.metallic_roughness_texture = Texture.from_data(data.get("metallic_roughness_texture")) if data.get("metallic_roughness_texture") else None  # noqa E501
+        self.metallic_roughness_texture = TextureInfo.from_data(data.get("metallic_roughness_texture")) if data.get("metallic_roughness_texture") else None  # noqa E501
+
+
+class PBRSpecularGlossiness(Data):
+    """Class that defines the specular-glossiness material model from Physically-Based Rendering (PBR) methodology.
+
+    https://kcoley.github.io/glTF/extensions/2.0/Khronos/KHR_materials_pbrSpecularGlossiness/schema/glTF.KHR_materials_pbrSpecularGlossiness.schema.json
+    """
+
+    def __init__(
+        self,
+        diffuse_factor=None,
+        diffuse_texture=None,
+        specular_factor=None,
+        glossiness_factor=None,
+        specular_glossiness_texture=None,
+    ):
+        super(PBRSpecularGlossiness, self).__init__()
+        self.diffuse_factor = diffuse_factor  # [1.0, 1.0, 1.0, 1.0]
+        self.diffuse_texture = diffuse_texture
+        self.specular_factor = specular_factor  # [1.0, 1.0, 1.0]
+        self.glossiness_factor = glossiness_factor  # 1.0
+        self.specular_glossiness_texture = specular_glossiness_texture
+
+    @property
+    def data(self):
+        return {
+            "diffuse_factor": self.diffuse_factor,
+            "diffuse_texture": self.diffuse_texture.data if self.diffuse_texture else None,  # noqa E501
+            "specular_factor": self.specular_factor,
+            "glossiness_factor": self.glossiness_factor,
+            "specular_glossiness_texture": self.specular_glossiness_texture.data if self.specular_glossiness_texture else None,
+        }  # noqa E501
+
+    @data.setter
+    def data(self, data):
+        self.diffuse_factor = data.get("diffuse_factor")
+        self.diffuse_texture = TextureInfo.from_data(data.get("diffuse_texture")) if data.get("diffuse_texture") else None  # noqa E501
+        self.specular_factor = data.get("specular_factor")
+        self.glossiness_factor = data.get("glossiness_factor")
+        self.specular_glossiness_texture = TextureInfo.from_data(data.get("specular_glossiness_texture")) if data.get("specular_glossiness_texture") else None  # noqa E501
 
 
 class Texture(Data):
@@ -184,6 +231,32 @@ class Texture(Data):
             self.repeat = data.get("repeat")
 
 
+class TextureInfo(Data):
+    def __init__(self, index=None, tex_coord=None, texture_transform=None):
+        super(TextureInfo, self).__init__()
+        self.index = index
+        self.tex_coord = tex_coord
+        self.texture_transform = texture_transform
+
+    @property
+    def data(self):
+        data = {}
+        if self.index is not None:
+            data.update({"index": self.index})
+        if self.tex_coord is not None:
+            data.update({"tex_coord": self.tex_coord})
+        if self.texture_transform is not None:
+            data.update({"texture_transform": self.texture_transform.data})
+        return data
+
+    @data.setter
+    def data(self, data):
+        if data:
+            self.index = data.get("index")
+            self.tex_coord = data.get("texCoord")
+            self.texture_transform = TextureTransform.from_data(data.get("texture_transform")) if data.get("texture_transform") else None
+
+
 class NormalTexture(Texture):
     """The tangent space normal texture.
 
@@ -215,11 +288,13 @@ class OcclusionTexture(Texture):
 
     The occlusion values are linearly sampled from the R channel. Higher values indicate areas that receive full indirect lighting and lower values indicate no indirect lighting.
     If other channels are present (GBA), they **MUST** be ignored for occlusion calculations. When undefined, the material does not have an occlusion texture.
+
+    https://github.com/KhronosGroup/glTF/blob/main/specification/2.0/schema/material.occlusionTextureInfo.schema.json
     """
 
     def __init__(self, source=None, name=None, strength=None):
         super(OcclusionTexture, self).__init__(source, name)
-        self.strength = strength
+        self.strength = strength  # 1.0
 
     @property
     def data(self):
@@ -233,6 +308,83 @@ class OcclusionTexture(Texture):
             self.source = data.get("source")
             self.name = data.get("name")
             self.strength = data.get("strength")
+
+
+class TextureTransform(Data):
+    """Class that enables shifting and scaling UV coordinates on a per-texture basis.
+
+    https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Khronos/KHR_texture_transform
+    """
+
+    def __init__(
+        self,
+        offset=None,
+        rotation=None,
+        scale=None,
+        tex_coord=None,
+    ):
+        super(TextureTransform, self).__init__()
+        self.offset = offset  # or [0.0, 0.0]
+        self.rotation = rotation  # or 0.
+        self.scale = scale  # or [1., 1.]
+        self.tex_coord = tex_coord
+
+    @property
+    def data(self):
+        data = {}
+        if self.offset is not None:
+            data.update({"offset": self.offset})
+        if self.rotation is not None:
+            data.update({"rotation": self.rotation})
+        if self.scale is not None:
+            data.update({"scale": self.scale})
+        if self.tex_coord is not None:
+            data.update({"tex_coord": self.tex_coord})
+        return data
+
+    @data.setter
+    def data(self, data):
+        if data:
+            self.offset = data.get("offset")
+            self.rotation = data.get("rotation")
+            self.scale = data.get("scale")
+            self.tex_coord = data.get("texCoord")
+
+
+class MineType(object):
+    JPEG = "image/jpeg"
+    PNG = "image/png"
+
+
+class Image(Data):
+    def __init__(
+        self,
+        uri=None,
+        mime_type=None,
+        name=None,
+    ):
+        super(Image, self).__init__()
+        self.uri = uri
+        self.mime_type = mime_type
+        self.name = name
+
+    @property
+    def data(self):
+        data = {}
+        if self.name is not None:
+            data.update({"name": self.name})
+        if self.mime_type is not None:
+            data.update({"mimeType": self.mime_type})
+        if self.uri is not None:
+            data.update({"uri": self.uri})
+        return data
+
+    @data.setter
+    def data(self, data):
+        if data:
+            self.uri = data.get("uri")
+            self.mime_type = data.get("mimeType")
+            self.name = data.get("name")
 
 
 if __name__ == "__main__":
