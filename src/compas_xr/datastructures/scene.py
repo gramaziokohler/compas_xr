@@ -8,6 +8,9 @@ from compas.datastructures import Graph
 from compas_xr.files.usd import USDScene
 from compas_xr.files.gltf import GLTFScene
 
+from .material import Image
+from .material import Texture
+from .material import Material
 
 __all__ = ["Scene"]
 
@@ -20,12 +23,14 @@ class Scene(Graph):  # or scenegraph
     ----------
     """
 
-    def __init__(self, name="scene", up_axis="Z", materials=None):
+    def __init__(self, name="scene", up_axis="Z", materials=None, images=None, textures=None):
         super(Scene, self).__init__()
         self.name = name
         self.up_axis = up_axis
         self.update_default_node_attributes({"is_reference": False})
         self.materials = materials or []
+        self.images = images or []
+        self.textures = textures or []
 
     def add_layer(self, key, parent=None, attr_dict=None, **kwattr):
         self.add_node(key, parent=parent, attr_dict=attr_dict, **kwattr)
@@ -38,11 +43,34 @@ class Scene(Graph):  # or scenegraph
         self.materials.append(material)
         return len(self.materials) - 1
 
+    def add_image(self, image):
+        self.images.append(image)
+        return len(self.images) - 1
+
+    def add_texture(self, texture):
+        self.textures.append(texture)
+        return len(self.textures) - 1
+
     @property
     def data(self):
-        data_dict = super(Scene, self).data
-        data_dict["materials"] = [m.data for m in self.materials]
-        return data_dict
+        data = super(Scene, self).data
+        if self.materials is not None:
+            data["materials"] = [m.data for m in self.materials]
+        if self.images is not None:
+            data["images"] = [m.data for m in self.images]
+        if self.textures is not None:
+            data["textures"] = [m.data for m in self.textures]
+        return data
+
+    @data.setter
+    def data(self, data):
+        super(Scene, self.__class__).data.fset(self, data)
+        if data.get("materials") is not None:
+            self.materials = [Material.from_data(d) for d in data.get("materials")]
+        if data.get("images") is not None:
+            self.images = [Image.from_data(d) for d in data.get("images")]
+        if data.get("textures") is not None:
+            self.textures = [Texture.from_data(d) for d in data.get("textures")]
 
     @classmethod
     def from_gltf(cls, filepath):
@@ -104,7 +132,6 @@ if __name__ == "__main__":
     from compas.geometry import Box
     from compas.geometry import Frame, Rotation, Vector
     from compas_xr import DATA
-    from compas_xr.datastructures import Material
     from compas_xr.datastructures.material import PBRMetallicRoughness
 
     scene = Scene()
