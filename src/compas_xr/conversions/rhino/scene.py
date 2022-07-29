@@ -166,6 +166,7 @@ class RhinoScene(BaseScene):
         # 1. Materials
 
         # 2. Blocks
+        # is this needed to first go through all blocks? maybe make that togehter with everyting else..
         for layer_name in rs.LayerNames():
             parent = rs.ParentLayer(layer_name)
             parent_in_scene = layer_name[(layer_name.rfind(":") + 1) :]
