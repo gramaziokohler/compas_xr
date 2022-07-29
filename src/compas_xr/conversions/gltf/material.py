@@ -32,7 +32,7 @@ def replace_recursively(adict, replace_map, ndict=None):
     return ndict
 
 
-class GLTFMaterial(MaterialData):
+class GLTFMaterial(MaterialData):  # TODO: base on BaseMaterial?
     def __init__(self, *args, **kwargs):
         super(GLTFMaterial, self).__init__(*args, **kwargs)
         self.content = None

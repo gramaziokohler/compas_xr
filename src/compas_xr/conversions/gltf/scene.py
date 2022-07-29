@@ -6,10 +6,12 @@ from compas.datastructures import Mesh
 from compas.geometry import Rotation
 from compas.geometry import Frame
 
-from compas_xr.files.gltf import GLTFMaterial
+from compas_xr.conversions import BaseScene
+
+from .material import GLTFMaterial
 
 
-class GLTFScene(object):
+class GLTFScene(BaseScene):
     """ """
 
     def __init__(self, content=None):
@@ -38,16 +40,16 @@ class GLTFScene(object):
             shortest_path = scene.node_to_root(key)
             for key in reversed(shortest_path):
                 if key not in visited:
-                    gltf_scene.add_gltf_node_to_content(scene, gscene, key)
+                    gltf_scene._add_gltf_node_to_content(scene, gscene, key)
                     visited.append(key)
 
         for key in scene.ordered_keys:
             if key not in visited:
-                gltf_scene.add_gltf_node_to_content(scene, gscene, key)
+                gltf_scene._add_gltf_node_to_content(scene, gscene, key)
 
         return gltf_scene
 
-    def add_gltf_node_to_content(self, graph, scene, key):
+    def _add_gltf_node_to_content(self, graph, scene, key):
         # graph, = self
         parent = graph.node_attribute(key, "parent")
         is_reference = graph.node_attribute(key, "is_reference")

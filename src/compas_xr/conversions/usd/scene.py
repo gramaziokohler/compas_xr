@@ -18,9 +18,11 @@ from compas_usd.conversions import frame_and_scale_from_prim
 from compas_usd.conversions import box_from_prim
 from compas_usd.material import USDMaterial
 
+from compas_xr.conversions import BaseScene
 
-class USDScene(object):
-    """ """
+
+class USDScene(BaseScene):
+    """Wrapper about Usd.Stage."""
 
     def __init__(self, scene=None):
         self.scene = scene
