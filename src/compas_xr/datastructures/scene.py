@@ -2,11 +2,13 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+import compas
 from compas.topology import breadth_first_ordering
 from compas.datastructures import Graph
 
-from compas_xr.files.usd import USDScene
-from compas_xr.files.gltf import GLTFScene
+if not compas.IPY:
+    from compas_xr.conversions.usd import USDScene
+from compas_xr.conversions.gltf import GLTFScene
 
 from .material import Image
 from .material import Texture
@@ -38,6 +40,16 @@ class Scene(Graph):  # or scenegraph
         if parent:
             self.add_edge(parent, key)
         return key
+
+    def unique_key(self, name, num_padding=3, i=0):
+        if not self.has_node(name):
+            return name, 0
+        postfix = "%0" + str(num_padding) + "d"
+        key = (name + postfix) % (i)
+        while self.has_node(key):
+            i += 1
+            key = (name + postfix) % (i)
+        return key, i
 
     def add_material(self, material):
         self.materials.append(material)
