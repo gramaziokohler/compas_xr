@@ -28,5 +28,5 @@ try:
     import omni  # noqa F401
 
     IN_OMNI = True
-except ModuleNotFoundError:
+except:  # ModuleNotFoundError:
     IN_OMNI = False
