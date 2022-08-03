@@ -108,7 +108,7 @@ def obj_to_scene(
     objgeo = obj.Geometry
     
     material = RhinoMaterial.from_object(obj)
-    print(">> material", material.material)
+    print("material", material.material)
 
     if type(objgeo) == rg.InstanceReferenceGeometry:
         idef = scriptcontext.doc.InstanceDefinitions.FindId(objgeo.ParentIdefId)
@@ -116,14 +116,17 @@ def obj_to_scene(
 
         # check if the reference to the instance already exists.
         # if not, add to scene
-        # if not scene.has_layer("references"):
-        #    references = scene.add_layer("references")
+        if not scene.has_layer("references"):
+            references = scene.add_layer("references")
 
-        # if not scene.has_layer(name):
-        #    # add the reference to the scene
-        #    scene.add_layer(name, parent="references", is_reference=True)  # here we assume the name to be unique
-        #    for robj in idef.GetObjects():
-        #        obj_to_scene(robj, scene, name)
+        if not scene.has_layer(name):
+            # add the reference to the scene
+            scene.add_layer(name, parent="references", is_reference=True)  # here we assume the name to be unique
+            for robj in idef.GetObjects():
+                obj_to_scene(robj, scene, name)
+        else:
+            # it already exists, we dont have to add it
+            pass
 
         # add the instance to the scene
 
@@ -167,55 +170,7 @@ class RhinoScene(BaseScene):
 
         rscene = cls()
         scene = rscene.scene
-
-        # 1. Materials
         
-
-        # 2. Blocks
-        block_names = []
-        block_depths = []
-        # is this needed to first go through all blocks? maybe make that togehter with everyting else..
-        for layer_name in rs.LayerNames():  # this is ordered
-            parent = rs.ParentLayer(layer_name)
-            for guid in rs.ObjectsByLayer(layer_name):
-                robj = rs.coercerhinoobject(guid, True)
-                if type(robj.Geometry) == rg.InstanceReferenceGeometry:
-                    idef = scriptcontext.doc.InstanceDefinitions.FindId(robj.Geometry.ParentIdefId)
-                    if idef.Name not in block_names:
-                        block_names.append(idef.Name)
-                        block_depths.append(0)
-                    # go through if we find more instances within
-                    names, depths = block_names_within_block(idef)
-                    block_names += names
-                    block_depths += depths
-
-        if len(block_names):
-            # sort based on block depths
-            idxs = argsort(block_depths)
-            block_depths = [block_depths[i] for i in idxs]
-            block_names = [block_names[i] for i in idxs]
-            print(reversed(block_names))
-
-            # add to scene
-            references = scene.add_layer("references")
-            for block_name in reversed(block_names):  # start with the one that has the least depth
-                idef = scriptcontext.doc.InstanceDefinitions.Find(block_name)
-                scene.add_layer(block_name, parent=references, is_reference=True)  # here we assume the name to be unique
-                for obj in idef.GetObjects():
-                    obj_to_scene(obj, scene, block_name)
-
-        """
-        # 3. Other objects
-        for layer_name in rs.LayerNames():  # this is ordered
-            parent = rs.ParentLayer(layer_name)
-            parent_in_scene = layer_name[(layer_name.rfind(":") + 1) :]
-            key = scene.unique_key(parent_in_scene)
-            scene.add_layer(key, parent=parent)
-            for guid in rs.ObjectsByLayer(layer_name):
-                robj = rs.coercerhinoobject(guid, True)
-                obj_to_scene(robj, scene, key)
-        """
-
         for layer_name in rs.LayerNames():  # this is ordered
             parent = rs.ParentLayer(layer_name)
             if parent is not None:
@@ -223,12 +178,10 @@ class RhinoScene(BaseScene):
             parent_in_scene = layer_name[(layer_name.rfind(":") + 1) :]
             key = scene.unique_key(parent_in_scene)
             scene.add_layer(key, parent=parent)
+            
             for guid in rs.ObjectsByLayer(layer_name):
                 robj = rs.coercerhinoobject(guid, True)
-                obj_to_scene(robj, scene, key)
-                
-                material = RhinoMaterial.from_object(robj)
-                print("material", material.material)
+                obj_to_scene(robj, scene, key) # takes care of the references, instances, materials
 
         # remove orphans
         return rscene
