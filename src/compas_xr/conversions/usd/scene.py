@@ -33,9 +33,9 @@ class USDScene(BaseScene):
         scene.scene = Usd.Stage.Open(filename)
         return scene
 
-    def reference_filename(self, reference_name, fullpath=True, extension=None):
+    def reference_filename(self, reference_name, filepath=None, fullpath=True, extension=None):
         stage = self.scene
-        filepath = str(stage.GetRootLayer().resolvedPath)  # .realPath
+        filepath = filepath or str(stage.GetRootLayer().resolvedPath)  # .realPath
         if not extension:
             _, extension = os.path.splitext(filepath)
         filename = "%s%s" % (reference_name, extension)
@@ -44,9 +44,10 @@ class USDScene(BaseScene):
         else:
             return filename
 
-    def prim_instance(self, path, reference_name, xform=False, extension=None):
+    def prim_instance(self, path, reference_name, filepath=None, xform=False, extension=None):
         stage = self.scene
-        reference_filepath = self.reference_filename(reference_name, fullpath=False, extension=extension)
+        reference_filepath = self.reference_filename(reference_name, filepath=filepath, fullpath=False, extension=extension)
+        print(reference_filepath)
         if not xform:
             ref = stage.OverridePrim(path)
             ref.GetReferences().AddReference("./%s" % reference_filepath)
@@ -59,10 +60,16 @@ class USDScene(BaseScene):
         return ref
 
     @classmethod
-    def from_scene(cls, scene):
+    def from_scene(cls, scene, filepath=None):
+
+        if scene.has_references and filepath is None:
+            raise ValueError("Please pass a filename for a scene with references")
 
         usd_scene = cls()
-        usd_scene.scene = Usd.Stage.CreateInMemory()
+        if filepath:
+            usd_scene.scene = Usd.Stage.CreateNew(filepath)
+        else:
+            usd_scene.scene = Usd.Stage.CreateInMemory()
         stage = usd_scene.scene
 
         UsdGeom.SetStageUpAxis(stage, scene.up_axis)  # UsdGeom.Tokens.z
@@ -72,14 +79,18 @@ class USDScene(BaseScene):
         for material in scene.materials:
             usd_materials.append(USDMaterial.from_material(stage, material, image_uris=image_uris, textures=scene.textures))
 
-        # 1. Add those that are references first
+        # Export the references first, otherwise we will not find a linkage
         visited = []
-        for key in scene.nodes_where({"is_reference": True}):
+        for key in scene.ordered_references:
             subscene = scene.subscene(key)
             children = scene._all_children(key, include_key=True)
             visited += children
             reference_filepath = usd_scene.reference_filename(key, fullpath=True)
-            subscene.to_usd(reference_filepath)
+            USDScene.from_scene(subscene, filepath=reference_filepath)  # .to_usd
+            # reference_filepath = usd_scene.reference_filename(key, fullpath=True)
+            # subscene.to_usd(reference_filepath)
+
+        print(visited)
 
         for key in scene.ordered_keys:
             if key in visited:
@@ -90,6 +101,9 @@ class USDScene(BaseScene):
             element = scene.node_attribute(key, "element")
             instance_of = scene.node_attribute(key, "instance_of")
             scale = scene.node_attribute(key, "scale")
+
+            if instance_of:
+                print("instance_of", instance_of)
 
             tex_coords = scene.node_attribute(key, "tex_coords")
 
@@ -110,9 +124,8 @@ class USDScene(BaseScene):
                         prim_default(stage, path, transformation)
                         path += "/element"
 
-                    prim = usd_scene.prim_instance(path, scene.node_attribute(key, "instance_of"))
-                    # if frame:
-                    #    apply_frame_transformation_on_prim(ref, frame)
+                    # GetRealPath() is string
+                    prim = usd_scene.prim_instance(path, scene.node_attribute(key, "instance_of"), filepath=str(stage.GetRootLayer().resolvedPath))
 
                 else:
 
@@ -137,12 +150,18 @@ class USDScene(BaseScene):
 
                     if not frame and not element:
                         prim = prim_default(stage, path, transformation)
+            else:
+                raise ValueError("we should never come here")
 
             if mkey is not None:
                 UsdShade.MaterialBindingAPI(prim).Bind(usd_materials[mkey].material)
 
             if is_root and key != "references":
                 stage.SetDefaultPrim(prim.GetPrim())  # dont use references as default layer
+
+        print("stage.GetRootLayer()", type(stage.GetRootLayer()))
+        stage.GetRootLayer().Save()
+        # stage.Export(filepath) # removes the linkages
 
         return usd_scene
 
@@ -208,4 +227,12 @@ class USDScene(BaseScene):
         return scene
 
     def to_usd(self, filename):
-        self.scene.Export(filename)
+        """
+        for key, subscene in self.subscenes.items():
+            reference_filepath = self.reference_filename(key, filepath=filename, fullpath=True)
+            print(reference_filepath)
+            subscene.to_usd(reference_filepath)
+        """
+        # self.scene.Export(filename)
+        # self.scene.GetRootLayer().Save()
+        pass
