@@ -1,3 +1,4 @@
+from distutils import extension
 import os
 from pxr import Sdf
 from pxr import Usd
@@ -26,6 +27,7 @@ class USDScene(BaseScene):
 
     def __init__(self, scene=None):
         self.scene = scene
+        self.references = {}
 
     @classmethod
     def from_usd(cls, filename):
@@ -33,43 +35,23 @@ class USDScene(BaseScene):
         scene.scene = Usd.Stage.Open(filename)
         return scene
 
-    def reference_filename(self, reference_name, filepath=None, fullpath=True, extension=None):
-        stage = self.scene
-        filepath = filepath or str(stage.GetRootLayer().resolvedPath)  # .realPath
-        if not extension:
-            _, extension = os.path.splitext(filepath)
-        filename = "%s%s" % (reference_name, extension)
-        if fullpath:
-            return os.path.join(os.path.dirname(filepath), filename)
-        else:
-            return filename
-
-    def prim_instance(self, path, reference_name, filepath=None, xform=False, extension=None):
-        stage = self.scene
-        reference_filepath = self.reference_filename(reference_name, filepath=filepath, fullpath=False, extension=extension)
-        print(reference_filepath)
-        if not xform:
-            ref = stage.OverridePrim(path)
-            ref.GetReferences().AddReference("./%s" % reference_filepath)
-        else:
-            ref = UsdGeom.Xform.Define(stage, path)
-            ref.GetPrim().GetReferences().AddReference("./%s" % reference_filepath)
-
+    def prim_instance(self, path, reference_name):
+        # the following leads to warnings, as these references do not yet exist at the time of creation
+        # TODO: how to surpress these warnings
+        ref = self.scene.OverridePrim(path)
+        ref.GetReferences().AddReference("./%s" % reference_name)
+        # alternatively with xform
+        # ref = UsdGeom.Xform.Define(self.scene, path)
+        # ref.GetPrim().GetReferences().AddReference("./%s" % reference_name)
         ref_xform = UsdGeom.Xformable(ref)
         ref_xform.SetXformOpOrder([])
         return ref
 
     @classmethod
-    def from_scene(cls, scene, filepath=None):
-
-        if scene.has_references and filepath is None:
-            raise ValueError("Please pass a filename for a scene with references")
-
+    def from_scene(cls, scene):
+        """ """
         usd_scene = cls()
-        if filepath:
-            usd_scene.scene = Usd.Stage.CreateNew(filepath)
-        else:
-            usd_scene.scene = Usd.Stage.CreateInMemory()
+        usd_scene.scene = Usd.Stage.CreateInMemory()
         stage = usd_scene.scene
 
         UsdGeom.SetStageUpAxis(stage, scene.up_axis)  # UsdGeom.Tokens.z
@@ -83,14 +65,10 @@ class USDScene(BaseScene):
         visited = []
         for key in scene.ordered_references:
             subscene = scene.subscene(key)
+            subscene.node_attribute(key, "is_reference", value=False)  # important to not get into an infinite loop when exporting
+            usd_scene.references[key] = cls.from_scene(subscene)
             children = scene._all_children(key, include_key=True)
             visited += children
-            reference_filepath = usd_scene.reference_filename(key, fullpath=True)
-            USDScene.from_scene(subscene, filepath=reference_filepath)  # .to_usd
-            # reference_filepath = usd_scene.reference_filename(key, fullpath=True)
-            # subscene.to_usd(reference_filepath)
-
-        print(visited)
 
         for key in scene.ordered_keys:
             if key in visited:
@@ -101,10 +79,6 @@ class USDScene(BaseScene):
             element = scene.node_attribute(key, "element")
             instance_of = scene.node_attribute(key, "instance_of")
             scale = scene.node_attribute(key, "scale")
-
-            if instance_of:
-                print("instance_of", instance_of)
-
             tex_coords = scene.node_attribute(key, "tex_coords")
 
             mkey = scene.node_attribute(key, "material")
@@ -123,9 +97,7 @@ class USDScene(BaseScene):
                     if frame:
                         prim_default(stage, path, transformation)
                         path += "/element"
-
-                    # GetRealPath() is string
-                    prim = usd_scene.prim_instance(path, scene.node_attribute(key, "instance_of"), filepath=str(stage.GetRootLayer().resolvedPath))
+                    prim = usd_scene.prim_instance(path, scene.node_attribute(key, "instance_of"))
 
                 else:
 
@@ -158,10 +130,6 @@ class USDScene(BaseScene):
 
             if is_root and key != "references":
                 stage.SetDefaultPrim(prim.GetPrim())  # dont use references as default layer
-
-        print("stage.GetRootLayer()", type(stage.GetRootLayer()))
-        stage.GetRootLayer().Save()
-        # stage.Export(filepath) # removes the linkages
 
         return usd_scene
 
@@ -226,13 +194,28 @@ class USDScene(BaseScene):
 
         return scene
 
+    def _add_extension_to_external_reference(self, extension):
+        for ref in self.scene.GetRootLayer().GetExternalReferences():
+            _, ext = os.path.splitext(ref)
+            if not len(ext):
+                self.scene.GetRootLayer().UpdateExternalReference(ref, ref + extension)
+
+    def _reference_filename(self, reference_name, filepath):
+        _, extension = os.path.splitext(filepath)
+        return os.path.join(os.path.dirname(filepath), reference_name + extension)
+
     def to_usd(self, filename):
-        """
-        for key, subscene in self.subscenes.items():
-            reference_filepath = self.reference_filename(key, filepath=filename, fullpath=True)
-            print(reference_filepath)
-            subscene.to_usd(reference_filepath)
-        """
-        # self.scene.Export(filename)
-        # self.scene.GetRootLayer().Save()
-        pass
+        _, extension = os.path.splitext(filename)
+        for key, reference in self.references.items():
+            reference._add_extension_to_external_reference(extension)
+            reference_filepath = self._reference_filename(key, filename)
+            reference.to_usd(reference_filepath)
+        self._add_extension_to_external_reference(extension)
+
+        # There should be a better way of doing this, but
+        # stage.Export(filepath) removes the linkages (links to references), and
+        # stage.GetRootLayer().Import(self.scene.GetRootLayer()) is not not working.
+        # That's why we need to make the following workaround:
+        stage = Usd.Stage.CreateNew(filename)
+        stage.GetRootLayer().ImportFromString(self.scene.GetRootLayer().ExportToString())
+        stage.GetRootLayer().Save()

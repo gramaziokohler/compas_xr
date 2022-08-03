@@ -75,7 +75,7 @@ class Scene(Graph):  # or scenegraph
 
     @property
     def ordered_references(self):
-        # Go through references and add those with the deepest depth first
+        """Returns an ordered list of references with the deepest depth first."""
         block_names = []
         block_depths = []
 
@@ -150,7 +150,7 @@ class Scene(Graph):  # or scenegraph
         return shortest_path
 
     def to_usd(self, filepath):
-        USDScene.from_scene(self, filepath).to_usd(filepath)
+        USDScene.from_scene(self).to_usd(filepath)
 
     def to_gltf(self, filepath, embed_data=False):
         GLTFScene.from_scene(self).to_gltf(filepath, embed_data=embed_data)
@@ -161,12 +161,12 @@ class Scene(Graph):  # or scenegraph
 
         def _add_branch(scene, key, parent):
             element = self.node_attribute(key, "element")
-
+            is_reference = self.node_attribute(key, "is_reference")
             frame = self.node_attribute(key, "frame")
             instance_of = self.node_attribute(key, "instance_of")
             scale = self.node_attribute(key, "scale")
-            # TODO: auto attributes, but first key should not include "reference" key
-            scene.add_layer(key, parent=parent, element=element, frame=frame, instance_of=instance_of, scale=scale)
+            # TODO: auto copy attributes !!!
+            scene.add_layer(key, parent=parent, element=element, frame=frame, instance_of=instance_of, scale=scale, is_reference=is_reference)
             for child in self.nodes_where({"parent": key}):
                 _add_branch(scene, child, key)
 
