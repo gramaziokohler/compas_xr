@@ -19,6 +19,7 @@ import Rhino.Geometry as rg
 import scriptcontext
 
 from compas_xr.conversions import BaseScene
+from compas_xr.conversions.rhino.material import RhinoMaterial
 from compas_xr.utilities import argsort
 
 
@@ -105,6 +106,9 @@ def obj_to_scene(
 
     name = obj.Name
     objgeo = obj.Geometry
+    
+    material = RhinoMaterial.from_object(obj)
+    print(">> material", material.material)
 
     if type(objgeo) == rg.InstanceReferenceGeometry:
         idef = scriptcontext.doc.InstanceDefinitions.FindId(objgeo.ParentIdefId)
@@ -222,6 +226,9 @@ class RhinoScene(BaseScene):
             for guid in rs.ObjectsByLayer(layer_name):
                 robj = rs.coercerhinoobject(guid, True)
                 obj_to_scene(robj, scene, key)
+                
+                material = RhinoMaterial.from_object(robj)
+                print("material", material.material)
 
         # remove orphans
         return rscene
