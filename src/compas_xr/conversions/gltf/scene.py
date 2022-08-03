@@ -37,7 +37,7 @@ class GLTFScene(BaseScene):
 
         # Go through references and add those with the deepest depth first
         visited = []
-        for key in scene.ordered_references():
+        for key in scene.ordered_references:
             shortest_path = scene.node_to_root(key)
             for key in reversed(shortest_path):
                 if key not in visited:
