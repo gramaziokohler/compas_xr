@@ -1,6 +1,12 @@
 class BaseScene(object):
     """Base Scene class for conversions"""
 
+    def __init__(self, name="BaseScene"):
+        from compas_xr.datastructures import Scene
+
+        self.name = name
+        self.scene = Scene(name=self.name)
+
     @classmethod
     def from_scene(cls, scene):
         """Construct a scene.
@@ -19,4 +25,4 @@ class BaseScene(object):
         :class:`compas_xr.datastructures.Scene`
             A COMPAS scene.
         """
-        raise NotImplementedError
+        return self.scene
