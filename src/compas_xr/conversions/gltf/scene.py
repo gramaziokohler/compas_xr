@@ -8,6 +8,7 @@ from compas.geometry import Frame
 
 from compas_xr.conversions import BaseScene
 
+
 from .material import GLTFMaterial
 
 
@@ -34,14 +35,28 @@ class GLTFScene(BaseScene):
             gltf_material = GLTFMaterial.from_material(content, material)
             content.add_material(gltf_material)
 
-        # Add those that are references first
+        # Go through references and add those with the deepest depth first
         visited = []
-        for key in scene.nodes_where({"is_reference": True}):
+        for key in scene.ordered_references():
             shortest_path = scene.node_to_root(key)
             for key in reversed(shortest_path):
                 if key not in visited:
                     gltf_scene._add_gltf_node_to_content(scene, gscene, key)
                     visited.append(key)
+
+        # print("=======================================")
+
+        # Add those that are references first
+        # visited = []
+        # for key in scene.nodes_where({"is_reference": True}):
+        #    print("is_reference", key)
+        #    shortest_path = scene.node_to_root(key)
+        #    print(shortest_path)
+        #    for key in reversed(shortest_path):
+        #        if key not in visited:
+        #            gltf_scene._add_gltf_node_to_content(scene, gscene, key)
+        #            visited.append(key)
+        print("==================================================")
 
         for key in scene.ordered_keys:
             if key not in visited:
@@ -73,7 +88,10 @@ class GLTFScene(BaseScene):
             node.mesh_key = reference.mesh_key
         elif is_reference:
             # set invisible?
-            pass
+            # iter through children
+            children = graph._all_children(key, include_key=False)
+            for child in children:
+                self._add_gltf_node_to_content(graph, scene, child)
 
         if element:
             mesh = Mesh.from_shape(element)  # if shape, else take Mesh directly
