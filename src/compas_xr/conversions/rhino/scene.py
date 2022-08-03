@@ -19,6 +19,7 @@ import Rhino.Geometry as rg
 import scriptcontext
 
 from compas_xr.conversions import BaseScene
+from compas_xr.utilities import argsort
 
 
 def transformation_from_xform(xform):  # TODO upstream to compas
@@ -39,11 +40,6 @@ def transformation_from_xform(xform):  # TODO upstream to compas
         for j in range(0, 4):
             transformation[i, j] = xform[i, j]
     return transformation
-
-
-def argsort(seq):  # TODO: upstream to compsa
-    # http://stackoverflow.com/questions/3071415/efficient-method-to-calculate-the-rank-vector-of-a-list-in-python
-    return sorted(range(len(seq)), key=seq.__getitem__)
 
 
 def block_names_within_block(idef, depth=0):
@@ -101,16 +97,32 @@ def convert_rhino_object_to_compas(obj):
         print("%s not covered in export" % type(obj))
 
 
-def obj_to_scene(obj, scene, parent):
+def obj_to_scene(
+    obj,
+    scene,
+    parent,
+):
 
     name = obj.Name
     objgeo = obj.Geometry
 
-
     if type(objgeo) == rg.InstanceReferenceGeometry:
         idef = scriptcontext.doc.InstanceDefinitions.FindId(objgeo.ParentIdefId)
         name = idef.Name
-        
+
+        # check if the reference to the instance already exists.
+        # if not, add to scene
+        # if not scene.has_layer("references"):
+        #    references = scene.add_layer("references")
+
+        # if not scene.has_layer(name):
+        #    # add the reference to the scene
+        #    scene.add_layer(name, parent="references", is_reference=True)  # here we assume the name to be unique
+        #    for robj in idef.GetObjects():
+        #        obj_to_scene(robj, scene, name)
+
+        # add the instance to the scene
+
         # TODO this is not working sometimes
         xf = rs.BlockInstanceXform(obj)
         T = transformation_from_xform(xf)
@@ -120,22 +132,23 @@ def obj_to_scene(obj, scene, parent):
         frame = Frame.from_transformation(Tl * R)
         # TODO end
 
-        key, _ = scene.unique_key(name)
+        key = scene.unique_key(name)
+        # print("parent", parent)
         scene.add_layer(key, parent=parent, frame=frame, instance_of=name, scale=scale_factors)
 
     else:
         element = convert_rhino_object_to_compas(objgeo)
         name = name or "element"
-        key, _ = scene.unique_key(name)
+        key = scene.unique_key(name)
+        # print("parent", parent)
         scene.add_layer(key, parent=parent, element=element)
 
 
 class RhinoScene(BaseScene):
-    def __init__(self, name=None):
-        from compas_xr.datastructures import Scene
+    def __init__(self):
 
-        self.name = name or "RhinoScene"
-        self.scene = Scene(name=self.name)
+        super(RhinoScene, self).__init__(name="RhinoScene")
+
         self.block_names = []
         self.layers = []
         self.materials = []
@@ -145,31 +158,21 @@ class RhinoScene(BaseScene):
         """Construct a `RhinoScene` from a :class:`compas_xr.datastructures.Scene`"""
         pass
 
-    def to_compas(self):
-        """Convert to a COMPAS object.
-
-        Returns
-        -------
-        :class:`compas_xr.datastructures.Scene`
-            A COMPAS scene.
-        """
-        scene = Scene()
-
     @classmethod
     def from_rhino(cls):
 
         rscene = cls()
         scene = rscene.scene
-        block_names = []
-        block_depths = []
 
         # 1. Materials
+        
 
         # 2. Blocks
+        block_names = []
+        block_depths = []
         # is this needed to first go through all blocks? maybe make that togehter with everyting else..
-        for layer_name in rs.LayerNames():
+        for layer_name in rs.LayerNames():  # this is ordered
             parent = rs.ParentLayer(layer_name)
-            parent_in_scene = layer_name[(layer_name.rfind(":") + 1) :]
             for guid in rs.ObjectsByLayer(layer_name):
                 robj = rs.coercerhinoobject(guid, True)
                 if type(robj.Geometry) == rg.InstanceReferenceGeometry:
@@ -187,20 +190,32 @@ class RhinoScene(BaseScene):
             idxs = argsort(block_depths)
             block_depths = [block_depths[i] for i in idxs]
             block_names = [block_names[i] for i in idxs]
-            print(block_names)
-            
+            print(reversed(block_names))
+
             # add to scene
             references = scene.add_layer("references")
             for block_name in reversed(block_names):  # start with the one that has the least depth
                 idef = scriptcontext.doc.InstanceDefinitions.Find(block_name)
-                block_key = scene.unique_key(block_name)
-                scene.add_layer(block_key, parent="references")
+                scene.add_layer(block_name, parent=references, is_reference=True)  # here we assume the name to be unique
                 for obj in idef.GetObjects():
-                    obj_to_scene(obj, scene, block_key)
+                    obj_to_scene(obj, scene, block_name)
 
+        """
         # 3. Other objects
         for layer_name in rs.LayerNames():  # this is ordered
             parent = rs.ParentLayer(layer_name)
+            parent_in_scene = layer_name[(layer_name.rfind(":") + 1) :]
+            key = scene.unique_key(parent_in_scene)
+            scene.add_layer(key, parent=parent)
+            for guid in rs.ObjectsByLayer(layer_name):
+                robj = rs.coercerhinoobject(guid, True)
+                obj_to_scene(robj, scene, key)
+        """
+
+        for layer_name in rs.LayerNames():  # this is ordered
+            parent = rs.ParentLayer(layer_name)
+            if parent is not None:
+                parent = parent[(parent.rfind(":") + 1) :]
             parent_in_scene = layer_name[(layer_name.rfind(":") + 1) :]
             key = scene.unique_key(parent_in_scene)
             scene.add_layer(key, parent=parent)
@@ -213,5 +228,13 @@ class RhinoScene(BaseScene):
 
 
 if __name__ == "__main__":
+    import os
+    from compas_xr import DATA
 
     rhino_scene = RhinoScene.from_rhino()
+    scene = rhino_scene.to_compas()
+    filename = os.path.join(DATA, "rhinoscene.json")
+    scene.to_json(filename, pretty=True)
+    # filename = os.path.join(DATA, "rhinoscene.json")
+    # scene = Scene.from_json(filename)
+    scene.to_gltf(os.path.join(DATA, "rhinoscene.gltf"))
