@@ -9,6 +9,7 @@ from compas.datastructures import Graph
 if not compas.IPY:
     from compas_xr.conversions.usd import USDScene
 from compas_xr.conversions.gltf import GLTFScene
+from compas_xr.utilities import argsort
 
 from .material import Image
 from .material import Texture
@@ -41,15 +42,18 @@ class Scene(Graph):  # or scenegraph
             self.add_edge(parent, key)
         return key
 
+    def has_layer(self, key):
+        return self.has_node(key)
+
     def unique_key(self, name, num_padding=3, i=0):
         if not self.has_node(name):
-            return name, 0
+            return name
         postfix = "%0" + str(num_padding) + "d"
         key = (name + postfix) % (i)
         while self.has_node(key):
             i += 1
             key = (name + postfix) % (i)
-        return key, i
+        return key
 
     def add_material(self, material):
         self.materials.append(material)
@@ -62,6 +66,44 @@ class Scene(Graph):  # or scenegraph
     def add_texture(self, texture):
         self.textures.append(texture)
         return len(self.textures) - 1
+
+    @property
+    def has_references(self):
+        """Returns `True` if the scene contains references, `False` otherwise."""
+        references = list(self.nodes_where({"is_reference": True}))
+        return bool(len(references))
+
+    @property
+    def ordered_references(self):
+        # Go through references and add those with the deepest depth first
+        block_names = []
+        block_depths = []
+
+        def add_key_and_depth(key, depth, block_names, block_depths):
+            if key not in block_names:
+                block_names.append(key)
+                block_depths.append(depth)
+            else:
+                idx = block_names.index(key)
+                if block_depths[idx] < depth:
+                    block_depths[idx] = depth
+
+        def find_references_recursive(key, depth, block_names, block_depths):
+            for child in self.nodes_where({"parent": key}):
+                if self.node_attribute(child, "instance_of"):
+                    instance = self.node_attribute(child, "instance_of")
+                    add_key_and_depth(instance, depth + 1, block_names, block_depths)
+                    find_references_recursive(instance, depth + 1, block_names, block_depths)
+                else:
+                    find_references_recursive(child, depth + 1, block_names, block_depths)
+
+        depth = 0
+        for key in self.nodes_where({"is_reference": True}):
+            add_key_and_depth(key, depth, block_names, block_depths)
+            find_references_recursive(key, depth, block_names, block_depths)
+
+        for idx in reversed(argsort(block_depths)):
+            yield block_names[idx]
 
     @property
     def data(self):
@@ -108,22 +150,27 @@ class Scene(Graph):  # or scenegraph
         return shortest_path
 
     def to_usd(self, filepath):
-        USDScene.from_scene(self).to_usd(filepath)
+        USDScene.from_scene(self, filepath).to_usd(filepath)
 
     def to_gltf(self, filepath, embed_data=False):
         GLTFScene.from_scene(self).to_gltf(filepath, embed_data=embed_data)
 
     def subscene(self, key):
         subscene = Scene()
+        world = subscene.add_layer("world")
 
         def _add_branch(scene, key, parent):
             element = self.node_attribute(key, "element")
-            # TODO: what to do if we have another reference?
-            scene.add_layer(key, parent=parent, element=element)  # more attr?
+
+            frame = self.node_attribute(key, "frame")
+            instance_of = self.node_attribute(key, "instance_of")
+            scale = self.node_attribute(key, "scale")
+            # TODO: auto attributes, but first key should not include "reference" key
+            scene.add_layer(key, parent=parent, element=element, frame=frame, instance_of=instance_of, scale=scale)
             for child in self.nodes_where({"parent": key}):
                 _add_branch(scene, child, key)
 
-        _add_branch(subscene, key, None)
+        _add_branch(subscene, key, world)
         return subscene
 
     def _all_children(self, key, include_key=True):
