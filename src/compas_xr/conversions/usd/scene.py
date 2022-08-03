@@ -1,4 +1,3 @@
-from distutils import extension
 import os
 from pxr import Sdf
 from pxr import Usd
@@ -61,9 +60,9 @@ class USDScene(BaseScene):
         for material in scene.materials:
             usd_materials.append(USDMaterial.from_material(stage, material, image_uris=image_uris, textures=scene.textures))
 
-        # Export the references first, otherwise we will not find a linkage
+        # Create references first
         visited = []
-        for key in scene.ordered_references:
+        for key in scene.ordered_references:  # starting with the deepest depth
             subscene = scene.subscene(key)
             subscene.node_attribute(key, "is_reference", value=False)  # important to not get into an infinite loop when exporting
             usd_scene.references[key] = cls.from_scene(subscene)
