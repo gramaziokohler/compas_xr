@@ -1,6 +1,10 @@
 class BaseMaterial(object):
     """Base Material class for conversions"""
 
+    def __init__(self, name="BaseMaterial", material=None):
+        self.name = name
+        self.material = material
+
     @classmethod
     def from_material(cls, material):
         """Construct a material.
