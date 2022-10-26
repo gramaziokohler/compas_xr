@@ -78,8 +78,6 @@ class USDScene(BaseScene):
             element = scene.node_attribute(key, "element")
             instance_of = scene.node_attribute(key, "instance_of")
             scale = scene.node_attribute(key, "scale")
-            tex_coords = scene.node_attribute(key, "tex_coords")
-
             mkey = scene.node_attribute(key, "material")
 
             transformation = Transformation.from_frame(frame) if frame else Transformation()
@@ -109,9 +107,13 @@ class USDScene(BaseScene):
                             prim = prim_from_box(stage, path, element)
                         elif type(element) == Mesh:
                             prim = prim_from_mesh(stage, path, element)
-                            if tex_coords:
+                            texture_coordinates = element.vertices_attribute("texture_coordinate")
+                            # TODO: vertex_normals = element.vertices_attribute("vertex_normal")
+                            # TODO: vertex_colors = element.vertices_attribute("vertex_color")
+                            print("texture_coordinates", texture_coordinates)
+                            if texture_coordinates[0] is not None:
                                 usd_tex_coords = prim.CreatePrimvar("st", Sdf.ValueTypeNames.TexCoord2fArray, UsdGeom.Tokens.varying)
-                                usd_tex_coords.Set(tex_coords)
+                                usd_tex_coords.Set(texture_coordinates)
 
                         elif type(element) == Cylinder:
                             prim = prim_from_cylinder(stage, path, element)
@@ -120,6 +122,7 @@ class USDScene(BaseScene):
                             raise NotImplementedError
 
                     if not frame and not element:
+                        print("path", path)
                         prim = prim_default(stage, path, transformation)
             else:
                 raise ValueError("we should never come here")
@@ -210,6 +213,8 @@ class USDScene(BaseScene):
             reference_filepath = self._reference_filename(key, filename)
             reference.to_usd(reference_filepath)
         self._add_extension_to_external_reference(extension)
+
+        # TODO: remove references layer
 
         # There should be a better way of doing this, but
         # stage.Export(filepath) removes the linkages (links to references), and
