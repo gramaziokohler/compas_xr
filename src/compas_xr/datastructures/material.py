@@ -1,4 +1,24 @@
+"""Most of these classes below follow the material definitions of the GLTF schema.
+"""
 from compas.data import Data
+
+__all__ = [
+    "MineType",
+    "AlphaMode",
+    "Material",
+    "PBRMetallicRoughness",
+    "PBRSpecularGlossiness",
+    "Texture",
+    "TextureInfo",
+    "NormalTextureInfo",
+    "OcclusionTextureInfo",
+    "TextureTransform",
+    "Image",
+    "Transmission",
+    "Specular",
+    "Ior",
+    "Clearcoat",
+]
 
 
 class MineType(object):
@@ -59,11 +79,13 @@ class Material(Data):
 
     Examples
     --------
+    >>> from compas_xr.datastructures import PBRMetallicRoughness
     >>> material = Material(name="material")
     >>> material.pbr_metallic_roughness = PBRMetallicRoughness()
     >>> material.pbr_metallic_roughness.base_color_factor = [0.9, 0.4, 0.2, 1.0]
     >>> material.pbr_metallic_roughness.metallic_factor = 0.0
     >>> material.pbr_metallic_roughness.roughness_factor = 0.5
+    >>> material.data
     """
 
     def __init__(
