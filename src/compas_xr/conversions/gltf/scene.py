@@ -13,7 +13,7 @@ from .material import GLTFMaterial
 
 
 class GLTFScene(BaseScene):
-    """ """
+    """Scene to handle GLTF coversion"""
 
     def __init__(self, content=None):
         self.content = content
