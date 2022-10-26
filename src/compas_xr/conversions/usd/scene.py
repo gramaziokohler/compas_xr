@@ -49,6 +49,7 @@ class USDScene(BaseScene):
     @classmethod
     def from_scene(cls, scene):
         """ """
+
         usd_scene = cls()
         usd_scene.scene = Usd.Stage.CreateInMemory()
         stage = usd_scene.scene
