@@ -9,7 +9,6 @@ from compas.datastructures import Graph
 if not compas.IPY:
     from compas_xr.conversions.usd import USDScene
 from compas_xr.conversions.gltf import GLTFScene
-from compas_xr.utilities import argsort
 
 from .material import Image
 from .material import Texture
@@ -18,6 +17,11 @@ from .material import TextureInfo
 from compas.data import Data
 
 __all__ = ["Scene"]
+
+
+def argsort(seq):  # TODO: upstream to compas
+    # http://stackoverflow.com/questions/3071415/efficient-method-to-calculate-the-rank-vector-of-a-list-in-python
+    return sorted(range(len(seq)), key=seq.__getitem__)
 
 
 class Scene(Graph):
@@ -76,6 +80,7 @@ class Scene(Graph):
     def add_material(self, material):
         """Adds a material to the scene."""
         self.materials.append(material)
+        self._replace_image_and_texture_indices_recursively(material)
         return len(self.materials) - 1
 
     # --------------------------------------------------------------------------
@@ -212,7 +217,7 @@ class Scene(Graph):
                     "dtype",
                 ]
                 and not callable(getattr(item, a))
-            ):
+            ):  # TODO: better?
 
                 attr = getattr(item, a)
                 print(item, a, attr)
@@ -244,8 +249,8 @@ class Scene(Graph):
 
     @property
     def data(self):
-        for material in self.materials:
-            self._replace_image_and_texture_indices_recursively(material)
+        # for material in self.materials:
+        #    self._replace_image_and_texture_indices_recursively(material)
         data = super(Scene, self).data
         if self._images is not None:
             data["images"] = [m.data for m in self._images]
@@ -298,7 +303,7 @@ class Scene(Graph):
 
         def _add_branch(scene, key, parent):
 
-            # print(">>>>", self.node_attributes(key))
+            print(">>>>", self.node_attributes(key))
             element = self.node_attribute(key, "element")
             is_reference = self.node_attribute(key, "is_reference")
             frame = self.node_attribute(key, "frame")
