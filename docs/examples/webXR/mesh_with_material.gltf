@@ -1,0 +1,103 @@
+{
+    "asset": {
+        "version": "2.0"
+    },
+    "bufferViews": [
+        {
+            "buffer": 0,
+            "byteLength": 768,
+            "byteOffset": 0
+        },
+        {
+            "buffer": 0,
+            "byteLength": 972,
+            "byteOffset": 768
+        }
+    ],
+    "accessors": [
+        {
+            "bufferView": 0,
+            "count": 384,
+            "componentType": 5123,
+            "type": "SCALAR"
+        },
+        {
+            "bufferView": 1,
+            "count": 81,
+            "componentType": 5126,
+            "type": "VEC3",
+            "min": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "max": [
+                0.5,
+                0.5,
+                0.30000000000000004
+            ]
+        }
+    ],
+    "meshes": [
+        {
+            "primitives": [
+                {
+                    "indices": 0,
+                    "material": 0,
+                    "attributes": {
+                        "POSITION": 1
+                    }
+                }
+            ]
+        }
+    ],
+    "nodes": [
+        {
+            "name": "world",
+            "children": [
+                1
+            ]
+        },
+        {
+            "name": "element",
+            "mesh": 0
+        }
+    ],
+    "scene": 0,
+    "scenes": [
+        {
+            "nodes": [
+                0
+            ],
+            "name": "scene"
+        }
+    ],
+    "materials": [
+        {
+            "name": "Plaster",
+            "pbrMetallicRoughness": {
+                "baseColorFactor": [
+                    1.0,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "metallicFactor": 0.0,
+                "roughnessFactor": 0.5
+            },
+            "emissiveFactor": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "alphaMode": "OPAQUE",
+            "doubleSided": true
+        }
+    ],
+    "buffers": [
+        {
+            "byteLength": 1740,
+            "uri": "mesh_with_material.bin"
+        }
+    ]
+}
