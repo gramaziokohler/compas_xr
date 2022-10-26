@@ -43,12 +43,7 @@ def scene_with_material_texture():
     image_uri = "compas_icon_white.png"
     image_file = os.path.join(BASE_FOLDER, "fixtures", image_uri)
     image_data = Image(name=image_uri, mime_type=MineType.PNG, uri=image_file)
-    # image_idx = scene.add_image(image_data)
     texture = Texture(source=image_data)
-    # texture_idx = scene.add_texture(texture)
-
-    # texture = Texture(source=texture)
-    # texture_idx2 = scene.add_texture(texture)
 
     material = Material()
     material.name = "Texture"
