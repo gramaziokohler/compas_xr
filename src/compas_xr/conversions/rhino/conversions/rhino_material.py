@@ -362,13 +362,13 @@ def AddMaterial(gltf_content, material):
         param = rhinoMaterial.RenderMaterial.GetParameter("emission-multiplier")
         if param is not None:
             emissionMultiplier = float(param)
-        material.EmissiveFactor = [
+        material.emissive_factor = [
             emissionMultiplier,
             emissionMultiplier,
             emissionMultiplier,
         ]
     else:
-        material.EmissiveFactor = [
+        material.emissive_factor = [
             float(rhinoMaterial.PhysicallyBased.Emission.R),
             float(rhinoMaterial.PhysicallyBased.Emission.G),
             float(rhinoMaterial.PhysicallyBased.Emission.B),

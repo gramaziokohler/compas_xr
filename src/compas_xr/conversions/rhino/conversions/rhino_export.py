@@ -16,7 +16,7 @@ from compas.utilities import color_to_rgb
 from compas.geometry import Frame, Transformation
 import compas
 
-from compas_xr.rhino.conversions.rhino_material import AddMaterial
+from compas_xr.conversions.rhino.conversions.rhino_material import AddMaterial
 
 
 # https://github.com/Stykka/glTF-Bin/blob/master/glTF-BinExporter/RhinoDocGltfConverter.cs
@@ -247,6 +247,7 @@ if __name__ == "__main__":
 
             if rhino_mesh.TextureCoordinates.Count > 0 and options.ExportTextureCoordinates:
                 pd.attributes["TEXCOORD_0"] = [(float(u), float(v)) for u, v in rhino_mesh.TextureCoordinates]
+                print(pd.attributes["TEXCOORD_0"])
 
             if rhino_mesh.VertexColors.Count > 0 and options.ExportVertexColors:
                 colors = []
