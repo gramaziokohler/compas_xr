@@ -1,12 +1,13 @@
-import compas_xr
+"""Check out the connect sample from NVIDIA omniverse, stored in
+C:\Users\USER\AppData\Local\ov\pkg\connectsample-103.1.0\source\pyHelloWorld
+"""
 from pxr import Usd
 
-if compas_xr.IN_OMNI:
+try:
     import omni.client
     import omni.usd
-
-
-# C:\Users\rustr\AppData\Local\ov\pkg\connectsample-103.1.0\source\pyHelloWorld
+except ModuleNotFoundError:
+    pass
 
 
 def open_stage(url):
@@ -55,7 +56,7 @@ def shutdown_omniverse():
     omni.client.shutdown()
 
 
-def remove_mesh(stage_url, prim_path):
+def remove_mesh(stage_url, prim_path): # NEEDED?
     stage = open_stage(stage_url)
     stage.RemovePrim(prim_path)
     stage.Save()

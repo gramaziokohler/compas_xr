@@ -49,62 +49,25 @@ from roslibpy import Ros
 
 from compas_fab.backends.ros.messages import Pose
 from compas_fab.backends.ros.messages import PoseStamped
-from compas_fab.backends.ros.messages import ROSmsg
+from compas_fab.backends.ros.messages import Int8MultiArray
+from compas_fab.backends.ros.messages import Float32MultiArray
+
 from compas.geometry import Transformation
 from compas.geometry import Frame
 
 
-class MultiArrayLayout(ROSmsg):
-    """http://docs.ros.org/en/api/std_msgs/html/msg/MultiArrayLayout.html"""
-
-    def __init__(self, dim=None, data_offset=None):
-        self.dim = dim or []
-        self.data_offset = data_offset or 0
-
-    @classmethod
-    def from_msg(cls, msg):
-        dim = msg["dim"]
-        return cls(dim, msg["data_offset"])
-
-
-class Int8MultiArray(ROSmsg):
-    """http://docs.ros.org/en/api/std_msgs/html/msg/Int8MultiArray.html"""
-
-    def __init__(self, layout=None, data=None):
-        self.layout = layout or MultiArrayLayout()
-        self.data = data or []
-
-    @classmethod
-    def from_msg(cls, msg):
-        layout = MultiArrayLayout.from_msg(msg["layout"])
-        return cls(layout, msg["data"])
-
-
-class Float32MultiArray(ROSmsg):
-    """http://docs.ros.org/en/api/std_msgs/html/msg/Float32MultiArray.html"""
-
-    def __init__(self, layout=None, data=None):
-        self.layout = layout or MultiArrayLayout()
-        self.data = data or []
-
-    @classmethod
-    def from_msg(cls, msg):
-        layout = MultiArrayLayout.from_msg(msg["layout"])
-        return cls(layout, msg["data"])
-
-
-if __name__ == "__main__":
+def controller_input_to_ros():
     # ros
     client = Ros(host="localhost", port=9090)
     client.run()
 
     model_names = ["generic_hmd", "controller_left", "controller_right", "OptiTrackRigidBody", "lh_basestation_valve_gen2"]
-    position_talkers = dict(zip(model_names, [Topic(client, "/position_%s" % name, "geometry_msgs/PoseStamped") for name in model_names]))
+    position_talkers = dict(zip(model_names, [Topic(client, "/position_%s" % name, PoseStamped.ROS_MSG_TYPE) for name in model_names]))
     hands = ["left", "right"]
     hands_idx = dict(zip(hands, [None for _ in range(len(hands))]))
 
-    buttonpress_talker = dict(zip(hands, [Topic(client, "/buttonpress_%s" % hand, "std_msgs/Int8MultiArray") for hand in hands]))
-    trackpad_talker = dict(zip(hands, [Topic(client, "/trackpad_%s" % hand, "std_msgs/Float32MultiArray") for hand in hands]))
+    buttonpress_talker = dict(zip(hands, [Topic(client, "/buttonpress_%s" % hand, Int8MultiArray.ROS_MSG_TYPE) for hand in hands]))
+    trackpad_talker = dict(zip(hands, [Topic(client, "/trackpad_%s" % hand, Float32MultiArray.ROS_MSG_TYPE) for hand in hands]))
 
     button_idx = [openvr.k_EButton_SteamVR_Trigger, openvr.k_EButton_SteamVR_Touchpad, openvr.k_EButton_Grip, openvr.k_EButton_A, openvr.k_EButton_IndexController_B]
     button_values = [0 for _ in range(len(button_idx))]
