@@ -14,38 +14,96 @@ from compas_xr.utilities import argsort
 from .material import Image
 from .material import Texture
 from .material import Material
+from .material import TextureInfo
+from compas.data import Data
 
 __all__ = ["Scene"]
 
 
-class Scene(Graph):  # or scenegraph
-    """Class for managing a Scene.
+class Scene(Graph):
+    """Scene data structure for describing a scene composed by layers and elements (geometry), materials, animations, lights, cameras, etc.
+
+    Parameters
+    ----------
+    name : str, optional
+        The name of the datastructure. Defaults to "scene".
+    up_axis : str, optional
+        The axis that looks up. Defaults to "Z"
+    materials : list of :class:`compas_xr.datastructures.Material`, optional
+        The materials of the scene
 
 
     Attributes
     ----------
+    images : list of :class:`compas_xr.datastructures.Image`
+        The images contained in the materials of the scene.
+    textures : list of :class:`compas_xr.datastructures.Texture`
+        The textures contained in the materials of the scene.
     """
 
-    def __init__(self, name="scene", up_axis="Z", materials=None, images=None, textures=None):
+    def __init__(self, name="scene", up_axis="Z", materials=None):
         super(Scene, self).__init__()
         self.name = name
         self.up_axis = up_axis
-        self.update_default_node_attributes({"is_reference": False})
         self.materials = materials or []
-        self.images = images or []
-        self.textures = textures or []
+        self._images = []
+        self._textures = []
+        self.update_default_node_attributes({"is_reference": False})
 
-    def add_layer(self, key, parent=None, attr_dict=None, **kwattr):
-        self.add_node(key, parent=parent, attr_dict=attr_dict, **kwattr)
-        # raise if parent does not exist
+    def add_layer(self, layer_name, parent=None, attr_dict=None, **kwattr):
+        """Adds a layer to the scene.
+
+        Parameters
+        ----------
+        layer_name : str
+            The name of the layer
+        parent : str, optional
+            The name of the parent
+
+        Returns
+        -------
+        str
+            The name of the added layer.
+        """
+        self.add_node(layer_name, parent=parent, attr_dict=attr_dict, **kwattr)
         if parent:
-            self.add_edge(parent, key)
-        return key
+            if self.has_layer(parent):
+                self.add_edge(parent, layer_name)
+            else:
+                raise ValueError("Parent %s does not exist in scene." % parent)
+        return layer_name
 
-    def has_layer(self, key):
-        return self.has_node(key)
+    def add_material(self, material):
+        """Adds a material to the scene."""
+        self.materials.append(material)
+        return len(self.materials) - 1
+
+    # --------------------------------------------------------------------------
+    # helpers
+    # --------------------------------------------------------------------------
+
+    def has_layer(self, layer_name):
+        """Returns `True` if the layer exists, `False` otherwise."""
+        return self.has_node(layer_name)
 
     def unique_key(self, name, num_padding=3, i=0):
+        """Returns a unique key in the scene.
+
+        Parameters
+        ----------
+        name : str
+            The name of the layer
+        num_padding : int, optional
+            The padding of the counter, defaults to 3.
+        i : int, optional
+            The number of starting counting, defaults to 0.
+
+        Returns
+        -------
+        str
+            The name of a unique key.
+
+        """
         if not self.has_node(name):
             return name
         postfix = "%0" + str(num_padding) + "d"
@@ -55,17 +113,43 @@ class Scene(Graph):  # or scenegraph
             key = (name + postfix) % (i)
         return key
 
-    def add_material(self, material):
-        self.materials.append(material)
-        return len(self.materials) - 1
+    def material_index_by_name(self, name):
+        for i, m in enumerate(self.materials):
+            if m.name == name:
+                return i
+        return None
 
-    def add_image(self, image):
-        self.images.append(image)
-        return len(self.images) - 1
+    # --------------------------------------------------------------------------
+    # properties
+    # --------------------------------------------------------------------------
 
-    def add_texture(self, texture):
-        self.textures.append(texture)
-        return len(self.textures) - 1
+    @property
+    def textures(self):
+        return self._textures
+
+    @property
+    def images(self):
+        return self._images
+
+    @property
+    def material_names(self):  # TODO: check if this is used at all
+        for material in self.materials:
+            yield material.name
+
+    @property
+    def ordered_keys(self):
+        for root in self.nodes_where({"parent": None}):
+            for key in breadth_first_ordering(self.adjacency, root):
+                yield key
+
+    def node_to_root(self, key):  # TODO: check if this is used at all
+        shortest_path = [key]
+        parent = self.node_attribute(key, "parent")
+        while parent:
+            shortest_path.append(parent)
+            key = parent
+            parent = self.node_attribute(key, "parent")
+        return shortest_path
 
     @property
     def has_references(self):
@@ -75,7 +159,7 @@ class Scene(Graph):  # or scenegraph
 
     @property
     def ordered_references(self):
-        """Returns an ordered list of references with the deepest depth first."""
+        """Returns an ordered list of references, starting with the deepest depth first."""
         block_names = []
         block_depths = []
 
@@ -105,26 +189,90 @@ class Scene(Graph):  # or scenegraph
         for idx in reversed(argsort(block_depths)):
             yield block_names[idx]
 
+    def _replace_image_and_texture_indices_recursively(self, item):
+        # todo go deep into material and check if we need to add texture etc and replace
+        for a in dir(item):
+            if (
+                not a.startswith("__")
+                and a
+                not in [
+                    "DATASCHEMA",
+                    "_JSONSCHEMA",
+                    "JSONSCHEMA",
+                    "JSONSCHEMANAME",
+                    "guid",
+                    "jsondefinitions",
+                    "jsonstring",
+                    "jsonvalidator",
+                    "_guid",
+                    "_jsondefinitions",
+                    "_jsonvalidator",
+                    "data",
+                    "_name",
+                    "dtype",
+                ]
+                and not callable(getattr(item, a))
+            ):
+
+                attr = getattr(item, a)
+                print(item, a, attr)
+                if isinstance(attr, TextureInfo):
+                    if attr.texture is not None:
+                        texture = attr.texture
+                        image = texture.source
+                        if image:
+                            if image not in self._images:
+                                self._images.append(image)
+                                image_idx = len(self._images) - 1
+                            else:
+                                image_idx = self._images.index(image)
+                            texture.index = image_idx
+
+                        if texture not in self._textures:
+                            self._textures.append(texture)
+                            texture_idx = len(self._textures) - 1
+                        else:
+                            texture_idx = self._textures.index(texture)
+                        attr.index = texture_idx
+
+                elif isinstance(attr, Data):
+                    self._replace_image_and_texture_indices_recursively(attr)
+
+    # --------------------------------------------------------------------------
+    # data
+    # --------------------------------------------------------------------------
+
     @property
     def data(self):
+        for material in self.materials:
+            self._replace_image_and_texture_indices_recursively(material)
         data = super(Scene, self).data
+        if self._images is not None:
+            data["images"] = [m.data for m in self._images]
+        if self._textures is not None:
+            data["textures"] = [m.data for m in self._textures]
         if self.materials is not None:
             data["materials"] = [m.data for m in self.materials]
-        if self.images is not None:
-            data["images"] = [m.data for m in self.images]
-        if self.textures is not None:
-            data["textures"] = [m.data for m in self.textures]
         return data
 
     @data.setter
     def data(self, data):
         super(Scene, self.__class__).data.fset(self, data)
+        if data.get("images") is not None:
+            self._images = [Image.from_data(d) for d in data.get("images")]
+        if data.get("textures") is not None:
+            self._textures = [Texture.from_data(d) for d in data.get("textures")]
+            for t in self._textures:
+                if t.index is not None:
+                    t.source = self._images[t.index]  # link them
+                else:
+                    raise Exception("ss")
         if data.get("materials") is not None:
             self.materials = [Material.from_data(d) for d in data.get("materials")]
-        if data.get("images") is not None:
-            self.images = [Image.from_data(d) for d in data.get("images")]
-        if data.get("textures") is not None:
-            self.textures = [Texture.from_data(d) for d in data.get("textures")]
+
+    # --------------------------------------------------------------------------
+    # constructors
+    # --------------------------------------------------------------------------
 
     @classmethod
     def from_gltf(cls, filepath):
@@ -134,21 +282,6 @@ class Scene(Graph):  # or scenegraph
     def from_usd(cls, filepath):
         return USDScene.from_usd(filepath).to_compas()
 
-    @property
-    def ordered_keys(self):
-        for root in self.nodes_where({"parent": None}):
-            for key in breadth_first_ordering(self.adjacency, root):
-                yield key
-
-    def node_to_root(self, key):
-        shortest_path = [key]
-        parent = self.node_attribute(key, "parent")
-        while parent:
-            shortest_path.append(parent)
-            key = parent
-            parent = self.node_attribute(key, "parent")
-        return shortest_path
-
     def to_usd(self, filepath):
         USDScene.from_scene(self).to_usd(filepath)
 
@@ -156,17 +289,30 @@ class Scene(Graph):  # or scenegraph
         GLTFScene.from_scene(self).to_gltf(filepath, embed_data=embed_data)
 
     def subscene(self, key):
+        """Creates a sub scene with key as root layer."""
         subscene = Scene()
         world = subscene.add_layer("world")
 
+        # self._images = images or [] TODO
+        # self._textures = textures or [] TODO
+
         def _add_branch(scene, key, parent):
+
+            # print(">>>>", self.node_attributes(key))
             element = self.node_attribute(key, "element")
             is_reference = self.node_attribute(key, "is_reference")
             frame = self.node_attribute(key, "frame")
             instance_of = self.node_attribute(key, "instance_of")
             scale = self.node_attribute(key, "scale")
+
+            tex_coords = self.node_attribute(key, "tex_coords")
+            mkey = self.node_attribute(key, "material")
+            if mkey is not None:
+                material = self.materials[mkey]
+                mkey = scene.add_material(material)
+
             # TODO: auto copy attributes !!!
-            scene.add_layer(key, parent=parent, element=element, frame=frame, instance_of=instance_of, scale=scale, is_reference=is_reference)
+            scene.add_layer(key, parent=parent, element=element, frame=frame, instance_of=instance_of, scale=scale, is_reference=is_reference, tex_coords=tex_coords, material=mkey)
             for child in self.nodes_where({"parent": key}):
                 _add_branch(scene, child, key)
 
@@ -184,65 +330,3 @@ class Scene(Graph):  # or scenegraph
         if not include_key:
             array = array[1:]
         return array
-
-
-if __name__ == "__main__":
-    import os
-    from compas.geometry import Box
-    from compas.geometry import Frame, Rotation, Vector
-    from compas_xr import DATA
-    from compas_xr.datastructures.material import PBRMetallicRoughness
-
-    scene = Scene()
-    world = scene.add_layer("world")
-
-    material = Material(name="material")
-    material.pbr_metallic_roughness = PBRMetallicRoughness()
-    material.pbr_metallic_roughness.base_color_factor = [0.9, 0.4, 0.2, 1.0]
-    material.pbr_metallic_roughness.metallic_factor = 0.0
-    material.pbr_metallic_roughness.roughness_factor = 0.5
-    mkey = scene.add_material(material)
-
-    # frame = Frame.worldXY()
-    # frame.point = [1, 2, 3]
-    # frame = Frame.from_euler_angles([0.1, 0.2, 0.3], point=[1, 2, 3])
-
-    rotation = Rotation.from_basis_vectors(Vector(0.936, 0.275, -0.218), Vector(-0.274, 0.961, 0.037))
-    frame = Frame.from_rotation(rotation, point=[1, 2, 3])
-    box = Box(frame, 1, 1, 1)
-    scene.add_layer("box", parent=world, element=box, material=mkey)  # material_key=mkey
-    # TODO: materials_map?
-
-    scene_data_before = scene.data
-
-    usd_filename = os.path.join(DATA, "test_scene.usda")
-    gltf_filename = os.path.join(DATA, "test_scene.gltf")
-
-    scene.to_usd(usd_filename)
-    scene.to_gltf(gltf_filename)
-
-    scene = Scene.from_usd(usd_filename)
-    print("USD")
-    print("=======================")
-    print(scene.data)
-
-    # scene = Scene.from_gltf(gltf_filename)
-    # print("GLTF")
-    # print("=======================")
-    # print(scene.data)
-
-    scene_data_after = scene.data
-
-    print(scene_data_before["node"])
-    print(scene_data_after["node"])
-
-    # assert scene_data_before["materials"] == scene_data_after["materials"]
-
-    print(scene_data_before["materials"])
-    print(scene_data_after["materials"])
-
-    # assert scene_data_before["attributes"] == scene_data_after["attributes"]
-    assert scene_data_before["dna"] == scene_data_after["dna"]
-    assert scene_data_before["dea"] == scene_data_after["dea"]
-    assert scene_data_before["adjacency"] == scene_data_after["adjacency"]
-    assert scene_data_before["edge"] == scene_data_after["edge"]
