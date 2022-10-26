@@ -14,12 +14,6 @@ if compas.IPY:
     from compas_rhino.geometry import RhinoBox  # noqa E402
     from compas.utilities import color_to_rgb  # noqa E402
 
-    sys.path.append(r"C:\Users\rustr\workspace\compas_xr\src")
-
-    unload_modules("compas")
-    unload_modules("compas_xr")
-
-
 from compas_xr.conversions import BaseScene  # noqa E402
 from compas_xr.conversions.rhino.material import RhinoMaterial  # noqa E402
 
@@ -105,10 +99,6 @@ def convert_rhino_brep_to_compas(brep, extrusion=None, robj=None):
                 return mesh_from_brep(brep, robj)
     else:
         return mesh_from_brep(brep)
-    if brep.IsSolid:
-        print("is solid")
-    print(brep.HasBrepForm)
-    print(brep.IsSurface)
 
 
 def convert_rhino_object_to_compas(obj, robj=None):
@@ -220,7 +210,7 @@ class RhinoScene(BaseScene):
     @classmethod
     def from_scene(cls, scene):
         """Construct a `RhinoScene` from a :class:`compas_xr.datastructures.Scene`"""
-        pass
+        raise NotImplementedError
 
     @classmethod
     def from_rhino(cls):
