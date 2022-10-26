@@ -31,6 +31,17 @@ class GLTFScene(BaseScene):
         content = gltf_scene.content
         gscene = content.add_scene(scene.name)
 
+        from compas.files.gltf.data_classes import ImageData
+        from compas.files.gltf.data_classes import TextureData
+
+        for image in scene.images:
+            image_data = ImageData(name=image.name, mime_type=image.mime_type, uri=image.uri)
+            content.add_image(image_data)
+
+        for texture in scene.textures:
+            texture = TextureData(source=texture.index, name=texture.name)  # 'offset': [0.0, 0.0], 'rotation': 0.0, 'repeat': [0, 0], 'scale': [1.0, 1.0]}
+            content.add_texture(texture)
+
         for material in scene.materials:
             gltf_material = GLTFMaterial.from_material(content, material)
             content.add_material(gltf_material)
@@ -40,23 +51,9 @@ class GLTFScene(BaseScene):
         for key in scene.ordered_references:
             shortest_path = scene.node_to_root(key)
             for key in reversed(shortest_path):
-                if key not in visited:
-                    gltf_scene._add_gltf_node_to_content(scene, gscene, key)
-                    visited.append(key)
-
-        # print("=======================================")
-
-        # Add those that are references first
-        # visited = []
-        # for key in scene.nodes_where({"is_reference": True}):
-        #    print("is_reference", key)
-        #    shortest_path = scene.node_to_root(key)
-        #    print(shortest_path)
-        #    for key in reversed(shortest_path):
-        #        if key not in visited:
-        #            gltf_scene._add_gltf_node_to_content(scene, gscene, key)
-        #            visited.append(key)
-        print("==================================================")
+                gltf_scene._add_gltf_node_to_content(scene, gscene, key)
+            children = scene._all_children(key, include_key=True)
+            visited += children
 
         for key in scene.ordered_keys:
             if key not in visited:
@@ -85,7 +82,15 @@ class GLTFScene(BaseScene):
 
         if instance_of:
             reference = self.content.get_node_by_name(instance_of)
+            # here we need to copy the whole tree of the instance
             node.mesh_key = reference.mesh_key
+            for child in graph._all_children(instance_of, include_key=False):
+                new_name = "%s_%s" % (node.name, child)
+                child_node = self.content.get_node_by_name(child)
+                if child_node.mesh_key:
+                    new_child_node = self.content.add_child_to_node(node, new_name)
+                    new_child_node.mesh_key = child_node.mesh_key
+
         elif is_reference:
             # set invisible?
             # iter through children
@@ -94,13 +99,14 @@ class GLTFScene(BaseScene):
                 self._add_gltf_node_to_content(graph, scene, child)
 
         if element:
-            mesh = Mesh.from_shape(element)  # if shape, else take Mesh directly
+            mesh = element if type(element) == Mesh else Mesh.from_shape(element)
             mesh.quads_to_triangles()
             self.content.add_mesh_to_node(node, mesh)
 
         if material is not None:  # == key
-            for pd in node.mesh_data.primitive_data_list:
-                pd.material = material
+            if node.mesh_data:
+                for pd in node.mesh_data.primitive_data_list:
+                    pd.material = material
 
     def to_compas(self):
         # returns a :class:`Scene` object
