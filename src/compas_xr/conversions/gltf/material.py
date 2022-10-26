@@ -1,5 +1,11 @@
 from compas.files.gltf.data_classes import MaterialData
 
+from compas.files.gltf.extensions import KHR_materials_pbrSpecularGlossiness
+from compas.files.gltf.extensions import KHR_materials_clearcoat
+from compas.files.gltf.extensions import KHR_materials_transmission
+from compas.files.gltf.extensions import KHR_materials_specular
+from compas.files.gltf.extensions import KHR_materials_ior
+
 replace_map = {
     "pbr_metallic_roughness": "pbrMetallicRoughness",
     "normal_texture": "normalTexture",
@@ -14,6 +20,22 @@ replace_map = {
     "metallic_factor": "metallicFactor",
     "roughness_factor": "roughnessFactor",
     "metallic_roughness_texture": "metallicRoughnessTexture",
+    "diffuse_factor": "diffuseFactor",
+    "diffuse_texture": "diffuseTexture",
+    "specular_factor": "specularFactor",
+    "glossiness_factor": "glossinessFactor",
+    "specular_glossiness_texture": "specularGlossinessTexture",
+    "clearcoat_factor": "clearcoatFactor",
+    "clearcoat_texture": "clearcoatTexture",
+    "clearcoat_roughness_factor": "clearcoatRoughnessFactor",
+    "clearcoat_roughness_texture": "clearcoatRoughnessTexture",
+    "clearcoat_normal_texture": "clearcoatNormalTexture",
+    "transmission_factor": "transmissionFactor",
+    "transmission_texture": "transmissionTexture",
+    "specular_factor": "specularFactor",
+    "specular_texture": "specularTexture",
+    "specular_color_factor": "specularColorFactor",
+    "specular_color_texture": "specularColorTexture",
 }
 replace_map_inv = {v: k for k, v in replace_map.items()}
 
@@ -41,6 +63,25 @@ class GLTFMaterial(MaterialData):  # TODO: base on BaseMaterial?
     def from_material(cls, content, material):
         material_dict = replace_recursively(material.data, replace_map)
         obj = super(GLTFMaterial, cls).from_data(material_dict)
+
+        # extensions
+        if "pbr_specular_glossiness" in material_dict and material_dict["pbr_specular_glossiness"] is not None:
+            ext = KHR_materials_pbrSpecularGlossiness.from_data(material_dict["pbr_specular_glossiness"])
+            obj.add_extension(ext)
+        if "transmission" in material_dict and material_dict["transmission"] is not None:
+            ext = KHR_materials_transmission.from_data(material_dict["transmission"])
+            obj.add_extension(ext)
+        if "clearcoat" in material_dict and material_dict["clearcoat"] is not None:
+            print(material_dict["clearcoat"])
+            ext = KHR_materials_clearcoat.from_data(material_dict["clearcoat"])
+            obj.add_extension(ext)
+        if "ior" in material_dict and material_dict["ior"] is not None:
+            ext = KHR_materials_ior.from_data(material_dict["ior"])
+            obj.add_extension(ext)
+        if "specular" in material_dict and material_dict["specular"] is not None:
+            ext = KHR_materials_specular.from_data(material_dict["specular"])
+            obj.add_extension(ext)
+
         obj.content = content
         return obj
 
