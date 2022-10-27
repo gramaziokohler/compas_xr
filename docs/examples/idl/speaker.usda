@@ -1,0 +1,67 @@
+#usda 1.0
+(
+    defaultPrim = "world"
+    upAxis = "Z"
+)
+
+def Scope "Looks"
+{
+    def Material "Schwarzgrau_Nextel_Dark_Black"
+    {
+        token outputs:displacement.connect = </Looks/Schwarzgrau_Nextel_Dark_Black/Shader.outputs:displacement>
+        token outputs:surface.connect = </Looks/Schwarzgrau_Nextel_Dark_Black/Shader.outputs:surface>
+
+        def Shader "Shader"
+        {
+            uniform token info:id = "UsdPreviewSurface"
+            float inputs:clearcoat = 0
+            float inputs:clearcoatRoughness = 0.01
+            color3f inputs:diffuseColor = (0.1882353, 0.19607843, 0.20392157)
+            float inputs:displacement = 0
+            color3f inputs:emissiveColor = (0, 0, 0)
+            float inputs:ior = 1.5
+            float inputs:metallic = 0
+            normal3f inputs:normal = (0, 0, 1)
+            float inputs:occlusion = 1
+            float inputs:opacity
+            float inputs:roughness = 0.5
+            color3f inputs:specularColor = (0, 0, 0)
+            int inputs:useSpecularWorkflow = 1
+            token outputs:displacement
+            token outputs:surface
+        }
+
+        def Shader "primvar_st0"
+        {
+            uniform token info:id = "UsdPrimvarReader_float2"
+            float2 inputs:fallback = (0, 0)
+            token inputs:varname = "st0"
+            float2 outputs:result
+        }
+
+        def Shader "primvar_st1"
+        {
+            uniform token info:id = "UsdPrimvarReader_float2"
+            float2 inputs:fallback = (0, 0)
+            token inputs:varname = "st1"
+            float2 outputs:result
+        }
+    }
+}
+
+def Xform "world"
+{
+    matrix4d xformOp:transform = ( (1, 0, 0, 0), (0, 1, 0, 0), (0, 0, 1, 0), (0, 0, 0, 1) )
+    uniform token[] xformOpOrder = ["xformOp:transform"]
+
+    def Cube "speaker"
+    {
+        rel material:binding = </Looks/Schwarzgrau_Nextel_Dark_Black>
+        double size = 1
+        float3 xformOp:rotateXYZ = (-0, 0, -0)
+        float3 xformOp:scale = (0.18, 0.45, 0.2)
+        double3 xformOp:translate = (0.09000000000000075, 0.2250000000000003, 0.10000000000000053)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+    }
+}
+
