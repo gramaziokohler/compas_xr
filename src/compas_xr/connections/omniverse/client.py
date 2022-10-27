@@ -1,5 +1,5 @@
-"""Check out the connect sample from NVIDIA omniverse, stored in
-C:\Users\USER\AppData\Local\ov\pkg\connectsample-103.1.0\source\pyHelloWorld
+"""Check out the connect sample from NVIDIA omniverse:
+C:\\Users\\USER\\AppData\\Local\\ov\\pkg\\connectsample-103.1.0\\source\\pyHelloWorld
 """
 from pxr import Usd
 
@@ -56,7 +56,7 @@ def shutdown_omniverse():
     omni.client.shutdown()
 
 
-def remove_mesh(stage_url, prim_path): # NEEDED?
+def remove_mesh(stage_url, prim_path):  # NEEDED?
     stage = open_stage(stage_url)
     stage.RemovePrim(prim_path)
     stage.Save()
