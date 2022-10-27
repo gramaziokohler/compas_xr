@@ -1,5 +1,3 @@
-import sys
-
 import compas
 from compas.geometry import Frame  # noqa E402
 from compas.geometry import Transformation  # noqa E402
