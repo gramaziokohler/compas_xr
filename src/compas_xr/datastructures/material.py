@@ -85,7 +85,6 @@ class Material(Data):
     >>> material.pbr_metallic_roughness.base_color_factor = [0.9, 0.4, 0.2, 1.0]
     >>> material.pbr_metallic_roughness.metallic_factor = 0.0
     >>> material.pbr_metallic_roughness.roughness_factor = 0.5
-    >>> material.data
     """
 
     def __init__(
