@@ -98,8 +98,8 @@ def controller_input_to_ros():
             device_class = vrsys.getTrackedDeviceClass(i)
             if device_class == openvr.TrackedDeviceClass_Invalid:
                 continue
-            is_controller = device_class == openvr.TrackedDeviceClass_Controller
-            is_beacon = device_class == openvr.TrackedDeviceClass_TrackingReference
+            # is_controller = device_class == openvr.TrackedDeviceClass_Controller
+            # is_beacon = device_class == openvr.TrackedDeviceClass_TrackingReference
 
             # only once needed
             if device_class == openvr.TrackedDeviceClass_Controller:
