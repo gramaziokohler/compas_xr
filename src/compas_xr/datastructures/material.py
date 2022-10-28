@@ -239,7 +239,6 @@ class Texture(Data):
     @property
     def data(self):
         if self.index is None:
-            print("self", self)
             raise Exception("no index")
         return {
             # "source": self.source,
@@ -275,7 +274,6 @@ class TextureInfo(Data):
     def data(self):
         data = {}
         if self.index is None and self.texture is not None:
-            print("self", self)
             raise Exception("TextureInfo: no index")
         # if self.texture is not None:
         #    data.update({"texture": self.texture.data})

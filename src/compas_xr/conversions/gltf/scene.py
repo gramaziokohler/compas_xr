@@ -135,11 +135,11 @@ class GLTFScene(BaseScene):
                 parents[child] = node.name
 
             T = None
-            if node.translation:
-                print("node.translation", node.translation)
-            if node.rotation:
-                print("node.rotation", node.rotation)
-                # node.rotation = list(Rotation.from_frame(frame).quaternion.xyzw)
+            # if node.translation:
+            #    print("node.translation", node.translation)
+            # if node.rotation:
+            #    print("node.rotation", node.rotation)
+            #    # node.rotation = list(Rotation.from_frame(frame).quaternion.xyzw)
             if T:
                 frames[key] = Frame.from_transformation(T)
 

@@ -220,7 +220,6 @@ class Scene(Graph):
             ):  # TODO: better?
 
                 attr = getattr(item, a)
-                print(item, a, attr)
                 if isinstance(attr, TextureInfo):
                     if attr.texture is not None:
                         texture = attr.texture

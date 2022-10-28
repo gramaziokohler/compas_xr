@@ -123,7 +123,6 @@ class USDScene(BaseScene):
                             raise NotImplementedError
 
                     if not frame and not element:
-                        print("path", path)
                         prim = prim_default(stage, path, transformation)
             else:
                 raise ValueError("we should never come here")
@@ -187,7 +186,6 @@ class USDScene(BaseScene):
             frame = frames.get(key, None)
             # is_reference ?
             # instance_of ?
-            print(name, parent, frame, element, material)
             scene.add_layer(name, parent=parent, frame=frame, element=element, material=material)
 
         materials = []

@@ -72,7 +72,6 @@ class GLTFMaterial(MaterialData):  # TODO: base on BaseMaterial?
             ext = KHR_materials_transmission.from_data(material_dict["transmission"])
             obj.add_extension(ext)
         if "clearcoat" in material_dict and material_dict["clearcoat"] is not None:
-            print(material_dict["clearcoat"])
             ext = KHR_materials_clearcoat.from_data(material_dict["clearcoat"])
             obj.add_extension(ext)
         if "ior" in material_dict and material_dict["ior"] is not None:
