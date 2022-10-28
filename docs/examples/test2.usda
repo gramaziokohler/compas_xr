@@ -1,0 +1,81 @@
+#usda 1.0
+(
+    defaultPrim = "TexModel"
+    upAxis = "Y"
+)
+
+def Scope "Looks"
+{
+    def Material "boardMat"
+    {
+        token outputs:displacement.connect = </Looks/boardMat/Shader.outputs:displacement>
+        token outputs:surface.connect = </Looks/boardMat/Shader.outputs:surface>
+
+        def Shader "Shader"
+        {
+            uniform token info:id = "UsdPreviewSurface"
+            float inputs:clearcoat = 0
+            float inputs:clearcoatRoughness = 0.01
+            color3f inputs:diffuseColor = (1, 1, 1)
+            color3f inputs:diffuseColor.connect = </Looks/boardMat/diffuseTexture.outputs:rgb>
+            float inputs:displacement = 0
+            color3f inputs:emissiveColor = (0, 0, 0)
+            float inputs:ior = 1.5
+            float inputs:metallic = 0
+            normal3f inputs:normal = (0, 0, 1)
+            float inputs:occlusion = 1
+            float inputs:opacity.connect = </Looks/boardMat/diffuseTexture.outputs:a>
+            float inputs:roughness = 0.4
+            color3f inputs:specularColor = (1, 1, 1)
+            int inputs:useSpecularWorkflow = 1
+            token outputs:displacement
+            token outputs:surface
+        }
+
+        def Shader "primvar_st0"
+        {
+            uniform token info:id = "UsdPrimvarReader_float2"
+            float2 inputs:fallback = (0, 0)
+            token inputs:varname = "st0"
+            float2 outputs:result
+        }
+
+        def Shader "primvar_st1"
+        {
+            uniform token info:id = "UsdPrimvarReader_float2"
+            float2 inputs:fallback = (0, 0)
+            token inputs:varname = "st1"
+            float2 outputs:result
+        }
+
+        def Shader "diffuseTexture"
+        {
+            uniform token info:id = "UsdUVTexture"
+            float4 inputs:bias = (0, 0, 0, 0)
+            float4 inputs:fallback = (0, 0, 0, 1)
+            asset inputs:file = @c:\Users\rustr\workspace\compas_xr\docs\examples\USDLogoLrg.png@
+            float4 inputs:scale = (1, 1, 1, 1)
+            float2 inputs:st
+            float outputs:a
+            float3 outputs:rgb
+        }
+    }
+}
+
+def Xform "TexModel"
+{
+    matrix4d xformOp:transform = ( (1, 0, 0, 0), (0, 1, 0, 0), (0, 0, 1, 0), (0, 0, 0, 1) )
+    uniform token[] xformOpOrder = ["xformOp:transform"]
+
+    def Mesh "card"
+    {
+        int[] faceVertexCounts = [4]
+        int[] faceVertexIndices = [0, 1, 2, 3]
+        rel material:binding = </Looks/boardMat>
+        point3f[] points = [(-430, -145, 0), (430, -145, 0), (430, 145, 0), (-430, 145, 0)]
+        texCoord2f[] primvars:st = [(0, 0), (1, 0), (1, 1), (0, 1)] (
+            interpolation = "varying"
+        )
+    }
+}
+

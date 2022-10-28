@@ -1,0 +1,157 @@
+{
+    "asset": {
+        "version": "2.0"
+    },
+    "bufferViews": [
+        {
+            "buffer": 0,
+            "byteLength": 72,
+            "byteOffset": 0
+        },
+        {
+            "buffer": 0,
+            "byteLength": 96,
+            "byteOffset": 72
+        },
+        {
+            "buffer": 0,
+            "byteLength": 64,
+            "byteOffset": 168
+        }
+    ],
+    "accessors": [
+        {
+            "bufferView": 0,
+            "count": 36,
+            "componentType": 5123,
+            "type": "SCALAR"
+        },
+        {
+            "bufferView": 1,
+            "count": 8,
+            "componentType": 5126,
+            "type": "VEC3",
+            "min": [
+                -0.5,
+                -0.5,
+                -0.5
+            ],
+            "max": [
+                0.5,
+                0.5,
+                0.5
+            ]
+        },
+        {
+            "bufferView": 2,
+            "count": 8,
+            "componentType": 5126,
+            "type": "VEC2",
+            "min": [
+                0.0,
+                0.0
+            ],
+            "max": [
+                1.0,
+                1.0
+            ]
+        }
+    ],
+    "meshes": [
+        {
+            "primitives": [
+                {
+                    "indices": 0,
+                    "material": 0,
+                    "attributes": {
+                        "POSITION": 1,
+                        "TEXCOORD_0": 2
+                    }
+                }
+            ]
+        }
+    ],
+    "nodes": [
+        {
+            "name": "world",
+            "children": [
+                1
+            ]
+        },
+        {
+            "name": "mesh",
+            "mesh": 0
+        }
+    ],
+    "scene": 0,
+    "scenes": [
+        {
+            "nodes": [
+                0
+            ],
+            "name": "scene"
+        }
+    ],
+    "materials": [
+        {
+            "name": "Texture",
+            "pbrMetallicRoughness": {
+                "baseColorTexture": {
+                    "index": 0
+                },
+                "metallicFactor": 0.0
+            },
+            "emissiveFactor": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "alphaMode": "OPAQUE",
+            "doubleSided": true,
+            "extensions": {
+                "KHR_materials_pbrSpecularGlossiness": {
+                    "diffuseFactor": [
+                        0.98,
+                        0.98,
+                        0.98,
+                        1.0
+                    ],
+                    "diffuseTexture": {
+                        "index": 0
+                    },
+                    "specularFactor": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "glossinessFactor": 1.0
+                }
+            }
+        }
+    ],
+    "textures": [
+        {
+            "source": 0,
+            "name": "Texture"
+        }
+    ],
+    "images": [
+        {
+            "name": "compas_icon_white.png",
+            "mimeType": "image/png",
+            "uri": "compas_icon_white.png"
+        }
+    ],
+    "buffers": [
+        {
+            "byteLength": 232,
+            "uri": "scene_with_texture.bin"
+        }
+    ],
+    "extensionsRequired": [
+        "KHR_materials_pbrSpecularGlossiness"
+    ],
+    "extensionsUsed": [
+        "KHR_materials_pbrSpecularGlossiness"
+    ]
+}
