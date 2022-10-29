@@ -16,8 +16,11 @@ from compas.utilities import color_to_rgb
 from compas.geometry import Frame, Transformation
 import compas
 
+import sys
+sys.path.append(r"C:\Users\rustr\workspace\compas_xr\src")
+from compas_rhino import unload_modules
+unload_modules("compas_xr")
 from compas_xr.conversions.rhino.conversions.rhino_material import AddMaterial
-
 
 # https://github.com/Stykka/glTF-Bin/blob/master/glTF-BinExporter/RhinoDocGltfConverter.cs
 

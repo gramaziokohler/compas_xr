@@ -1,0 +1,1 @@
+* scnee with instances works with USD (only material binding does not wort with deep depths, some geometries look strange, instance transform?)
