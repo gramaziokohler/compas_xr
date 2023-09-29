@@ -15,6 +15,8 @@ compas_xr
 from __future__ import print_function
 
 import os
+from .realtime_database import *
+from .storage import *
 
 
 __author__ = ["GKR"]
