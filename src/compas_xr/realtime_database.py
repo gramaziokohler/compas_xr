@@ -9,27 +9,29 @@ import pyrebase
 
 # Get the current file path
 current_file_path = os.path.abspath(__file__)
-print (current_file_path)
+print ("CURRENT FILE PATH = " + current_file_path)
 
-# Navigate to the parent folder
-parent_folder = os.path.dirname(current_file_path)
-print (parent_folder)
+# Define the number of levels to navigate up
+levels_to_go_up = 3
+
+#Construct File path to the correct location
+parent_folder = os.path.abspath(os.path.join(current_file_path, "../" * levels_to_go_up))
 
 # Enter another folder
 target_folder = os.path.join(parent_folder, "scripts")
-print (target_folder)
+print ("TARGET FOLDER PATH = " + target_folder)
 
 #JSON file path
 config_path = os.path.join(target_folder, "firebase_config.json")
 
-print (config_path)
+# Load the firebase configuration file from the JSON file if it exists: Else: Print.
+if os.path.exists(config_path):
+    with open(config_path) as config_file:
+        print (config_path)
+        config = json.load(config_file)
 
-config_path = r'X:\GKR_working\Fall_2023\git_working\compas_xr\src\compas_xr\scripts\firebase_config.json'
-
-# Load the configuration from the JSON file.
-with open(config_path) as config_file:
-    print(config_file)
-    config = json.load(config_file)
+else:
+    print ("FILE DOES NOT EXIST: " + config_path)
 
 # initialize the connection to firebase
 firebase = pyrebase.initialize_app(config)
@@ -102,7 +104,7 @@ def remove_key_built(key):
 
 
 def add_key_built(new_key_built):
-    db.child("Built Keys").update({str(new_key_built): str(new_key_built)})
+    db.child("Built Keys 2").update({str(new_key_built): str(new_key_built)})
 
 
 # get users' ids
@@ -160,11 +162,11 @@ def close_stream(my_stream):
     my_stream.close()
 
 
-if __name__ == "__main__":
+# if __name__ == "__main__":
 
-    add_key_built(4)
-    remove_key_built(10)
-    print(get_keys_built())
+#     add_key_built(4)
+#     remove_key_built(10)
+#     print(get_keys_built())
     # my_stream = db.child("Built Keys").stream(stream_handler)
     # my_stream = db.child("Users").stream(stream_handler)
     # close_stream(my_stream)
