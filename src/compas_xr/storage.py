@@ -41,8 +41,9 @@ def download_from_firebase(path_on_cloud, path_local):
     storage.child(path_on_cloud).download(path_local, filename)
 
 
-# if __name__ == "__main__":
+if __name__ == "__main__":
 
-#     # download_from_firebase(path_on_cloud, path_local)
-#     print(path_local)
-#     upload_to_firebase(path_on_cloud, path_local)
+    print ("TEST")
+    # download_from_firebase(path_on_cloud, path_local)
+    # print(path_local)
+    # upload_to_firebase(path_on_cloud, path_local)
