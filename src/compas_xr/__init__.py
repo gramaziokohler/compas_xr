@@ -15,8 +15,8 @@ compas_xr
 from __future__ import print_function
 
 import os
-from .realtime_database import *
-from .storage import *
+from .realtime_database import RealtimeDatabase
+from .storage import Storage
 
 
 __author__ = ["GKR"]
@@ -32,6 +32,6 @@ HOME = os.path.abspath(os.path.join(HERE, "../../"))
 DATA = os.path.abspath(os.path.join(HOME, "data"))
 DOCS = os.path.abspath(os.path.join(HOME, "docs"))
 TEMP = os.path.abspath(os.path.join(HOME, "temp"))
-
+SCRIPT = os.path.abspath(os.path.join(HOME, "scripts"))
 
 __all__ = ["HOME", "DATA", "DOCS", "TEMP"]

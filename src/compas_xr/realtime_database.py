@@ -1,6 +1,8 @@
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
+#add reference to the other
+# from compas_xr import SCRIPT
 
 import os
 import json
