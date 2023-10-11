@@ -32,6 +32,6 @@ HOME = os.path.abspath(os.path.join(HERE, "../../"))
 DATA = os.path.abspath(os.path.join(HOME, "data"))
 DOCS = os.path.abspath(os.path.join(HOME, "docs"))
 TEMP = os.path.abspath(os.path.join(HOME, "temp"))
-SCRIPT = os.path.abspath(os.path.join(HOME, "scripts"))
+# SCRIPT = os.path.abspath(os.path.join(HOME, "scripts"))
 
 __all__ = ["HOME", "DATA", "DOCS", "TEMP"]

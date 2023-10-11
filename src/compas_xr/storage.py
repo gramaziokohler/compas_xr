@@ -1,24 +1,24 @@
 import pyrebase
 import json
 import os
-from compas_xr import SCRIPT
+# from compas_xr import SCRIPT
 
 class Storage(object):
 
     # Class attribute for the shared firebase storage reference
     _shared_storage = None
 
-    def __init__(self, config_path=None):
+    def __init__(self, default_config_path = None, config_path=None):
         self.config_path = config_path
-        self.default_config_path = os.path.abspath(os.path.join(SCRIPT, "firebase_config.json"))
+        self.default_config_path = default_config_path
         self._ensure_storage()
 
     def _ensure_storage(self):
         # Initialize firebase connection and storage only once
         if not Storage._shared_storage:
-            path = self.config_path or Storage.default_config_path
+            path = self.config_path or self.default_config_path
 
-            # Load the firebase configuration file from the JSON file if it exists: Else: Print.
+            # Load the firebase configuration file from the JSON file if file exists.
             if os.path.exists(path):
                 with open(path) as config_file:
                     config = json.load(config_file)
