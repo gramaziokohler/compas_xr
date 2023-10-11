@@ -138,7 +138,7 @@ def get_json_data(name, childname):
         dt = db.child(name).child(childname).get().val()
         return dt
     
-def get_json_data_QR(name):
+def get_json_data_qr(name):
     json_data = {}
     data = db.child(name).get()
     if data.each():
