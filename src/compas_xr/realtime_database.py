@@ -10,6 +10,7 @@ import json
 import pyrebase
 
 
+
 class RealtimeDatabase(object):
 
     # Class attribute for the shared firebase database reference
@@ -45,6 +46,7 @@ class RealtimeDatabase(object):
         print(message["data"])
 
 
+    #This function should be set_partial_json_data_as_children
     def set_json_data(self, json_f, parentname, keys):
         self._ensure_database()
         with open(json_f) as json_file:
@@ -57,27 +59,12 @@ class RealtimeDatabase(object):
         for child, key in zip(children, keys):
             RealtimeDatabase._shared_database.child(parentname).child(key).set(child)
 
-
-    def set_json_data_joints(self, json_f):
-        self._ensure_database()
-        with open(json_f) as json_file:
-            json_data = json.load(json_file)
-
-        RealtimeDatabase._shared_database.child("Joints").set(json_data)
-
-
-    # def set_qr_frames(json_fr): 
-    #     with open(json_fr) as json_file:
-    #         json_data = json.load(json_file)
-
-    #     db.child("QRFrames").set(json_data)
-
-
+    #This should be set_parent_from_data
     def set_qr_frames(self, data, parent_name):
         self._ensure_database() 
         RealtimeDatabase._shared_database.child(parent_name).set(data)
 
-
+    #NOT SURE IF USED: This is the same as the function above.
     def set_data(self, childname, data):
         self._ensure_database() 
         RealtimeDatabase._shared_database.child(childname).set(data)
@@ -93,7 +80,7 @@ class RealtimeDatabase(object):
                 keys_built.append(key.val())
         return keys_built
 
-
+    # Dont believe we actually need this either
     def set_keys_built(self, keys):
         self._ensure_database()
         data = {}
@@ -102,18 +89,36 @@ class RealtimeDatabase(object):
         RealtimeDatabase._shared_database.child("Built Keys").set(data)
 
 
+    #Remove a parent: CHECK WHAT HAPPENS IF YOU TRY TO REMOVE A PARENT THAT DOES NOT EXIST
+    def remove_parent(self, parentname):
+        self._ensure_database()
+        RealtimeDatabase._shared_database.child(parentname).remove()
+
+    #Remove Child: CHECK WHAT HAPPENS IF YOU TRY TO REMOVE A CHILD THAT DOES NOT EXIST
+    def remove_child(self, parentname, childname):
+        self._ensure_database()
+        RealtimeDatabase._shared_database.child(parentname).child(childname).remove()
+    
+    #Remove children: CHECK WHAT HAPPENS IF YOU TRY TO REMOVE A CHILD THAT DOES NOT EXIST
+    def remove_children(self, parentname, children):
+        self._ensure_database()
+
+        for child in children:
+            RealtimeDatabase._shared_database.child(parentname).child(child).remove()
+    
+
+    #Don't actually need
     def remove_key_built(self, key):
         self._ensure_database()
         RealtimeDatabase._shared_database.child("Built Keys").child(str(key)).remove()
 
-    # update data
 
-
+    #Dont actually need
     def add_key_built(self, new_key_built):
         self._ensure_database()
         RealtimeDatabase._shared_database.child("Built Keys").update({str(new_key_built): str(new_key_built)})
 
-    # get users' ids
+    # get users' ids: REVIEW THESE
     def get_users(self):
         self._ensure_database()
         users_ids = []
@@ -125,7 +130,7 @@ class RealtimeDatabase(object):
             # print("Selected by user Nr.", user.val()["userID"])
         return users_ids
 
-
+    #Not sure if needed: user as input?
     def get_users_attribute(self, attribute):
         self._ensure_database()
         users_attributes = []
@@ -134,19 +139,22 @@ class RealtimeDatabase(object):
             users_attributes.append(user.val()[attribute])
         return users_attributes
 
-
-    def get_json_data(self, name, childname):
+    #This should be converted to get json data children::::::: I think this should raise an exception
+    def get_json_data(self, parentname, childname):
         self._ensure_database()
         json_data = {}
-        data = RealtimeDatabase._shared_database.child(name).child(childname).get()
+        data = RealtimeDatabase._shared_database.child(parentname).child(childname).get()
         if data.each():
             for d in data.each():
                 json_data[d.key()] = d.val()
             return json_data
         else:
-            dt = RealtimeDatabase._shared_database.child(name).child(childname).get().val()
+            # raise Exception("Child not Found in database")
+            dt = RealtimeDatabase._shared_database.child(parentname).child(childname).get().val()
             return dt
         
+    
+    #This should be converted to get json data Parent:::::::::: I also believe this should raise the exception
     def get_json_data_qr(self, name):
         self._ensure_database()
         json_data = {}
@@ -156,10 +164,11 @@ class RealtimeDatabase(object):
                 json_data[d.key()] = d.val()
             return json_data
         else:
+            # raise Exception("Parent not Found in database")
             dt = RealtimeDatabase._shared_database.child(name).get().val()
             return dt
 
-
+    #Also need to review this
     def listen():
         pass
         # my_stream = db.child("Built Keys").stream(stream_handler)

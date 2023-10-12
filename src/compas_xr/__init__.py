@@ -17,6 +17,7 @@ from __future__ import print_function
 import os
 from .realtime_database import RealtimeDatabase
 from .storage import Storage
+from .print_test import Print
 
 
 __author__ = ["GKR"]
@@ -32,6 +33,24 @@ HOME = os.path.abspath(os.path.join(HERE, "../../"))
 DATA = os.path.abspath(os.path.join(HOME, "data"))
 DOCS = os.path.abspath(os.path.join(HOME, "docs"))
 TEMP = os.path.abspath(os.path.join(HOME, "temp"))
-# SCRIPT = os.path.abspath(os.path.join(HOME, "scripts"))
+SCRIPT = os.path.abspath(os.path.join(HOME, "scripts"))
+
+# def storage_instance(default_file_path, config_path):
+
+#     storage = Storage(default_file_path, config_path)
+
+#     return storage
+
+# def realtime_database_instance(default_file_path, config_path):
+
+#     realtime_database = RealtimeDatabase(default_file_path, config_path)
+
+#     return realtime_database
+
+def print_instance():
+
+    print = Print()
+
+    return print
 
 __all__ = ["HOME", "DATA", "DOCS", "TEMP"]
