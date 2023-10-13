@@ -50,11 +50,11 @@ class Storage(Data):
         if not Storage._shared_storage:
             raise Exception("Could not initialize storage!")
 
-    def upload_to_firebase(self, path_on_cloud, path_local):
+    def upload(self, path_on_cloud, path_local):
         self._ensure_storage()
         Storage._shared_storage.child(path_on_cloud).put(path_local)
 
-    def download_from_firebase(self, path_on_cloud, path_local):
+    def download(self, path_on_cloud, path_local):
         self._ensure_storage()
         filename = path_local
         Storage._shared_storage.child(path_on_cloud).download(path_local, filename)
