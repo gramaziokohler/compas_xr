@@ -15,8 +15,8 @@ compas_xr
 from __future__ import print_function
 
 import os
-from .realtime_database import RealtimeDatabase
-from .storage import Storage
+# from .realtime_database import RealtimeDatabase
+# from .storage import Storage
 from .print_test import Print
 
 
@@ -47,10 +47,11 @@ SCRIPT = os.path.abspath(os.path.join(HOME, "scripts"))
 
 #     return realtime_database
 
-def print_instance():
+# def print_instance():
 
-    print = Print()
+#     print = Print()
 
-    return print
+#     return print
 
+__all_plugins__ = ["compas_xr.rhino.install"]
 __all__ = ["HOME", "DATA", "DOCS", "TEMP"]

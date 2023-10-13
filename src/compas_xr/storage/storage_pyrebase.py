@@ -2,13 +2,14 @@ import pyrebase
 import json
 import os
 from compas.data import Data
+from compas_xr.storage.storage_interface import StorageInterface
 # from compas_xr import SCRIPT
 
 # Get the current file path
 CURRENT_FILE_PATH = os.path.abspath(__file__)
 
 # Define the number of levels to navigate up
-LEVELS_TO_GO_UP = 3
+LEVELS_TO_GO_UP = 4
 
 #Construct File path to the correct location
 PARENT_FOLDER = os.path.abspath(os.path.join(CURRENT_FILE_PATH, "../" * LEVELS_TO_GO_UP))
@@ -18,7 +19,7 @@ TARGET_FOLDER = os.path.join(PARENT_FOLDER, "scripts")
 DEFAULT_CONFIG_PATH = os.path.join(TARGET_FOLDER, "firebase_config.json")
 
 
-class Storage(Data):
+class Storage(StorageInterface, Data):
 
     # Class attribute for the shared firebase storage reference
     _shared_storage = None
@@ -50,11 +51,11 @@ class Storage(Data):
         if not Storage._shared_storage:
             raise Exception("Could not initialize storage!")
 
-    def upload(self, path_on_cloud, path_local):
+    def upload_file(self, path_on_cloud, path_local):
         self._ensure_storage()
         Storage._shared_storage.child(path_on_cloud).put(path_local)
 
-    def download(self, path_on_cloud, path_local):
+    def download_file(self, path_on_cloud, path_local):
         self._ensure_storage()
         filename = path_local
         Storage._shared_storage.child(path_on_cloud).download(path_local, filename)
@@ -71,10 +72,3 @@ class Storage(Data):
     def from_data(cls, data):
         config_path = data["config_path"]
         return cls(config_path)
-
-if __name__ == "__main__":
-    st = Storage()
-    st.download_from_firebase("assembly_structure.json", r"X:\GKR_working\Fall_2023\git_working\compas_xr\data\assembly_structure_test.json")
-
-    from compas.data import json_dumps
-    print(json_dumps(st))

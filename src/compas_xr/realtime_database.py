@@ -46,7 +46,7 @@ class RealtimeDatabase(object):
         print(message["data"])
 
 
-    #This function should be set_partial_json_data_as_children
+    #TODO: This function should be set_partial_json_data_as_children
     def set_json_data(self, json_f, parentname, keys):
         self._ensure_database()
         with open(json_f) as json_file:
@@ -59,12 +59,12 @@ class RealtimeDatabase(object):
         for child, key in zip(children, keys):
             RealtimeDatabase._shared_database.child(parentname).child(key).set(child)
 
-    #This should be set_parent_from_data
+    #TODO: This should be set_parent_from_data
     def set_qr_frames(self, data, parent_name):
         self._ensure_database() 
         RealtimeDatabase._shared_database.child(parent_name).set(data)
 
-    #NOT SURE IF USED: This is the same as the function above.
+    #TODO: NOT SURE IF USED: This is the same as the function above.
     def set_data(self, childname, data):
         self._ensure_database() 
         RealtimeDatabase._shared_database.child(childname).set(data)
@@ -89,17 +89,17 @@ class RealtimeDatabase(object):
         RealtimeDatabase._shared_database.child("Built Keys").set(data)
 
 
-    #Remove a parent: CHECK WHAT HAPPENS IF YOU TRY TO REMOVE A PARENT THAT DOES NOT EXIST
+    #TODO: Remove a parent: CHECK WHAT HAPPENS IF YOU TRY TO REMOVE A PARENT THAT DOES NOT EXIST
     def remove_parent(self, parentname):
         self._ensure_database()
         RealtimeDatabase._shared_database.child(parentname).remove()
 
-    #Remove Child: CHECK WHAT HAPPENS IF YOU TRY TO REMOVE A CHILD THAT DOES NOT EXIST
+    #TODO: Remove Child: CHECK WHAT HAPPENS IF YOU TRY TO REMOVE A CHILD THAT DOES NOT EXIST
     def remove_child(self, parentname, childname):
         self._ensure_database()
         RealtimeDatabase._shared_database.child(parentname).child(childname).remove()
     
-    #Remove children: CHECK WHAT HAPPENS IF YOU TRY TO REMOVE A CHILD THAT DOES NOT EXIST
+    #TODO: Remove children: CHECK WHAT HAPPENS IF YOU TRY TO REMOVE A CHILD THAT DOES NOT EXIST
     def remove_children(self, parentname, children):
         self._ensure_database()
 
@@ -139,7 +139,7 @@ class RealtimeDatabase(object):
             users_attributes.append(user.val()[attribute])
         return users_attributes
 
-    #This should be converted to get json data children::::::: I think this should raise an exception
+    #TODO: This should be converted to get json data children::::::: I think this should raise an exception
     def get_json_data(self, parentname, childname):
         self._ensure_database()
         json_data = {}
@@ -154,7 +154,7 @@ class RealtimeDatabase(object):
             return dt
         
     
-    #This should be converted to get json data Parent:::::::::: I also believe this should raise the exception
+    #TODO: This should be converted to get json data Parent:::::::::: I also believe this should raise the exception
     def get_json_data_qr(self, name):
         self._ensure_database()
         json_data = {}
