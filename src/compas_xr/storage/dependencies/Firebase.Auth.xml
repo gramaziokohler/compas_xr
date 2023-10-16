@@ -1,0 +1,592 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Firebase.Auth</name>
+    </assembly>
+    <members>
+        <member name="T:Firebase.Auth.AuthCredential">
+            <summary>
+            Base class for provider-specific AuthCredentials.
+            </summary>
+        </member>
+        <member name="F:Firebase.Auth.AuthErrorReason.Undefined">
+            <summary>
+            Request didn't even complete, possibly due to network issue.
+            </summary>
+        </member>
+        <member name="F:Firebase.Auth.AuthErrorReason.Unknown">
+            <summary>
+            Unknown error reason.
+            </summary>
+        </member>
+        <member name="F:Firebase.Auth.AuthErrorReason.OperationNotAllowed">
+            <summary>
+            The sign in method is not enabled.
+            </summary>
+        </member>
+        <member name="F:Firebase.Auth.AuthErrorReason.UserDisabled">
+            <summary>
+            The user was disabled and is not granted access anymore.
+            </summary>
+        </member>
+        <member name="F:Firebase.Auth.AuthErrorReason.UserNotFound">
+            <summary>
+            The user was not found
+            </summary>
+        </member>
+        <member name="F:Firebase.Auth.AuthErrorReason.InvalidProviderID">
+            <summary>
+            Third-party Auth Providers: PostBody does not contain or contains invalid Authentication Provider string.
+            </summary>
+        </member>
+        <member name="F:Firebase.Auth.AuthErrorReason.InvalidAccessToken">
+            <summary>
+            Third-party Auth Providers: PostBody does not contain or contains invalid Access Token string obtained from Auth Provider.
+            </summary>
+        </member>
+        <member name="F:Firebase.Auth.AuthErrorReason.LoginCredentialsTooOld">
+            <summary>
+            Changes to user's account has been made since last log in. User needs to login again.
+            </summary>
+        </member>
+        <member name="F:Firebase.Auth.AuthErrorReason.MissingRequestURI">
+            <summary>
+            Third-party Auth Providers: Request does not contain a value for parameter: requestUri.
+            </summary>
+        </member>
+        <member name="F:Firebase.Auth.AuthErrorReason.SystemError">
+            <summary>
+            Third-party Auth Providers: Request does not contain a value for parameter: postBody.
+            </summary>
+        </member>
+        <member name="F:Firebase.Auth.AuthErrorReason.InvalidEmailAddress">
+            <summary>
+            Email/Password Authentication: Email address is not in valid format.
+            </summary>
+        </member>
+        <member name="F:Firebase.Auth.AuthErrorReason.MissingPassword">
+            <summary>
+            Email/Password Authentication: No password provided!
+            </summary>
+        </member>
+        <member name="F:Firebase.Auth.AuthErrorReason.WeakPassword">
+            <summary>
+            Email/Password Signup: Password must be more than 6 characters.  This error could also be caused by attempting to create a user account using Set Account Info without supplying a password for the new user.
+            </summary>
+        </member>
+        <member name="F:Firebase.Auth.AuthErrorReason.EmailExists">
+            <summary>
+            Email/Password Signup: Email address already connected to another account. This error could also be caused by attempting to create a user account using Set Account Info and an email address already linked to another account.
+            </summary>
+        </member>
+        <member name="F:Firebase.Auth.AuthErrorReason.MissingEmail">
+            <summary>
+            Email/Password Signin: No email provided! This error could also be caused by attempting to create a user account using Set Account Info without supplying an email for the new user.
+            </summary>
+        </member>
+        <member name="F:Firebase.Auth.AuthErrorReason.UnknownEmailAddress">
+            <summary>
+            Email/Password Signin: No user with a matching email address is registered.
+            </summary>
+        </member>
+        <member name="F:Firebase.Auth.AuthErrorReason.WrongPassword">
+            <summary>
+            Email/Password Signin: The supplied password is not valid for the email address.
+            </summary>
+        </member>
+        <member name="F:Firebase.Auth.AuthErrorReason.TooManyAttemptsTryLater">
+            <summary>
+            Email/Password Signin: Too many password login have been attempted. Try again later.
+            </summary>
+        </member>
+        <member name="F:Firebase.Auth.AuthErrorReason.MissingRequestType">
+            <summary>
+            Password Recovery: Request does not contain a value for parameter: requestType or supplied value is invalid.
+            </summary>
+        </member>
+        <member name="F:Firebase.Auth.AuthErrorReason.ResetPasswordExceedLimit">
+            <summary>
+            Password Recovery: Reset password limit exceeded.
+            </summary>
+        </member>
+        <member name="F:Firebase.Auth.AuthErrorReason.InvalidIDToken">
+            <summary>
+            Account Linking: Authenticated User ID Token is invalid!
+            </summary>
+        </member>
+        <member name="F:Firebase.Auth.AuthErrorReason.MissingIdentifier">
+            <summary>
+            Linked Accounts: Request does not contain a value for parameter: identifier.
+            </summary>
+        </member>
+        <member name="F:Firebase.Auth.AuthErrorReason.InvalidIdentifier">
+            <summary>
+            Linked Accounts: Request contains an invalid value for parameter: identifier.
+            </summary>
+        </member>
+        <member name="F:Firebase.Auth.AuthErrorReason.AlreadyLinked">
+            <summary>
+            Linked accounts: account to link has already been linked.
+            </summary>
+        </member>
+        <member name="F:Firebase.Auth.AuthErrorReason.InvalidApiKey">
+            <summary>
+            Specified API key is not valid.
+            </summary>
+        </member>
+        <member name="F:Firebase.Auth.AuthErrorReason.AccountExistsWithDifferentCredential">
+            <summary>
+            The email user tried to sign in with is already registered under a different provider.
+            </summary>
+        </member>
+        <member name="M:Firebase.Auth.EnumExtensions.ToEnumString``1(``0)">
+            <summary>
+            Finds the <see cref="T:System.Runtime.Serialization.EnumMemberAttribute"/> on given enum and returns its value.
+            </summary>
+        </member>
+        <member name="T:Firebase.Auth.FirebaseAuthClient">
+            <inherit />
+        </member>
+        <member name="T:Firebase.Auth.FirebaseAuthConfig">
+            <summary>
+            Configuration of firebase auth.
+            </summary>
+        </member>
+        <member name="P:Firebase.Auth.FirebaseAuthConfig.ApiKey">
+            <summary>
+            The api key of your Firebase app. 
+            </summary>
+        </member>
+        <member name="P:Firebase.Auth.FirebaseAuthConfig.UserRepository">
+            <summary>
+            Repository of firebase tokens. Default is in-memory.
+            </summary>
+        </member>
+        <member name="P:Firebase.Auth.FirebaseAuthConfig.Providers">
+            <summary>
+            Collection of auth providers (e.g. Google, Facebook etc.)
+            </summary>
+        </member>
+        <member name="P:Firebase.Auth.FirebaseAuthConfig.JsonSettings">
+            <summary>
+            Json.net serializer settings.
+            </summary>
+        </member>
+        <member name="P:Firebase.Auth.FirebaseAuthConfig.HttpClient">
+            <summary>
+            HttpClient to be used for web requests.
+            </summary>
+        </member>
+        <member name="P:Firebase.Auth.FirebaseAuthConfig.AuthDomain">
+            <summary>
+            Auth domain of your firebase app, e.g. hello.firebaseapp.com
+            </summary>
+        </member>
+        <member name="P:Firebase.Auth.FirebaseAuthConfig.RedirectUri">
+            <summary>
+            Specifies the uri that oauth provider will navigate to to finish auth.
+            </summary>
+        </member>
+        <member name="M:Firebase.Auth.FirebaseAuthConfig.GetAuthProvider(Firebase.Auth.FirebaseProviderType)">
+            <summary>
+            Get provider instance for given <paramref name="providerType"/>.
+            </summary>
+        </member>
+        <member name="T:Firebase.Auth.FirebaseAuthException">
+            <summary>
+            Base class for all FirebaseAuth exceptions.
+            </summary>
+        </member>
+        <member name="P:Firebase.Auth.FirebaseAuthException.Reason">
+            <summary>
+            Indicates why a login failed. If not resolved, defaults to <see cref="F:Firebase.Auth.AuthErrorReason.Undefined"/>.
+            </summary>
+        </member>
+        <member name="T:Firebase.Auth.FirebaseAuthLinkConflictException">
+            <summary>
+            Exception thrown when user tries to login with email that is already associated with a different Auth provider
+            (and creating multiple accounts using the same email address with different authentication providers is not allowed in Firebase Console)
+            </summary>
+        </member>
+        <member name="T:Firebase.Auth.FirebaseAuthHttpException">
+            <summary>
+            Exception thrown during invocation of an HTTP request.
+            </summary>
+        </member>
+        <member name="P:Firebase.Auth.FirebaseAuthHttpException.RequestData">
+            <summary>
+            Json data passed to the authentication service.
+            </summary>
+        </member>
+        <member name="P:Firebase.Auth.FirebaseAuthHttpException.RequestUrl">
+            <summary>
+            Url for which the request failed.
+            </summary>
+        </member>
+        <member name="P:Firebase.Auth.FirebaseAuthHttpException.ResponseData">
+            <summary>
+            Response from the authentication service.
+            </summary>
+        </member>
+        <member name="T:Firebase.Auth.FirebaseCredential">
+            <summary>
+            Firebase credentials used to make Firebase requests.
+            </summary>
+        </member>
+        <member name="P:Firebase.Auth.FirebaseCredential.IdToken">
+            <summary>
+            Value of the token to be used with Firebase requests.
+            </summary>
+        </member>
+        <member name="P:Firebase.Auth.FirebaseCredential.RefreshToken">
+            <summary>
+            Value of the refresh token which can be used to refresh the <see cref="P:Firebase.Auth.FirebaseCredential.IdToken"/>.
+            </summary>
+        </member>
+        <member name="P:Firebase.Auth.FirebaseCredential.Created">
+            <summary>
+            Specifies when the token was created.
+            </summary>
+        </member>
+        <member name="P:Firebase.Auth.FirebaseCredential.ExpiresIn">
+            <summary>
+            Specifies in how many second the token expires in from the moment it was created.
+            </summary>
+        </member>
+        <member name="P:Firebase.Auth.FirebaseCredential.ProviderType">
+            <summary>
+            Type of the firebase auth provider.
+            </summary>
+        </member>
+        <member name="M:Firebase.Auth.FirebaseCredential.IsExpired">
+            <summary>
+            Specifies whether the token already expired. 
+            </summary>
+        </member>
+        <member name="T:Firebase.Auth.FirebaseFailureParser">
+            <summary>
+            Parser of HTTP response errors into <see cref="T:Firebase.Auth.AuthErrorReason"/> enum.
+            </summary>
+        </member>
+        <member name="M:Firebase.Auth.FirebaseFailureParser.GetFailureReason(System.String)">
+            <summary>
+            Resolves failure reason flags based on the returned error code.
+            </summary>
+        </member>
+        <member name="T:Firebase.Auth.FirebaseProviderType">
+            <summary>
+            Type of authentication provider.
+            </summary>
+        </member>
+        <member name="T:Firebase.Auth.IFirebaseAuthClient">
+            <summary>
+            Firebase client which encapsulates communication with Firebase servers.
+            </summary>
+        </member>
+        <member name="P:Firebase.Auth.IFirebaseAuthClient.User">
+            <summary>
+            Currently signed in user.
+            </summary>
+        </member>
+        <member name="E:Firebase.Auth.IFirebaseAuthClient.AuthStateChanged">
+            <summary>
+            Event raised when the user auth state change changes. This can happen during sign in / sign out or when credential tokens change.
+            </summary>
+        </member>
+        <member name="M:Firebase.Auth.IFirebaseAuthClient.FetchSignInMethodsForEmailAsync(System.String)">
+            <summary>
+            Gets a list of sign-in methods for given email. If there are no methods, it means the user with given email doesn't exist.
+            </summary>
+        </member>
+        <member name="M:Firebase.Auth.IFirebaseAuthClient.CreateUserWithEmailAndPasswordAsync(System.String,System.String,System.String)">
+            <summary>
+            Creates a new user with given email, password and display name (optional) and signs this user in.
+            </summary>
+        </member>
+        <member name="M:Firebase.Auth.IFirebaseAuthClient.SignInAnonymouslyAsync">
+            <summary>
+            Signs in as an anonymous user.
+            </summary>
+        </member>
+        <member name="M:Firebase.Auth.IFirebaseAuthClient.SignInWithRedirectAsync(Firebase.Auth.FirebaseProviderType,Firebase.Auth.SignInRedirectDelegate)">
+            <summary>
+            Signs in via third party OAuth providers - e.g. Google, Facebook etc.
+            </summary>
+            <param name="authType"> Type of the provider, must be an oauth one. </param>
+            <param name="redirectDelegate"> Delegate which should invoke the passed uri for oauth authentication and return the final redirect uri. </param>
+        </member>
+        <member name="M:Firebase.Auth.IFirebaseAuthClient.SignInWithEmailAndPasswordAsync(System.String,System.String)">
+            <summary>
+            Signs in with email and password. If the email &amp; password combination is incorrect, <see cref="T:Firebase.Auth.FirebaseAuthException"/> is thrown.
+            </summary>
+        </member>
+        <member name="M:Firebase.Auth.IFirebaseAuthClient.SignInWithCredentialAsync(Firebase.Auth.AuthCredential)">
+            <summary>
+            Sign in with platform specific credential. For example:
+            <code>
+            var credential = GoogleProvider.GetCredential("token");
+            </code>
+            </summary>
+        </member>
+        <member name="M:Firebase.Auth.IFirebaseAuthClient.ResetEmailPasswordAsync(System.String)">
+            <summary>
+            Sends a password reset email to given address.
+            </summary>
+        </member>
+        <member name="M:Firebase.Auth.IFirebaseAuthClient.SignOut">
+            <summary>
+            Signs current user out.
+            </summary>
+        </member>
+        <member name="P:Firebase.Auth.Providers.FetchUserProvidersResult.UserExists">
+            <summary>
+            Specifies whether a user account exists for the given <see cref="P:Firebase.Auth.Providers.FetchUserProvidersResult.Email"/>.
+            </summary>
+        </member>
+        <member name="P:Firebase.Auth.Providers.FetchUserProvidersResult.SignInProviders">
+            <summary>
+            Collection of allowed sign-in providers. If empty, it means any provider is allowed.
+            </summary>
+        </member>
+        <member name="P:Firebase.Auth.Providers.FetchUserProvidersResult.AllProviders">
+            <summary>
+            Collection of providers given <see cref="P:Firebase.Auth.Providers.FetchUserProvidersResult.Email"/> has an account with.
+            </summary>
+        </member>
+        <member name="T:Firebase.Auth.Providers.FirebaseAuthProvider">
+            <summary>
+            Base class for Firebase auth providers.
+            </summary>
+        </member>
+        <member name="T:Firebase.Auth.Providers.OAuthContinuation">
+            <summary>
+            Continuation of OAuth sign in. This class processes the redirect uri user is navigated to and signs the user in.
+            </summary>
+        </member>
+        <member name="P:Firebase.Auth.Providers.OAuthContinuation.Uri">
+            <summary>
+            The uri user should be initially navigated to in browser.
+            </summary>
+        </member>
+        <member name="M:Firebase.Auth.Providers.OAuthContinuation.ContinueSignInAsync(System.String,System.String)">
+            <summary>
+            Finishes OAuth sign in after user signs in in browser.
+            </summary>
+            <param name="redirectUri"> Final uri that user lands on after completing sign in in browser. </param>
+            <param name="idToken"> Optional id token  of an existing Firebase user. If set, it will effectivelly perform account linking. </param>
+            <returns></returns>
+        </member>
+        <member name="T:Firebase.Auth.Repository.FileUserRepository">
+            <summary>
+            <see cref="T:Firebase.Auth.Repository.IUserRepository"/> implementation which saves user data application data folder using the <see cref="T:System.IO.File"/> API.
+            </summary>
+            <inheritdoc />
+        </member>
+        <member name="M:Firebase.Auth.Repository.FileUserRepository.#ctor(System.String)">
+            <summary>
+            Creates new instance of <see cref="T:Firebase.Auth.Repository.FileUserRepository"/>.
+            </summary>
+            <param name="folder"> Name of the subfolder to be created / accessed under <see cref="F:System.Environment.SpecialFolder.ApplicationData"/>. </param>
+        </member>
+        <member name="T:Firebase.Auth.Repository.InMemoryRepository">
+            <inherit />
+        </member>
+        <member name="T:Firebase.Auth.Repository.IUserRepository">
+            <summary>
+            Repository abstraction for <see cref="T:Firebase.Auth.User"/>.
+            </summary>
+        </member>
+        <member name="T:Firebase.Auth.Requests.Converters.DefaultEnumConverter">
+            <inheritdoc />
+            <summary>
+            Defaults enum values to the base value if 
+            </summary>
+        </member>
+        <member name="F:Firebase.Auth.Requests.Converters.DefaultEnumConverter.defaultValue">
+            <summary>
+            The default value used to fallback on when a enum is not convertable.
+            </summary>
+        </member>
+        <member name="M:Firebase.Auth.Requests.Converters.DefaultEnumConverter.#ctor">
+            <inheritdoc />
+            <summary>
+            Default constructor. Defaults the default value to 0.
+            </summary>
+        </member>
+        <member name="M:Firebase.Auth.Requests.Converters.DefaultEnumConverter.#ctor(System.Int32)">
+            <inheritdoc />
+            <summary>
+            Sets the default value for the enum value.
+            </summary>
+            <param name="defaultValue">The default value to use.</param>
+        </member>
+        <member name="M:Firebase.Auth.Requests.Converters.DefaultEnumConverter.ReadJson(Newtonsoft.Json.JsonReader,System.Type,System.Object,Newtonsoft.Json.JsonSerializer)">
+            <inheritdoc />
+            <summary>
+            Reads the provided JSON and attempts to convert using StringEnumConverter. If that fails set the value to the default value.
+            </summary>
+            <param name="reader">Reads the JSON value.</param>
+            <param name="objectType">Current type that is being converted.</param>
+            <param name="existingValue">The existing value being read.</param>
+            <param name="serializer">Instance of the JSON Serializer.</param>
+            <returns>The deserialized value of the enum if it exists or the default value if it does not.</returns>
+        </member>
+        <member name="M:Firebase.Auth.Requests.Converters.DefaultEnumConverter.CanConvert(System.Type)">
+            <inheritdoc />
+            <summary>
+            Validates that this converter can handle the type that is being provided.
+            </summary>
+            <param name="objectType">The type of the object being converted.</param>
+            <returns>True if the base class says so, and if the value is an enum and has a default value to fall on.</returns>
+        </member>
+        <member name="T:Firebase.Auth.Requests.CreateAuthUri">
+            <summary>
+            Creates oauth authentication uri that user needs to navigate to in order to authenticate.
+            </summary>
+        </member>
+        <member name="T:Firebase.Auth.Requests.DeleteAccount">
+            <summary>
+            Deletes user's account.
+            </summary>
+        </member>
+        <member name="T:Firebase.Auth.Requests.FirebaseRequestBase`2">
+            <summary>
+            Base class for issuing http requests against google <see cref="T:Firebase.Auth.Requests.Endpoints"/>.
+            </summary>
+            <typeparam name="TRequest"> Specifies the type of request payload. </typeparam>
+            <typeparam name="TResponse"> Specifies the type of response payload. </typeparam>
+        </member>
+        <member name="T:Firebase.Auth.Requests.GetAccountInfo">
+            <summary>
+            Gets basic info about a user and his/her account.
+            </summary>
+        </member>
+        <member name="T:Firebase.Auth.Requests.ProjectConfig">
+            <summary>
+            Get basic config info about the firebase project.
+            </summary>
+        </member>
+        <member name="T:Firebase.Auth.Requests.RefreshToken">
+            <summary>
+            Refreshes IdToken using a refresh token.
+            </summary>
+        </member>
+        <member name="T:Firebase.Auth.Requests.ResetPassword">
+            <summary>
+            Resets user's password for given email by sending a reset email.
+            </summary>
+        </member>
+        <member name="T:Firebase.Auth.Requests.SetAccountInfo">
+            <summary>
+            Updates specified fields for the user's account.
+            </summary>
+        </member>
+        <member name="T:Firebase.Auth.Requests.SetAccountLink">
+            <summary>
+            Link two accounts.
+            </summary>
+        </member>
+        <member name="T:Firebase.Auth.Requests.SetAccountUnlink">
+            <summary>
+            Unlink accounts.
+            </summary>
+        </member>
+        <member name="T:Firebase.Auth.Requests.SignupNewUser">
+            <summary>
+            Creates a new user account.
+            </summary>
+        </member>
+        <member name="T:Firebase.Auth.Requests.VerifyAssertion">
+            <summary>
+            Finishes oauth authentication processing.
+            </summary>
+        </member>
+        <member name="T:Firebase.Auth.Requests.VerifyPassword">
+            <summary>
+            Verifies specified password matches the user's actual password.
+            </summary>
+        </member>
+        <member name="T:Firebase.Auth.SignInRedirectDelegate">
+            <summary>
+            Delegate which should invoke the passed uri for oauth authentication and return the final redirect uri.
+            </summary>
+            <param name="uri"> Uri to take user to. </param>
+            <returns> Redirect uri that user lands on. </returns>
+        </member>
+        <member name="T:Firebase.Auth.User">
+            <summary>
+            Represents a signed-in Firebase user. 
+            </summary>
+        </member>
+        <member name="P:Firebase.Auth.User.Uid">
+            <summary>
+            Firebase user ID.
+            </summary>
+        </member>
+        <member name="P:Firebase.Auth.User.IsAnonymous">
+            <summary>
+            Specifies whether this user is anonymous.
+            </summary>
+        </member>
+        <member name="P:Firebase.Auth.User.Info">
+            <summary>
+            More information about current user.
+            </summary>
+        </member>
+        <member name="M:Firebase.Auth.User.GetIdTokenAsync(System.Boolean)">
+            <summary>
+            Get fresh firebase id token.
+            </summary>
+            <param name="forceRefresh"> Specifies whether the token should be refreshed even if it's not expired. </param>
+        </member>
+        <member name="M:Firebase.Auth.User.DeleteAsync">
+            <summary>
+            Delete user's account.
+            </summary>
+        </member>
+        <member name="M:Firebase.Auth.User.ChangePasswordAsync(System.String)">
+            <summary>
+            Change user's password.
+            </summary>
+            <param name="password"> The new password. </param>
+        </member>
+        <member name="M:Firebase.Auth.User.ChangeDisplayNameAsync(System.String)">
+            <summary>
+            Change user's display name.
+            </summary>
+            <param name="displayName"> The new display name. </param>
+        </member>
+        <member name="M:Firebase.Auth.User.LinkWithCredentialAsync(Firebase.Auth.AuthCredential)">
+            <summary>
+            Link this user with another credential. The user represented by the <paramref name="credential"/> object must not already exist in Firebase.
+            </summary>
+            <param name="credential"> Provider-specifc credentials. </param>
+        </member>
+        <member name="M:Firebase.Auth.User.UnlinkAsync(Firebase.Auth.FirebaseProviderType)">
+            <summary>
+            Unlinks a provider from a user account.
+            </summary>
+        </member>
+        <member name="T:Firebase.Auth.UserCredential">
+            <summary>
+            A structure containing a <see cref="P:Firebase.Auth.UserCredential.User"/>, an <see cref="P:Firebase.Auth.UserCredential.AuthCredential"/> and <see cref="P:Firebase.Auth.UserCredential.OperationType"/>.
+            </summary>
+        </member>
+        <member name="P:Firebase.Auth.UserEventArgs.User">
+            <summary>
+            Currently signed in user. Null if no user is signed in.
+            </summary>
+        </member>
+        <member name="T:Firebase.Auth.UserInfo">
+            <summary>
+            Basic information about the signed in user.
+            </summary>
+        </member>
+        <member name="M:Firebase.Auth.UserManager.#ctor(Firebase.Auth.Repository.IUserRepository)">
+            <summary>
+            Creates a new instance of <see cref="T:Firebase.Auth.UserManager"/> with custom repository.
+            </summary>
+            <param name="fileSystem"> Proxy to the filesystem operations. </param>
+        </member>
+    </members>
+</doc>
