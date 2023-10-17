@@ -30,6 +30,8 @@ from Firebase.Storage import FirebaseStorageTask
 from System.IO import FileStream, FileMode
 from System.Threading import CancellationTokenSource
 
+
+#TODO: Update file path... this currently maps to C: drive or wherever the program is running the code
 # Get the current file path
 CURRENT_FILE_PATH = os.path.abspath(__file__)
 # print (CURRENT_FILE_PATH)
@@ -43,7 +45,6 @@ PARENT_FOLDER = os.path.abspath(os.path.join(CURRENT_FILE_PATH, "../" * LEVELS_T
 # Enter another folder
 TARGET_FOLDER = os.path.join(PARENT_FOLDER, "scripts")
 DEFAULT_CONFIG_PATH = os.path.join(TARGET_FOLDER, "firebase_config.json")
-
 
 class Storage(StorageInterface):
     
@@ -73,13 +74,12 @@ class Storage(StorageInterface):
                 # api_key = config["apiKey"]
                 # auth_config_test = FirebaseAuthConfig()
                 # auth_config = FirebaseAuthProvider(FirebaseConfig(api_key))
-
                 # auth_config.api_key = config["apiKey"]  # Set the API key separately
                 # auth_client = FirebaseAuthClient(config_file)
+
+                #Initilize Storage instance from storageBucket
                 storage_client = FirebaseStorage(config["storageBucket"])
-
                 print (storage_client)
-
                 Storage._shared_storage = storage_client
 
         else:
@@ -93,7 +93,13 @@ class Storage(StorageInterface):
     
     
     def download_file(self, path_on_cloud, path_local):
-        pass
+        if Storage._shared_storage:
+            # Use the Firebase.Storage library to upload the file
+            storage_refrence = Storage._shared_storage.Child(path_on_cloud)
+            print (storage_refrence)
+
+
+
 
     def upload_file(self, path_on_cloud, path_local):
         if Storage._shared_storage:
@@ -101,31 +107,21 @@ class Storage(StorageInterface):
             storage_refrence = Storage._shared_storage.Child(path_on_cloud)
             print (storage_refrence)
 
-            # target_url = storage_refrence.Child(path_on_cloud).GetTargetUrl()
-            # download_url = storage_refrence.GetDownloadUrl()
-            # escape_path = storage_refrence.GetEscapePath()
             event = threading.Event()
 
             def cont():
+                print ("function is being called to trigger event and task was completed")
                 event.set()
-
-            # print ("ENTERING SELF.STORAGE")
 
             with FileStream(path_local, FileMode.Open) as file_stream:
                 
                 task = storage_refrence.PutAsync(file_stream)
                 task_thing = task.GetAwaiter()
-                event.wait()
                 task_thing.OnCompleted(cont)
+                event.wait(3.0)
+                
                 print (task)
 
-                # await task
-
-                # # Once the task is completed, you can check its status
-                # if task.IsFaulted:
-                #     print("Upload task failed:", task.Exception)
-                # else:
-                #     print("File uploaded successfully.")
 
 
 # # Back up PROXY option, and works but not the ideal solution.
