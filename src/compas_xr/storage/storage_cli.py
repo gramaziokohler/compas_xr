@@ -46,6 +46,10 @@ PARENT_FOLDER = os.path.abspath(os.path.join(CURRENT_FILE_PATH, "../" * LEVELS_T
 TARGET_FOLDER = os.path.join(PARENT_FOLDER, "scripts")
 DEFAULT_CONFIG_PATH = os.path.join(TARGET_FOLDER, "firebase_config.json")
 
+def _event_trigger(event):
+    print ("function is being called to trigger event and task was completed")
+    event.set()
+
 class Storage(StorageInterface):
     
     _shared_storage = None
@@ -94,31 +98,40 @@ class Storage(StorageInterface):
     
     def download_file(self, path_on_cloud, path_local):
         if Storage._shared_storage:
-            # Use the Firebase.Storage library to upload the file
+            # Shared storage instance with a specificatoin of file name.
             storage_refrence = Storage._shared_storage.Child(path_on_cloud)
             print (storage_refrence)
 
+            download_event = threading.Event()
 
+            def _callback_download():
+                _event_trigger(download_event)
+
+            download_url = storage_refrence.GetDownloadUrlAsync()
+            task_download = download_url.GetAwaiter()
+            task_download.OnCompleted(_callback_download)
+            download_event.wait(3.0)
+
+            print (download_url)
 
 
     def upload_file(self, path_on_cloud, path_local):
         if Storage._shared_storage:
-            # Use the Firebase.Storage library to upload the file
+            # Shared storage instance with a specification of file name.
             storage_refrence = Storage._shared_storage.Child(path_on_cloud)
             print (storage_refrence)
 
-            event = threading.Event()
+            upload_event = threading.Event()
 
-            def cont():
-                print ("function is being called to trigger event and task was completed")
-                event.set()
+            def _callback_upload():
+                _event_trigger(upload_event)
 
             with FileStream(path_local, FileMode.Open) as file_stream:
                 
                 task = storage_refrence.PutAsync(file_stream)
-                task_thing = task.GetAwaiter()
-                task_thing.OnCompleted(cont)
-                event.wait(3.0)
+                task_upload = task.GetAwaiter()
+                task_upload.OnCompleted(_callback_upload)
+                upload_event.wait(3.0)
                 
                 print (task)
 
