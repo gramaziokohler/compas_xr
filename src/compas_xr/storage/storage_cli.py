@@ -5,7 +5,11 @@ from compas.data import Data
 from compas_xr.storage.storage_interface import StorageInterface
 import clr
 import threading
-import time
+from System.Threading import (
+    ManualResetEventSlim,
+    CancellationTokenSource,
+    CancellationToken)
+
 
 #TODO: Find correct dependencies (these two for example)
 lib_dir = os.path.join(os.path.dirname(__file__), "dependencies")
@@ -28,7 +32,6 @@ from Firebase.Auth.Providers import FirebaseAuthProvider
 from Firebase.Storage import FirebaseStorage
 from Firebase.Storage import FirebaseStorageTask
 from System.IO import FileStream, FileMode
-from System.Threading import CancellationTokenSource
 
 
 #TODO: Update file path... this currently maps to C: drive or wherever the program is running the code
@@ -49,6 +52,20 @@ DEFAULT_CONFIG_PATH = os.path.join(TARGET_FOLDER, "firebase_config.json")
 def _event_trigger(event):
     print ("function is being called to trigger event and task was completed")
     event.set()
+
+
+def _mre_event_trigger(task, mre):
+    print ("entered mre function")
+
+    if task.IsFaulted:
+        print ("here")
+    else:
+        print ("This is a normal task")
+        #TODO: THIS IS THE PROBLEM LINE
+        # result = task.Result.Content
+        mre.Set()
+    
+    # return result
 
 class Storage(StorageInterface):
     
@@ -71,8 +88,6 @@ class Storage(StorageInterface):
             if os.path.exists(path):
                 with open(path) as config_file:
                     config = json.load(config_file)
-                
-                print ("I entered here")
 
                 # Initialize Firebase authentication and storage
                 # api_key = config["apiKey"]
@@ -102,17 +117,27 @@ class Storage(StorageInterface):
             storage_refrence = Storage._shared_storage.Child(path_on_cloud)
             print (storage_refrence)
 
-            download_event = threading.Event()
+            mre_download = ManualResetEventSlim(False)
 
-            def _callback_download():
-                _event_trigger(download_event)
+            # def _callback_download():
+            #     _mre_event_trigger(mre_download)
 
-            download_url = storage_refrence.GetDownloadUrlAsync()
-            task_download = download_url.GetAwaiter()
-            task_download.OnCompleted(_callback_download)
-            download_event.wait(3.0)
+            downloadurl_task = storage_refrence.GetDownloadUrlAsync()
+            print (downloadurl_task)
 
-            print (download_url)
+            result = _mre_event_trigger(downloadurl_task, mre_download)
+            # mre_download.Wait(3.0)
+            if mre_download.IsSet:
+                print ("your event was set off buddy")
+
+            else:
+                print ("your event was never set loser")
+            # task_download = downloadurl_task.GetAwaiter()
+            # task_download.OnCompleted(_callback_download)
+            # # download_event.wait(3.0)
+
+            # print ("here")
+            # print (downloadurl_task)
 
 
     def upload_file(self, path_on_cloud, path_local):
@@ -121,17 +146,21 @@ class Storage(StorageInterface):
             storage_refrence = Storage._shared_storage.Child(path_on_cloud)
             print (storage_refrence)
 
-            upload_event = threading.Event()
+            # upload_event = threading.Event()
+            mre_upload = ManualResetEventSlim(False)
 
             def _callback_upload():
-                _event_trigger(upload_event)
+                _event_trigger(mre_upload)
 
             with FileStream(path_local, FileMode.Open) as file_stream:
                 
                 task = storage_refrence.PutAsync(file_stream)
+
+                print (task.Progress.Percentage)
+
                 task_upload = task.GetAwaiter()
                 task_upload.OnCompleted(_callback_upload)
-                upload_event.wait(3.0)
+                mre_upload.wait(3.0)
                 
                 print (task)
 
