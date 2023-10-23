@@ -184,7 +184,7 @@ class Storage(StorageInterface):
             url = self._start_async_call(_begin_download)
             
             #THIS WORKED
-            download = self.download_file_from_remote(url, path_local)
+            self.download_file_from_remote(url, path_local)
             print ("download_complete")
 
 
@@ -194,32 +194,20 @@ class Storage(StorageInterface):
             storage_refrence = Storage._shared_storage.Child(path_on_cloud)
             print (storage_refrence)
 
-            upload_event = threading.Event()
-            mre_upload = ManualResetEventSlim(False)
-
-            def _callback_upload():
-                _event_trigger(upload_event)
-
             with FileStream(path_local, FileMode.Open) as file_stream:
                 
-                task = storage_refrence.PutAsync(file_stream)
-                print (task)
+                def _begin_upload(result):
 
-                
-                # progress = task.Progress
-                # progress_changed_event = progress.ProgressChanged
-                # length = file_stream.Length
-                # position = file_stream.Position
-                
-                # # print (progress.Result.Percentage)
+                    uploadtask = storage_refrence.PutAsync(file_stream)
+                    task_upload = uploadtask.GetAwaiter()
+                    task_upload.OnCompleted(lambda: result["event"].set())
 
-                # # task.ContinueWith(_callback_upload)
-                task_upload = task.GetAwaiter()
-                task_upload.OnCompleted(_callback_upload)
-                upload_event.wait(3.0)
+                    result["event"].wait()
+                    result["data"] = True
                 
-                print (task)
-
+                upload = self._start_async_call(_begin_upload)
+           
+                print (upload)
 
 
 # # Back up PROXY option, and works but not the ideal solution.
