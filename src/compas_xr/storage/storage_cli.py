@@ -1,10 +1,15 @@
 import os
 import sys
 import json
+import io
 from compas.data import Data
+from compas.data import json_loads,json_dumps
+from compas.datastructures import Assembly
 from compas_xr.storage.storage_interface import StorageInterface
 import clr
 import threading
+from System.IO import FileStream, FileMode, MemoryStream, Stream
+from System.Text import Encoding
 from System.Threading import (
     ManualResetEventSlim,
     CancellationTokenSource,
@@ -34,10 +39,10 @@ from Firebase.Auth import FirebaseAuthClient
 from Firebase.Auth.Providers import FirebaseAuthProvider
 from Firebase.Storage import FirebaseStorage
 from Firebase.Storage import FirebaseStorageTask
-from System.IO import FileStream, FileMode
 
 
-#TODO: Update file path... this currently maps to C: drive or wherever the program is running the code
+
+#TODO: Update file path... this currently maps to C: drive or wherever the program is running the code... this is important.
 # Get the current file path
 CURRENT_FILE_PATH = os.path.abspath(__file__)
 # print (CURRENT_FILE_PATH)
@@ -187,15 +192,17 @@ class Storage(StorageInterface):
             self.download_file_from_remote(url, path_local)
             print ("download_complete")
 
-
     def upload_file(self, path_on_cloud, path_local):
         if Storage._shared_storage:
             # Shared storage instance with a specification of file name.
             storage_refrence = Storage._shared_storage.Child(path_on_cloud)
             print (storage_refrence)
 
+            
             with FileStream(path_local, FileMode.Open) as file_stream:
                 
+                print (type(file_stream))
+
                 def _begin_upload(result):
 
                     uploadtask = storage_refrence.PutAsync(file_stream)
@@ -209,7 +216,65 @@ class Storage(StorageInterface):
            
                 print (upload)
 
+    def upload_assembly(self, path_on_cloud, assembly):
+        if Storage._shared_storage:
+            # Shared storage instance with a specification of file name.
+            storage_refrence = Storage._shared_storage.Child(path_on_cloud)
+                
+            data = assembly.data
 
+            #Serialize data
+            serialized_data = json_dumps(data)
+            print (serialized_data)
+
+            byte_data = Encoding.UTF8.GetBytes(serialized_data)
+            stream = MemoryStream(byte_data)
+
+            def _begin_upload(result):
+
+                uploadtask = storage_refrence.PutAsync(stream)
+                task_upload = uploadtask.GetAwaiter()
+                task_upload.OnCompleted(lambda: result["event"].set())
+
+                result["event"].wait()
+                result["data"] = True
+            
+            upload = self._start_async_call(_begin_upload)
+        
+            print (upload)
+
+    def download_assembly(self, path_on_cloud, path_local):
+        if Storage._shared_storage:
+            # Shared storage instance with a specificatoin of file name.
+            storage_refrence = Storage._shared_storage.Child(path_on_cloud)
+            print (storage_refrence)
+
+            def _begin_download(result):
+                downloadurl_task = storage_refrence.GetDownloadUrlAsync()
+                task_download = downloadurl_task.GetAwaiter()
+                task_download.OnCompleted(lambda: result["event"].set())
+
+                result["event"].wait()
+                result["data"] = downloadurl_task.Result
+            
+            url = self._start_async_call(_begin_download)
+            
+            #THIS WORKED -- Needs to be in an async event?
+            download = self.download_file_from_remote(url, path_local)
+            print ("download_complete")
+
+            #TODO: This works, but I am not sure if there is a better way then download to a local and open the local... maybe download to MemoryStream or ByteArray?
+            with open(path_local) as json_file:
+                json_assembly = json.load(json_file)
+
+            assembly_serialized = json_dumps(json_assembly)
+            desearialized_data = json_loads(assembly_serialized)
+            # print ("desearialized_data", desearialized_data)
+
+            assembly = Assembly.from_data(desearialized_data)
+            # print ("assembly", assembly)
+
+            return assembly
 # # Back up PROXY option, and works but not the ideal solution.
 # from compas.rpc import Proxy
 
