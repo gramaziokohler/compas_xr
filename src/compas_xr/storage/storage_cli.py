@@ -9,17 +9,20 @@ from System.Threading import (
     ManualResetEventSlim,
     CancellationTokenSource,
     CancellationToken)
+try:
+    # from urllib.request import urlopen
+    from urllib.request import urlretrieve
+except ImportError:
+    # from urllib2 import urlopen
+    from urllib import urlretrieve
 
 
-#TODO: Find correct dependencies (these two for example)
 lib_dir = os.path.join(os.path.dirname(__file__), "dependencies")
 print (lib_dir)
 if lib_dir not in sys.path:
     sys.path.append(lib_dir)
 
 
-#TODO: Find correct dependencies (these two for example)
-# clr.AddReference("LiteDB.dll")
 clr.AddReference("Firebase.Auth.dll")
 clr.AddReference("Firebase.dll")
 clr.AddReference("Firebase.Storage.dll")
@@ -111,33 +114,78 @@ class Storage(StorageInterface):
         return Storage._shared_storage
     
     
+    def _start_async_call(self, fn, timeout=10):
+        result = {}
+        result["event"] = threading.Event()
+        
+        async_thread = threading.Thread(target=fn, args=(result, ))
+        async_thread.start()
+        async_thread.join(timeout=timeout)
+
+        return result["data"]
+    
+    def download_file_from_remote(self, source, target, overwrite=True):
+        """Download a file from a remote source and save it to a local destination.
+
+        Parameters
+        ----------
+        source : str
+            The url of the source file.
+        target : str
+            The path of the local destination.
+        overwrite : bool, optional
+            If True, overwrite `target` if it already exists.
+
+        Examples
+        --------
+        .. code-block:: python
+
+            import os
+            import compas
+            from compas.utilities.remote import download_file_from_remote
+
+            source = 'https://raw.githubusercontent.com/compas-dev/compas/main/data/faces.obj'
+            target = os.path.join(compas.APPDATA, 'data', 'faces.obj')
+
+            download_file_from_remote(source, target)
+
+        """
+        parent = os.path.abspath(os.path.dirname(target))
+
+        if not os.path.exists(parent):
+            os.makedirs(parent)
+
+        if not os.path.isdir(parent):
+            raise Exception("The target path is not a valid file path: {}".format(target))
+
+        if not os.access(parent, os.W_OK):
+            raise Exception("The target path is not writable: {}".format(target))
+
+        if not os.path.exists(target):
+            urlretrieve(source, target)
+        else:
+            if overwrite:
+                urlretrieve(source, target)
+    
     def download_file(self, path_on_cloud, path_local):
         if Storage._shared_storage:
             # Shared storage instance with a specificatoin of file name.
             storage_refrence = Storage._shared_storage.Child(path_on_cloud)
             print (storage_refrence)
 
-            mre_download = ManualResetEventSlim(False)
+            def _begin_download(result):
+                downloadurl_task = storage_refrence.GetDownloadUrlAsync()
+                task_download = downloadurl_task.GetAwaiter()
+                task_download.OnCompleted(lambda: result["event"].set())
 
-            # def _callback_download():
-            #     _mre_event_trigger(mre_download)
-
-            downloadurl_task = storage_refrence.GetDownloadUrlAsync()
-            print (downloadurl_task)
-
-            result = _mre_event_trigger(downloadurl_task, mre_download)
-            # mre_download.Wait(3.0)
-            if mre_download.IsSet:
-                print ("your event was set off buddy")
-
-            else:
-                print ("your event was never set loser")
-            # task_download = downloadurl_task.GetAwaiter()
-            # task_download.OnCompleted(_callback_download)
-            # # download_event.wait(3.0)
-
-            # print ("here")
-            # print (downloadurl_task)
+                result["event"].wait()
+                result["data"] = downloadurl_task.Result
+            
+            url = self._start_async_call(_begin_download)
+            
+            #THIS WORKED
+            download = self.download_file_from_remote(url, path_local)
+            print ("download_complete")
 
 
     def upload_file(self, path_on_cloud, path_local):
@@ -146,21 +194,29 @@ class Storage(StorageInterface):
             storage_refrence = Storage._shared_storage.Child(path_on_cloud)
             print (storage_refrence)
 
-            # upload_event = threading.Event()
+            upload_event = threading.Event()
             mre_upload = ManualResetEventSlim(False)
 
             def _callback_upload():
-                _event_trigger(mre_upload)
+                _event_trigger(upload_event)
 
             with FileStream(path_local, FileMode.Open) as file_stream:
                 
                 task = storage_refrence.PutAsync(file_stream)
+                print (task)
 
-                print (task.Progress.Percentage)
+                
+                # progress = task.Progress
+                # progress_changed_event = progress.ProgressChanged
+                # length = file_stream.Length
+                # position = file_stream.Position
+                
+                # # print (progress.Result.Percentage)
 
+                # # task.ContinueWith(_callback_upload)
                 task_upload = task.GetAwaiter()
                 task_upload.OnCompleted(_callback_upload)
-                mre_upload.wait(3.0)
+                upload_event.wait(3.0)
                 
                 print (task)
 

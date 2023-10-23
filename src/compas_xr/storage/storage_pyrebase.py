@@ -1,7 +1,8 @@
 import pyrebase
 import json
 import os
-from compas.data import Data
+from compas.data import Data, json_dumps, json_loads
+from compas.datastructures import Assembly
 from compas_xr.storage.storage_interface import StorageInterface
 # from compas_xr import SCRIPT
 
@@ -59,6 +60,138 @@ class Storage(StorageInterface, Data):
         self._ensure_storage()
         filename = path_local
         Storage._shared_storage.child(path_on_cloud).download(path_local, filename)
+
+    #TODO: test these functions    
+    def add_assembly_attributes(assembly, data_type, robot_keys=None, built_keys=None, planned_keys=None):
+        
+        data_type_list = ['Cylinder','Box','ObjFile','Mesh']
+        
+        data = assembly.data
+        
+        data = [data]
+        data_nodes = data[0]['graph']['node']
+        length = len(data_nodes)
+        beam_keys = []
+        
+        for key in data_nodes:
+            data_nodes[key]['type_id'] = key
+            data_nodes[key]['type_data'] = data_type_list[data_type]
+            data_nodes[key]['is_built'] = False
+            data_nodes[key]['is_planned'] = False
+            data_nodes[key]['placed_by'] = "human"
+            beam_keys.append(key)
+        
+        for k in robot_keys:
+            data_nodes[str(k)]['placed_by'] = "robot"
+            
+        if built_keys:
+            for l in built_keys:
+                    data_nodes[str(l)]['is_built'] = True
+        
+        if planned_keys:
+            for m in planned_keys:
+                    data_nodes[str(m)]['is_planned'] = True
+        
+    def add_assembly_attributes_timbers(assembly, data_type, robot_keys=None, built_keys=None, planned_keys=None):
+
+        data_type_list = ['Cylinder','Box','ObjFile','Mesh']
+        
+        data = assembly.data
+        
+        data = [data]
+        data_nodes = data[0]['graph']['node']
+        length = len(data_nodes)
+        joints = {}
+        joint_keys = []
+        beam_keys = []
+        
+        for item in joint_keys:
+            data_nodes.pop(item)
+        
+        for key in data_nodes:
+            data_nodes[key]['type_id'] = key
+            data_nodes[key]['type_data'] = data_type_list[data_type]
+            data_nodes[key]['is_built'] = False
+            data_nodes[key]['is_planned'] = False
+            data_nodes[key]['placed_by'] = "human"
+            beam_keys.append(key)
+        
+        for k in robot_keys:
+            data_nodes[str(k)]['placed_by'] = "robot"
+            
+        if built_keys:
+            for l in built_keys:
+                    data_nodes[str(l)]['is_built'] = True
+        
+        if planned_keys:
+            for m in planned_keys:
+                    data_nodes[str(m)]['is_planned'] = True
+        
+        data[0]['graph']['joints'] = joints
+
+    def upload_data(self, path_on_cloud, data):
+        #Check Storage Refrence
+        self._ensure_storage()
+
+        #Serialize data
+        serialized_data = json_dumps(data)
+        Storage._shared_storage.child(path_on_cloud).put(serialized_data)
+
+    def download_data(self, path_on_cloud, path_local):
+        #Check Storage Reference
+        self._ensure_storage()
+        
+        #Download File to location
+        filename = path_local
+        Storage._shared_storage.child(path_on_cloud).download(path_local, filename)
+        
+        # Load the JSON Data File and desearlize it.
+        #TODO: Check if you need + filename?
+        if os.path.exists(path_local):
+            with open(path_local) as data:
+                data = json.load(data)
+        else:
+            raise Exception("Path Does Not Exist: {}".format(path_local))
+                
+        #Deserialize data
+        desearlize_data = json_loads(data)
+        
+        return desearlize_data
+
+    def upload_assembly(self, path_on_cloud, assembly):
+        #Check Storage Refrence
+        self._ensure_storage()
+
+        #Turn assembly to data
+        data = assembly.data
+
+        #Serialize data
+        serialized_data = json_dumps(data)
+        Storage._shared_storage.child(path_on_cloud).put(serialized_data)
+
+    def download_assembly(self, path_on_cloud, path_local, assembly):
+        #Check Storage Reference
+        self._ensure_storage()
+        
+        #Download File to location
+        filename = path_local
+        Storage._shared_storage.child(path_on_cloud).download(path_local, filename)
+        
+        # Load the JSON Data File and desearlize it.
+        #TODO: Check if you need + filename?
+        if os.path.exists(path_local):
+            with open(path_local) as data:
+                data = json.load(data)
+        else:
+            raise Exception("Path Does Not Exist: {}".format(path_local))
+                
+        #Deserialize data
+        desearlize_data = json_loads(data)
+        
+        #Create an assembly from data
+        assembly = Assembly.from_data(desearlize_data)
+
+        return assembly
 
     @property
     def data(self):
