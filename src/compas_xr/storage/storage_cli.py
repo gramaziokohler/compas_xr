@@ -87,9 +87,9 @@ class Storage(StorageInterface):
         self.storage = self._ensure_storage()
 
     def _ensure_storage(self):
-    # Initialize Firebase connection and storage only once
+        # Initialize Firebase connection and storage only once
         if not Storage._shared_storage:
-            path = self.config_path # Replace with the path to your config JSON file
+            path = self.config_path 
             print ("This is your path" + path)
 
             # Load the Firebase configuration file from the JSON file if the file exists
