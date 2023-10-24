@@ -1,7 +1,7 @@
 import os
 import sys
 import json
-from compas.data import Data
+from compas.data import json_dumps,json_loads
 from compas_xr.realtime_database.realtime_database_interface import RealtimeDatabaseInterface
 import clr
 import threading
@@ -31,6 +31,7 @@ clr.AddReference("Firebase.Storage.dll")
 print("Are u really working realtime?")
 
 from Firebase.Database import FirebaseClient
+from Firebase.Database.Query import FirebaseQuery
 # from Firebase.Auth import FirebaseAuthConfig
 # # from Firebase.Auth import FirebaseConfig
 # from Firebase.Auth import FirebaseAuthClient
@@ -101,3 +102,75 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
             raise Exception("Could not initialize storage!")
 
         return RealtimeDatabase._shared_database
+
+    def _start_async_call(self, fn, timeout=10):
+        print ("inside of start async")
+        result = {}
+        result["event"] = threading.Event()
+        
+        async_thread = threading.Thread(target=fn, args=(result, ))
+        async_thread.start()
+        async_thread.join(timeout=timeout)
+
+        return result["data"]
+    
+    def upload_file_all(self, json_path, parentname):
+        
+        if RealtimeDatabase._shared_database:
+
+            with open(json_path) as json_file:
+                json_data = json.load(json_file)
+            
+            serialized_data = json_dumps(json_data)
+            database_reference = RealtimeDatabase._shared_database 
+
+            def _begin_upload(result):
+                print ("inside of begin upload")
+                uploadtask = database_reference.Child(parentname).PutAsync(serialized_data)
+                print (uploadtask)
+                task_upload = uploadtask.GetAwaiter()
+                print (task_upload)
+                task_upload.OnCompleted(lambda: result["event"].set())
+                print
+                result["event"].wait()
+                result["data"] = True
+            
+            upload = self._start_async_call(_begin_upload)
+            print (upload)
+
+        #TODO: Do I need this?
+        else:
+            raise Exception("You need a DB reference!")
+    
+    def upload_file_all_as_child(self, json_path, parentname, childname):
+        
+        if RealtimeDatabase._shared_database:
+
+            with open(json_path) as json_file:
+                json_data = json.load(json_file)
+            
+            serialized_data = json_dumps(json_data)
+            database_reference = RealtimeDatabase._shared_database
+            print (type(database_reference))
+            parent_reference = database_reference.Child(parentname)
+            print (type(parent_reference))
+            parent_query = FirebaseQuery(parent_reference, database_reference)
+            print (parent_reference)
+
+            def _begin_upload(result):
+                print ("inside of begin upload")
+                uploadtask = parent_query.Child(childname).PutAsync(serialized_data)
+                print (uploadtask)
+                task_upload = uploadtask.GetAwaiter()
+                print (task_upload)
+                task_upload.OnCompleted(lambda: result["event"].set())
+                print
+                result["event"].wait()
+                result["data"] = True
+            
+            upload = self._start_async_call(_begin_upload)
+            print (upload)
+
+        #TODO: Do I need this?
+        else:
+            raise Exception("You need a DB reference!")

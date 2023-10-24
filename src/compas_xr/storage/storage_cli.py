@@ -193,6 +193,10 @@ class Storage(StorageInterface):
             print ("download_complete")
 
     def upload_file(self, path_on_cloud, path_local):
+        
+        # self._ensure_storage()
+        
+        #TODO: Do I need this?
         if Storage._shared_storage:
             # Shared storage instance with a specification of file name.
             storage_refrence = Storage._shared_storage.Child(path_on_cloud)
@@ -215,6 +219,10 @@ class Storage(StorageInterface):
                 upload = self._start_async_call(_begin_upload)
            
                 print (upload)
+
+        #TODO: Do I need this?
+        else:
+            raise Exception("You need a storage reference!")
 
     def upload_assembly(self, path_on_cloud, assembly):
         if Storage._shared_storage:
