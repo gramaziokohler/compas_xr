@@ -275,6 +275,61 @@ class Storage(StorageInterface):
             # print ("assembly", assembly)
 
             return assembly
+
+    def upload_data(self, path_on_cloud, data):
+        if Storage._shared_storage:
+            # Shared storage instance with a specification of file name.
+            storage_refrence = Storage._shared_storage.Child(path_on_cloud)
+           
+            #Serialize data
+            serialized_data = json_dumps(data)
+            print (serialized_data)
+
+            byte_data = Encoding.UTF8.GetBytes(serialized_data)
+            stream = MemoryStream(byte_data)
+
+            def _begin_upload(result):
+
+                uploadtask = storage_refrence.PutAsync(stream)
+                task_upload = uploadtask.GetAwaiter()
+                task_upload.OnCompleted(lambda: result["event"].set())
+
+                result["event"].wait()
+                result["data"] = True
+            
+            upload = self._start_async_call(_begin_upload)
+        
+            print (upload)
+
+    def download_data(self, path_on_cloud, path_local):
+        if Storage._shared_storage:
+            # Shared storage instance with a specificatoin of file name.
+            storage_refrence = Storage._shared_storage.Child(path_on_cloud)
+            print (storage_refrence)
+
+            def _begin_download(result):
+                downloadurl_task = storage_refrence.GetDownloadUrlAsync()
+                task_download = downloadurl_task.GetAwaiter()
+                task_download.OnCompleted(lambda: result["event"].set())
+
+                result["event"].wait()
+                result["data"] = downloadurl_task.Result
+            
+            url = self._start_async_call(_begin_download)
+            
+            #THIS WORKED -- Needs to be in an async event?
+            download = self.download_file_from_remote(url, path_local)
+            print ("download_complete")
+
+            #TODO: This works, but I am not sure if there is a better way then download to a local and open the local... maybe download to MemoryStream or ByteArray?
+            with open(path_local) as json_file:
+                json_data = json.load(json_file)
+
+            data_serialized = json_dumps(json_data)
+            desearialized_data = json_loads(data_serialized)
+
+            return desearialized_data
+
 # # Back up PROXY option, and works but not the ideal solution.
 # from compas.rpc import Proxy
 
