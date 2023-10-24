@@ -142,6 +142,45 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
         else:
             raise Exception("You need a DB reference!")
     
+    
+    def upload_file(self, json_path, parentname, paramaters):
+        
+        if RealtimeDatabase._shared_database:
+
+            with open(json_path) as json_file:
+                json_data = json.load(json_file)
+            
+            paramaters_list = {}
+
+            for param in paramaters:
+                values = json_data[param]
+                paramaters_dict = {param: values}
+                paramaters_list.update(paramaters_dict)
+            
+            # print (type(paramaters_list))
+            # print (type(paramaters_list[0]))
+
+            serialized_data = json_dumps(paramaters_list)
+            database_reference = RealtimeDatabase._shared_database 
+
+            def _begin_upload(result):
+                print ("inside of begin upload")
+                uploadtask = database_reference.Child(parentname).PutAsync(serialized_data)
+                print (uploadtask)
+                task_upload = uploadtask.GetAwaiter()
+                print (task_upload)
+                task_upload.OnCompleted(lambda: result["event"].set())
+                print
+                result["event"].wait()
+                result["data"] = True
+            
+            upload = self._start_async_call(_begin_upload)
+            print (upload)
+
+        #TODO: Do I need this?
+        else:
+            raise Exception("You need a DB reference!")
+
     def upload_file_all_as_child(self, json_path, parentname, childname):
         
         if RealtimeDatabase._shared_database:
