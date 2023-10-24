@@ -48,10 +48,10 @@
             <chunk name="Projection">
               <items count="2">
                 <item name="Target" type_name="gh_drawing_point" type_code="30">
-                  <X>-2202</X>
-                  <Y>-77</Y>
+                  <X>-1692</X>
+                  <Y>-357</Y>
                 </item>
-                <item name="Zoom" type_name="gh_single" type_code="5">0.5546324</item>
+                <item name="Zoom" type_name="gh_single" type_code="5">0.471437126</item>
               </items>
             </chunk>
             <chunk name="Views">
@@ -85,9 +85,9 @@
         </chunk>
         <chunk name="DefinitionObjects">
           <items count="1">
-            <item name="ObjectCount" type_name="gh_int32" type_code="3">145</item>
+            <item name="ObjectCount" type_name="gh_int32" type_code="3">150</item>
           </items>
-          <chunks count="145">
+          <chunks count="150">
             <chunk name="Object" index="0">
               <items count="2">
                 <item name="GUID" type_name="gh_guid" type_code="9">c552a431-af5b-46a9-a8a4-0fcbc27ef596</item>
@@ -11135,33 +11135,16 @@ from compas.geometry import Frame
 from compas.data import json_dumps
 from compas.data import Data
 
-
-def part_to_data(part):
-    return {
-        'name': part.name,
-        'frame': part.frame.to_data(),
-        # Add any other relevant attributes
-    }
-
 p1 = Part("part1", frame=Frame.worldXY())
 p2 = Part("part2", frame=Frame.worldXY())
 
 assembly = Assembly()
 
-p1_data = p1.to_data()
-
 assembly.add_part(p1)
 assembly.add_part(p2)
 assembly.add_connection(p1, p2)
-#
-#assembly_graph = assembly.graph
-assembly_data = assembly.to_data()
-#assembly_data_test = json_dumps(assembly_data)
 
-#assembly_data = {
-#    'parts': [part_to_data(part) for part in assembly.parts],
-#    'connections': [list(assembly.get_connections(part)) for part in assembly.parts]
-#}
+assembly_data = assembly.to_data()
 
 
 for part in assembly.parts():
@@ -11608,7 +11591,7 @@ if upload:
                       </items>
                       <chunks count="5">
                         <chunk name="InputParam" index="0">
-                          <items count="10">
+                          <items count="11">
                             <item name="AllowTreeAccess" type_name="gh_bool" type_code="1">true</item>
                             <item name="Description" type_name="gh_string" type_code="10">Script input DATA.</item>
                             <item name="InstanceGuid" type_name="gh_guid" type_code="9">77bc3ac1-0c1c-4b8d-b704-ab3c5934af4f</item>
@@ -11617,7 +11600,8 @@ if upload:
                             <item name="Optional" type_name="gh_bool" type_code="1">true</item>
                             <item name="ScriptParamAccess" type_name="gh_int32" type_code="3">0</item>
                             <item name="ShowTypeHints" type_name="gh_bool" type_code="1">true</item>
-                            <item name="SourceCount" type_name="gh_int32" type_code="3">0</item>
+                            <item name="Source" index="0" type_name="gh_guid" type_code="9">a50c5dca-b5cf-4c5d-983b-22dd596f7f9e</item>
+                            <item name="SourceCount" type_name="gh_int32" type_code="3">1</item>
                             <item name="TypeHintID" type_name="gh_guid" type_code="9">87f87f55-5b71-41f4-8aea-21d494016f81</item>
                           </items>
                           <chunks count="1">
@@ -11937,14 +11921,14 @@ print(DATA)</item>
                     <item name="Optional" type_name="gh_bool" type_code="1">false</item>
                     <item name="ScrollRatio" type_name="gh_double" type_code="6">0</item>
                     <item name="SourceCount" type_name="gh_int32" type_code="3">0</item>
-                    <item name="UserText" type_name="gh_string" type_code="10">assembly_upload.json</item>
+                    <item name="UserText" type_name="gh_string" type_code="10">assembly_upload_timbers.json</item>
                   </items>
                   <chunks count="2">
                     <chunk name="Attributes">
                       <items count="5">
                         <item name="Bounds" type_name="gh_drawing_rectanglef" type_code="35">
-                          <X>4312</X>
-                          <Y>713</Y>
+                          <X>4308</X>
+                          <Y>714</Y>
                           <W>224</W>
                           <H>38</H>
                         </item>
@@ -11952,8 +11936,8 @@ print(DATA)</item>
                         <item name="MarginRight" type_name="gh_int32" type_code="3">0</item>
                         <item name="MarginTop" type_name="gh_int32" type_code="3">0</item>
                         <item name="Pivot" type_name="gh_drawing_pointf" type_code="31">
-                          <X>4312.774</X>
-                          <Y>713.3624</Y>
+                          <X>4308.694</X>
+                          <Y>714.7225</Y>
                         </item>
                       </items>
                     </chunk>
@@ -12093,7 +12077,7 @@ print(DATA)</item>
                   </items>
                   <chunks count="1">
                     <chunk name="Attributes">
-                      <items count="3">
+                      <items count="2">
                         <item name="Bounds" type_name="gh_drawing_rectanglef" type_code="35">
                           <X>4303.159</X>
                           <Y>628.6309</Y>
@@ -12104,7 +12088,6 @@ print(DATA)</item>
                           <X>4308.159</X>
                           <Y>633.6309</Y>
                         </item>
-                        <item name="Selected" type_name="gh_bool" type_code="1">true</item>
                       </items>
                     </chunk>
                   </chunks>
@@ -12653,7 +12636,7 @@ print(DATA)</item>
                     <item name="Optional" type_name="gh_bool" type_code="1">false</item>
                     <item name="ScrollRatio" type_name="gh_double" type_code="6">0</item>
                     <item name="SourceCount" type_name="gh_int32" type_code="3">0</item>
-                    <item name="UserText" type_name="gh_string" type_code="10">assembly_timbers_upload.json</item>
+                    <item name="UserText" type_name="gh_string" type_code="10">assembly_upload_timbers.json</item>
                   </items>
                   <chunks count="2">
                     <chunk name="Attributes">
@@ -13753,13 +13736,13 @@ if upload:
                       <items count="2">
                         <item name="Bounds" type_name="gh_drawing_rectanglef" type_code="35">
                           <X>4574</X>
-                          <Y>1139</Y>
+                          <Y>1135</Y>
                           <W>114</W>
                           <H>104</H>
                         </item>
                         <item name="Pivot" type_name="gh_drawing_pointf" type_code="31">
                           <X>4674</X>
-                          <Y>1191</Y>
+                          <Y>1187</Y>
                         </item>
                       </items>
                     </chunk>
@@ -13792,13 +13775,13 @@ if upload:
                               <items count="2">
                                 <item name="Bounds" type_name="gh_drawing_rectanglef" type_code="35">
                                   <X>4576</X>
-                                  <Y>1141</Y>
+                                  <Y>1137</Y>
                                   <W>83</W>
                                   <H>20</H>
                                 </item>
                                 <item name="Pivot" type_name="gh_drawing_pointf" type_code="31">
                                   <X>4619</X>
-                                  <Y>1151</Y>
+                                  <Y>1147</Y>
                                 </item>
                               </items>
                             </chunk>
@@ -13824,13 +13807,13 @@ if upload:
                               <items count="2">
                                 <item name="Bounds" type_name="gh_drawing_rectanglef" type_code="35">
                                   <X>4576</X>
-                                  <Y>1161</Y>
+                                  <Y>1157</Y>
                                   <W>83</W>
                                   <H>20</H>
                                 </item>
                                 <item name="Pivot" type_name="gh_drawing_pointf" type_code="31">
                                   <X>4619</X>
-                                  <Y>1171</Y>
+                                  <Y>1167</Y>
                                 </item>
                               </items>
                             </chunk>
@@ -13855,13 +13838,13 @@ if upload:
                               <items count="2">
                                 <item name="Bounds" type_name="gh_drawing_rectanglef" type_code="35">
                                   <X>4576</X>
-                                  <Y>1181</Y>
+                                  <Y>1177</Y>
                                   <W>83</W>
                                   <H>20</H>
                                 </item>
                                 <item name="Pivot" type_name="gh_drawing_pointf" type_code="31">
                                   <X>4619</X>
-                                  <Y>1191</Y>
+                                  <Y>1187</Y>
                                 </item>
                               </items>
                             </chunk>
@@ -13885,13 +13868,13 @@ if upload:
                               <items count="2">
                                 <item name="Bounds" type_name="gh_drawing_rectanglef" type_code="35">
                                   <X>4576</X>
-                                  <Y>1201</Y>
+                                  <Y>1197</Y>
                                   <W>83</W>
                                   <H>20</H>
                                 </item>
                                 <item name="Pivot" type_name="gh_drawing_pointf" type_code="31">
                                   <X>4619</X>
-                                  <Y>1211</Y>
+                                  <Y>1207</Y>
                                 </item>
                               </items>
                             </chunk>
@@ -13916,13 +13899,13 @@ if upload:
                               <items count="2">
                                 <item name="Bounds" type_name="gh_drawing_rectanglef" type_code="35">
                                   <X>4576</X>
-                                  <Y>1221</Y>
+                                  <Y>1217</Y>
                                   <W>83</W>
                                   <H>20</H>
                                 </item>
                                 <item name="Pivot" type_name="gh_drawing_pointf" type_code="31">
                                   <X>4619</X>
-                                  <Y>1231</Y>
+                                  <Y>1227</Y>
                                 </item>
                               </items>
                             </chunk>
@@ -13956,7 +13939,7 @@ if upload:
                       <items count="1">
                         <item name="Bounds" type_name="gh_drawing_rectanglef" type_code="35">
                           <X>4429</X>
-                          <Y>1237</Y>
+                          <Y>1233</Y>
                           <W>103</W>
                           <H>22</H>
                         </item>
@@ -13988,7 +13971,7 @@ if upload:
                       <items count="5">
                         <item name="Bounds" type_name="gh_drawing_rectanglef" type_code="35">
                           <X>4319</X>
-                          <Y>1177</Y>
+                          <Y>1173</Y>
                           <W>224</W>
                           <H>38</H>
                         </item>
@@ -13997,7 +13980,7 @@ if upload:
                         <item name="MarginTop" type_name="gh_int32" type_code="3">0</item>
                         <item name="Pivot" type_name="gh_drawing_pointf" type_code="31">
                           <X>4319.968</X>
-                          <Y>1177.121</Y>
+                          <Y>1173.356</Y>
                         </item>
                       </items>
                     </chunk>
@@ -14032,14 +14015,14 @@ if upload:
                     <item name="NickName" type_name="gh_string" type_code="10">Boolean Toggle</item>
                     <item name="Optional" type_name="gh_bool" type_code="1">false</item>
                     <item name="SourceCount" type_name="gh_int32" type_code="3">0</item>
-                    <item name="ToggleValue" type_name="gh_bool" type_code="1">true</item>
+                    <item name="ToggleValue" type_name="gh_bool" type_code="1">false</item>
                   </items>
                   <chunks count="1">
                     <chunk name="Attributes">
                       <items count="1">
                         <item name="Bounds" type_name="gh_drawing_rectanglef" type_code="35">
                           <X>4388</X>
-                          <Y>1267</Y>
+                          <Y>1263</Y>
                           <W>146</W>
                           <H>22</H>
                         </item>
@@ -14071,7 +14054,7 @@ if upload:
                       <items count="5">
                         <item name="Bounds" type_name="gh_drawing_rectanglef" type_code="35">
                           <X>4317</X>
-                          <Y>1219</Y>
+                          <Y>1215</Y>
                           <W>223</W>
                           <H>20</H>
                         </item>
@@ -14080,7 +14063,7 @@ if upload:
                         <item name="MarginTop" type_name="gh_int32" type_code="3">0</item>
                         <item name="Pivot" type_name="gh_drawing_pointf" type_code="31">
                           <X>4317.833</X>
-                          <Y>1219.455</Y>
+                          <Y>1215.691</Y>
                         </item>
                       </items>
                     </chunk>
@@ -14112,19 +14095,19 @@ if upload:
                     <item name="Bold" type_name="gh_bool" type_code="1">true</item>
                     <item name="Ca" type_name="gh_drawing_pointf" type_code="31">
                       <X>4315.354</X>
-                      <Y>1097.389</Y>
+                      <Y>1093.625</Y>
                     </item>
                     <item name="Cb" type_name="gh_drawing_pointf" type_code="31">
                       <X>4500.144</X>
-                      <Y>1097.389</Y>
+                      <Y>1093.625</Y>
                     </item>
                     <item name="Cc" type_name="gh_drawing_pointf" type_code="31">
                       <X>4500.144</X>
-                      <Y>1114.405</Y>
+                      <Y>1110.64</Y>
                     </item>
                     <item name="Cd" type_name="gh_drawing_pointf" type_code="31">
                       <X>4315.354</X>
-                      <Y>1114.405</Y>
+                      <Y>1110.64</Y>
                     </item>
                     <item name="Description" type_name="gh_string" type_code="10">A quick note</item>
                     <item name="Font" type_name="gh_string" type_code="10">Microsoft Sans Serif</item>
@@ -14140,13 +14123,13 @@ if upload:
                       <items count="2">
                         <item name="Bounds" type_name="gh_drawing_rectanglef" type_code="35">
                           <X>4310.354</X>
-                          <Y>1092.389</Y>
+                          <Y>1088.625</Y>
                           <W>194.79</W>
                           <H>27.01563</H>
                         </item>
                         <item name="Pivot" type_name="gh_drawing_pointf" type_code="31">
                           <X>4315.354</X>
-                          <Y>1097.389</Y>
+                          <Y>1093.625</Y>
                         </item>
                       </items>
                     </chunk>
@@ -14333,6 +14316,567 @@ if frame_data:
                 </chunk>
               </chunks>
             </chunk>
+            <chunk name="Object" index="145">
+              <items count="2">
+                <item name="GUID" type_name="gh_guid" type_code="9">8ec86459-bf01-4409-baee-174d0d2b13d0</item>
+                <item name="Name" type_name="gh_string" type_code="10">Data</item>
+              </items>
+              <chunks count="1">
+                <chunk name="Container">
+                  <items count="7">
+                    <item name="Description" type_name="gh_string" type_code="10">Contains a collection of generic data</item>
+                    <item name="InstanceGuid" type_name="gh_guid" type_code="9">69aee81d-c216-4f77-806c-791f4b054e7f</item>
+                    <item name="Locked" type_name="gh_bool" type_code="1">true</item>
+                    <item name="Name" type_name="gh_string" type_code="10">Data</item>
+                    <item name="NickName" type_name="gh_string" type_code="10">Data</item>
+                    <item name="Optional" type_name="gh_bool" type_code="1">false</item>
+                    <item name="SourceCount" type_name="gh_int32" type_code="3">0</item>
+                  </items>
+                  <chunks count="2">
+                    <chunk name="Attributes">
+                      <items count="2">
+                        <item name="Bounds" type_name="gh_drawing_rectanglef" type_code="35">
+                          <X>3597</X>
+                          <Y>1110</Y>
+                          <W>50</W>
+                          <H>24</H>
+                        </item>
+                        <item name="Pivot" type_name="gh_drawing_pointf" type_code="31">
+                          <X>3622.89</X>
+                          <Y>1122.824</Y>
+                        </item>
+                      </items>
+                    </chunk>
+                    <chunk name="PersistentData">
+                      <items count="1">
+                        <item name="Count" type_name="gh_int32" type_code="3">1</item>
+                      </items>
+                      <chunks count="1">
+                        <chunk name="Branch" index="0">
+                          <items count="2">
+                            <item name="Count" type_name="gh_int32" type_code="3">1</item>
+                            <item name="Path" type_name="gh_string" type_code="10">{0}</item>
+                          </items>
+                          <chunks count="1">
+                            <chunk name="Item" index="0">
+                              <items count="3">
+                                <item name="TypeName" type_name="gh_string" type_code="10">Grasshopper.Kernel.Types.GH_String</item>
+                                <item name="null_string" type_name="gh_bool" type_code="1">false</item>
+                                <item name="string" type_name="gh_string" type_code="10">[{"graph": {"dea": {}, "adjacency": {"16": {}, "26": {}, "15": {}, "18": {}, "25": {}, "10": {}, "20": {}, "17": {}, "27": {}, "12": {}, "22": {}, "19": {}, "11": {}, "5": {}, "4": {}, "7": {}, "6": {}, "1": {}, "0": {}, "3": {}, "2": {}, "21": {}, "9": {}, "8": {}, "14": {}, "24": {}, "13": {}, "23": {}}, "node": {"16": {"part": {"dtype": "compas.datastructures/Part", "value": {"shape": {"faces": [[0, 1, 2], [0, 2, 3], [0, 3, 5], [0, 5, 4], [3, 2, 6], [3, 6, 5], [2, 1, 7], [2, 7, 6], [1, 0, 4], [1, 4, 7], [4, 5, 6], [4, 6, 7]], "vertices": [{"dtype": "compas.geometry/Point", "value": [-0.0074999999999999997, -0.0085000000000000006, -0.012], "guid": "2ade6386-6c52-4d14-85ef-3abade5aef08"}, {"dtype": "compas.geometry/Point", "value": [-0.0074999999999999997, 0.0085000000000000006, -0.012], "guid": "5bea66a7-b501-4212-86f7-77060507be39"}, {"dtype": "compas.geometry/Point", "value": [0.0074999999999999997, 0.0085000000000000006, -0.012], "guid": "001dcd31-8c4e-44ca-a553-134a39b31fdf"}, {"dtype": "compas.geometry/Point", "value": [0.0074999999999999997, -0.0085000000000000006, -0.012], "guid": "4c4b1638-c39b-4376-925c-0963e9e1b04d"}, {"dtype": "compas.geometry/Point", "value": [-0.0074999999999999997, -0.0085000000000000006, 0.0], "guid": "4a7874d5-3c58-46d9-a14b-635a5ae7125b"}, {"dtype": "compas.geometry/Point", "value": [0.0074999999999999997, -0.0085000000000000006, 0.0], "guid": "8eead7a7-4176-4739-ace4-edf452500a6c"}, {"dtype": "compas.geometry/Point", "value": [0.0074999999999999997, 0.0085000000000000006, 0.0], "guid": "92f4b65b-e4cf-49d4-b922-c8e04f6d7efa"}, {"dtype": "compas.geometry/Point", "value": [-0.0074999999999999997, 0.0085000000000000006, 0.0], "guid": "f6acd24c-98cf-4e53-9787-2e74d742eefa"}]}, "frame": {"yaxis": [-0.72572110810675727, -0.68798900663331852, 0.0], "xaxis": [0.68798900663331852, -0.72572110810675727, -0.0], "point": [0.11880984667031004, -0.02112976557825736, 0.027802592236588999]}, "attributes": {"ysize": 0.017000000000000001, "xsize": 0.014999999999999999, "n": 5, "course": 2, "name": "Part", "zsize": 0.012}, "key": 16, "transformations": [], "features": []}, "guid": "e8f0808d-1b80-4e73-8174-829df5bbd23b"}}, "26": {"part": {"dtype": "compas.datastructures/Part", "value": {"shape": {"faces": [[0, 1, 2], [0, 2, 3], [0, 3, 5], [0, 5, 4], [3, 2, 6], [3, 6, 5], [2, 1, 7], [2, 7, 6], [1, 0, 4], [1, 4, 7], [4, 5, 6], [4, 6, 7]], "vertices": [{"dtype": "compas.geometry/Point", "value": [-0.014999999999999999, -0.0085000000000000006, -0.012], "guid": "4dcfedaf-3894-4edd-9aa8-7f358ed57cde"}, {"dtype": "compas.geometry/Point", "value": [-0.014999999999999999, 0.0085000000000000006, -0.012], "guid": "8c5ac399-6f86-44a2-8834-2b1cabaab326"}, {"dtype": "compas.geometry/Point", "value": [0.014999999999999999, 0.0085000000000000006, -0.012], "guid": "7cd0243a-c0a7-4044-9cac-18fdd642b4e2"}, {"dtype": "compas.geometry/Point", "value": [0.014999999999999999, -0.0085000000000000006, -0.012], "guid": "b6041d8a-85e8-44eb-8474-af9d11153974"}, {"dtype": "compas.geometry/Point", "value": [-0.014999999999999999, -0.0085000000000000006, 0.0], "guid": "d9fe26bf-7e13-4a11-bbbc-6352e8735948"}, {"dtype": "compas.geometry/Point", "value": [0.014999999999999999, -0.0085000000000000006, 0.0], "guid": "21144d9f-e824-4083-b6c0-675961a1a3dc"}, {"dtype": "compas.geometry/Point", "value": [0.014999999999999999, 0.0085000000000000006, 0.0], "guid": "698d70c1-5dbe-44c8-8a3f-49d8b23bae7c"}, {"dtype": "compas.geometry/Point", "value": [-0.014999999999999999, 0.0085000000000000006, 0.0], "guid": "30944886-9614-4cf9-a7a0-e4c77c852aa3"}]}, "frame": {"yaxis": [-0.64286470975563259, -0.76597974186711126, 0.0], "xaxis": [0.76597974186711126, -0.64286470975563259, -0.0], "point": [0.095388710306848409, -0.0092796508068440729, 0.054860411226359033]}, "attributes": {"ysize": 0.017000000000000001, "xsize": 0.029999999999999999, "n": 4, "course": 4, "name": "Part", "zsize": 0.012}, "key": 26, "transformations": [], "features": []}, "guid": "4c69d450-964f-4fcc-9af0-93a83396e23f"}}, "15": {"part": {"dtype": "compas.datastructures/Part", "value": {"shape": {"faces": [[0, 1, 2], [0, 2, 3], [0, 3, 5], [0, 5, 4], [3, 2, 6], [3, 6, 5], [2, 1, 7], [2, 7, 6], [1, 0, 4], [1, 4, 7], [4, 5, 6], [4, 6, 7]], "vertices": [{"dtype": "compas.geometry/Point", "value": [-0.014999999999999999, -0.0085000000000000006, -0.012], "guid": "f3208069-db8c-43ab-887e-05c746222adf"}, {"dtype": "compas.geometry/Point", "value": [-0.014999999999999999, 0.0085000000000000006, -0.012], "guid": "f510bf01-bac8-45b9-a8f2-7fbe8006432a"}, {"dtype": "compas.geometry/Point", "value": [0.014999999999999999, 0.0085000000000000006, -0.012], "guid": "b001a58d-9660-471b-9da3-eafce0153c47"}, {"dtype": "compas.geometry/Point", "value": [0.014999999999999999, -0.0085000000000000006, -0.012], "guid": "2ae9a31e-fff5-4133-873e-6d0688fa365c"}, {"dtype": "compas.geometry/Point", "value": [-0.014999999999999999, -0.0085000000000000006, 0.0], "guid": "10b3d25e-3264-4fdb-b0aa-c440dcc55029"}, {"dtype": "compas.geometry/Point", "value": [0.014999999999999999, -0.0085000000000000006, 0.0], "guid": "ee384832-96c2-4496-bbc9-3a8648a47943"}, {"dtype": "compas.geometry/Point", "value": [0.014999999999999999, 0.0085000000000000006, 0.0], "guid": "525a0341-af23-4c5a-b1ab-875988c2c599"}, {"dtype": "compas.geometry/Point", "value": [-0.014999999999999999, 0.0085000000000000006, 0.0], "guid": "1ecb6357-173e-43f3-b10b-21cac64f0675"}]}, "frame": {"yaxis": [-0.7256197468946568, -0.68809591113196877, 0.0], "xaxis": [0.68809591113196877, -0.7256197468946568, -0.0], "point": [0.10131248923390732, -0.0028650484974457992, 0.027802592236588999]}, "attributes": {"ysize": 0.017000000000000001, "xsize": 0.029999999999999999, "n": 4, "course": 2, "name": "Part", "zsize": 0.012}, "key": 15, "transformations": [], "features": []}, "guid": "957c634e-edf6-4712-8208-d1812c07230d"}}, "18": {"part": {"dtype": "compas.datastructures/Part", "value": {"shape": {"faces": [[0, 1, 2], [0, 2, 3], [0, 3, 5], [0, 5, 4], [3, 2, 6], [3, 6, 5], [2, 1, 7], [2, 7, 6], [1, 0, 4], [1, 4, 7], [4, 5, 6], [4, 6, 7]], "vertices": [{"dtype": "compas.geometry/Point", "value": [-0.014999999999999999, -0.0085000000000000006, -0.012], "guid": "2c37dfff-a923-4805-909e-8caebaead95b"}, {"dtype": "compas.geometry/Point", "value": [-0.014999999999999999, 0.0085000000000000006, -0.012], "guid": "72524acf-c235-4abf-a2c6-a2ac13e14b6d"}, {"dtype": "compas.geometry/Point", "value": [0.014999999999999999, 0.0085000000000000006, -0.012], "guid": "4f2566f6-bbed-4485-b331-d26bcae3b4c2"}, {"dtype": "compas.geometry/Point", "value": [0.014999999999999999, -0.0085000000000000006, -0.012], "guid": "668ccf9f-3524-4875-9cfb-7c5f41ff6615"}, {"dtype": "compas.geometry/Point", "value": [-0.014999999999999999, -0.0085000000000000006, 0.0], "guid": "3b21ece5-a130-4bd2-a2ed-8c7be237993f"}, {"dtype": "compas.geometry/Point", "value": [0.014999999999999999, -0.0085000000000000006, 0.0], "guid": "e88dc12d-4f32-41f7-a252-cf4248e26507"}, {"dtype": "compas.geometry/Point", "value": [0.014999999999999999, 0.0085000000000000006, 0.0], "guid": "d0105056-fc69-4e85-b15f-8a86bacb723e"}, {"dtype": "compas.geometry/Point", "value": [-0.014999999999999999, 0.0085000000000000006, 0.0], "guid": "2ed262f2-1129-4608-bad2-70f594b83d7a"}]}, "frame": {"yaxis": [-0.96967250816876105, -0.24440791088200076, 0.0], "xaxis": [0.24440791088200076, -0.96967250816876105, 0.0], "point": [0.058486141765571348, 0.066837024717215227, 0.041331501731474006]}, "attributes": {"ysize": 0.017000000000000001, "xsize": 0.029999999999999999, "n": 1, "course": 3, "name": "Part", "zsize": 0.012}, "key": 18, "transformations": [], "features": []}, "guid": "82445678-820e-4f3b-be7a-0f5dab8c74b8"}}, "25": {"part": {"dtype": "compas.datastructures/Part", "value": {"shape": {"faces": [[0, 1, 2], [0, 2, 3], [0, 3, 5], [0, 5, 4], [3, 2, 6], [3, 6, 5], [2, 1, 7], [2, 7, 6], [1, 0, 4], [1, 4, 7], [4, 5, 6], [4, 6, 7]], "vertices": [{"dtype": "compas.geometry/Point", "value": [-0.014999999999999999, -0.0085000000000000006, -0.012], "guid": "96a2dece-7ba9-4749-8329-7c517aa849ac"}, {"dtype": "compas.geometry/Point", "value": [-0.014999999999999999, 0.0085000000000000006, -0.012], "guid": "3df2b92c-b835-489c-ba9b-397b3741edf0"}, {"dtype": "compas.geometry/Point", "value": [0.014999999999999999, 0.0085000000000000006, -0.012], "guid": "09a06cf4-a091-486e-a37d-62eea690afca"}, {"dtype": "compas.geometry/Point", "value": [0.014999999999999999, -0.0085000000000000006, -0.012], "guid": "b426ff6b-22b0-47fd-891d-d05522f7c1f2"}, {"dtype": "compas.geometry/Point", "value": [-0.014999999999999999, -0.0085000000000000006, 0.0], "guid": "480a7a4e-eb40-4e24-96a4-c2bf91103f84"}, {"dtype": "compas.geometry/Point", "value": [0.014999999999999999, -0.0085000000000000006, 0.0], "guid": "f9bb842d-ca52-4bac-b998-6d77ab267d9f"}, {"dtype": "compas.geometry/Point", "value": [0.014999999999999999, 0.0085000000000000006, 0.0], "guid": "0dc95de5-394b-4674-8487-d8de6b52e208"}, {"dtype": "compas.geometry/Point", "value": [-0.014999999999999999, 0.0085000000000000006, 0.0], "guid": "7db332ab-6c23-4bf6-bd79-cc46e713f9d6"}]}, "frame": {"yaxis": [-0.90673668626044679, -0.42169726319887835, 0.0], "xaxis": [0.42169726319887835, -0.90673668626044679, -0.0], "point": [0.074472588219326771, 0.017653149369942559, 0.054860411226359033]}, "attributes": {"ysize": 0.017000000000000001, "xsize": 0.029999999999999999, "n": 3, "course": 4, "name": "Part", "zsize": 0.012}, "key": 25, "transformations": [], "features": []}, "guid": "bb2828e5-f232-4d1c-b1cc-ba48d5aa8bc7"}}, "10": {"part": {"dtype": "compas.datastructures/Part", "value": {"shape": {"faces": [[0, 1, 2], [0, 2, 3], [0, 3, 5], [0, 5, 4], [3, 2, 6], [3, 6, 5], [2, 1, 7], [2, 7, 6], [1, 0, 4], [1, 4, 7], [4, 5, 6], [4, 6, 7]], "vertices": [{"dtype": "compas.geometry/Point", "value": [-0.014999999999999999, -0.0085000000000000006, -0.012], "guid": "0e956968-d725-4eb4-9198-6058a98fc8d2"}, {"dtype": "compas.geometry/Point", "value": [-0.014999999999999999, 0.0085000000000000006, -0.012], "guid": "c68a927f-06b3-4d79-8be0-5e48b926d545"}, {"dtype": "compas.geometry/Point", "value": [0.014999999999999999, 0.0085000000000000006, -0.012], "guid": "c10c0280-89a6-4efa-b5a1-50f85ad48743"}, {"dtype": "compas.geometry/Point", "value": [0.014999999999999999, -0.0085000000000000006, -0.012], "guid": "93f29efb-366a-4c57-9c7c-5d4130bced5c"}, {"dtype": "compas.geometry/Point", "value": [-0.014999999999999999, -0.0085000000000000006, 0.0], "guid": "f0545367-2540-408c-8dca-ffdaefb4bfea"}, {"dtype": "compas.geometry/Point", "value": [0.014999999999999999, -0.0085000000000000006, 0.0], "guid": "62b559e7-0a84-4a46-9fc6-fd1393e4348f"}, {"dtype": "compas.geometry/Point", "value": [0.014999999999999999, 0.0085000000000000006, 0.0], "guid": "87d859d4-f82e-49df-8843-41d5dc3c51b2"}, {"dtype": "compas.geometry/Point", "value": [-0.014999999999999999, 0.0085000000000000006, 0.0], "guid": "37afc43a-2693-4448-82fc-0b56a55c3c83"}]}, "frame": {"yaxis": [-0.79617325876801637, -0.6050687085139318, 0.0], "xaxis": [0.6050687085139318, -0.79617325876801637, -0.0], "point": [0.11587132320007454, -0.012540213243795978, 0.014273682741703981]}, "attributes": {"ysize": 0.017000000000000001, "xsize": 0.029999999999999999, "n": 4, "course": 1, "name": "Part", "zsize": 0.012}, "key": 10, "transformations": [], "features": []}, "guid": "12766824-13cb-4edf-b414-8bf466185c2e"}}, "20": {"part": {"dtype": "compas.datastructures/Part", "value": {"shape": {"faces": [[0, 1, 2], [0, 2, 3], [0, 3, 5], [0, 5, 4], [3, 2, 6], [3, 6, 5], [2, 1, 7], [2, 7, 6], [1, 0, 4], [1, 4, 7], [4, 5, 6], [4, 6, 7]], "vertices": [{"dtype": "compas.geometry/Point", "value": [-0.014999999999999999, -0.0085000000000000006, -0.012], "guid": "ff5cda95-9de5-41a7-b6bd-55839effe551"}, {"dtype": "compas.geometry/Point", "value": [-0.014999999999999999, 0.0085000000000000006, -0.012], "guid": "48e91f4d-656f-47da-a7df-c52942ed736d"}, {"dtype": "compas.geometry/Point", "value": [0.014999999999999999, 0.0085000000000000006, -0.012], "guid": "39628485-1121-465d-8c1f-83134ba2ace1"}, {"dtype": "compas.geometry/Point", "value": [0.014999999999999999, -0.0085000000000000006, -0.012], "guid": "fb626562-750e-4d9b-96bf-e1edf527c113"}, {"dtype": "compas.geometry/Point", "value": [-0.014999999999999999, -0.0085000000000000006, 0.0], "guid": "3c96a1cc-0bb0-42f9-8b0c-cfa1c316bbbb"}, {"dtype": "compas.geometry/Point", "value": [0.014999999999999999, -0.0085000000000000006, 0.0], "guid": "41d162e7-9d51-4e10-8e86-629c58b02146"}, {"dtype": "compas.geometry/Point", "value": [0.014999999999999999, 0.0085000000000000006, 0.0], "guid": "026bb55e-1aac-4180-bcda-0b9ad27f5bba"}, {"dtype": "compas.geometry/Point", "value": [-0.014999999999999999, 0.0085000000000000006, 0.0], "guid": "81c12600-7c59-48d7-8c51-27273cf2c9d6"}]}, "frame": {"yaxis": [-0.77898999398674929, -0.62703635402464841, 1.2325951644078309e-32], "xaxis": [0.62703635402464841, -0.77898999398674929, -1.8177334948850957e-16], "point": [0.086903831092242284, 0.0062319156476468331, 0.041331501731473985]}, "attributes": {"ysize": 0.017000000000000001, "xsize": 0.029999999999999999, "n": 3, "course": 3, "name": "Part", "zsize": 0.012}, "key": 20, "transformations": [], "features": []}, "guid": "6abeff4d-a2c9-4c0e-9531-ee57c8d14776"}}, "17": {"part": {"dtype": "compas.datastructures/Part", "value": {"shape": {"faces": [[0, 1, 2], [0, 2, 3], [0, 3, 5], [0, 5, 4], [3, 2, 6], [3, 6, 5], [2, 1, 7], [2, 7, 6], [1, 0, 4], [1, 4, 7], [4, 5, 6], [4, 6, 7]], "vertices": [{"dtype": "compas.geometry/Point", "value": [-0.014999999999999999, -0.0085000000000000006, -0.012], "guid": "85fb0d50-a026-4616-85e6-2d7d981fc17b"}, {"dtype": "compas.geometry/Point", "value": [-0.014999999999999999, 0.0085000000000000006, -0.012], "guid": "7a3d7426-ff72-4ac4-be92-303ba0bc19f8"}, {"dtype": "compas.geometry/Point", "value": [0.014999999999999999, 0.0085000000000000006, -0.012], "guid": "62f305c6-36f2-4ee1-83f0-899edd007289"}, {"dtype": "compas.geometry/Point", "value": [0.014999999999999999, -0.0085000000000000006, -0.012], "guid": "04ef6692-adb8-43d5-a90d-7cc3d1bdb7f7"}, {"dtype": "compas.geometry/Point", "value": [-0.014999999999999999, -0.0085000000000000006, 0.0], "guid": "393b7beb-7bfd-4efe-a579-813bf042eacc"}, {"dtype": "compas.geometry/Point", "value": [0.014999999999999999, -0.0085000000000000006, 0.0], "guid": "4f2ab1c5-35ad-4062-a95b-8a36f53c0431"}, {"dtype": "compas.geometry/Point", "value": [0.014999999999999999, 0.0085000000000000006, 0.0], "guid": "36da5bcf-a87f-4540-8e73-d053ae996907"}, {"dtype": "compas.geometry/Point", "value": [-0.014999999999999999, 0.0085000000000000006, 0.0], "guid": "d96726f2-0a2a-4861-8345-19a01e14fda4"}]}, "frame": {"yaxis": [-0.98608513229722172, -0.16624112566501301, 0.0], "xaxis": [0.16624112566501301, -0.98608513229722172, 1.2424114470241099e-16], "point": [0.05178508578500296, 0.09990002571997994, 0.041331501731473985]}, "attributes": {"ysize": 0.017000000000000001, "xsize": 0.029999999999999999, "n": 0, "course": 3, "name": "Part", "zsize": 0.012}, "key": 17, "transformations": [], "features": []}, "guid": "b40dffab-d37d-43fb-9c5a-752b33039c6d"}}, "27": {"part": {"dtype": "compas.datastructures/Part", "value": {"shape": {"faces": [[0, 1, 2], [0, 2, 3], [0, 3, 5], [0, 5, 4], [3, 2, 6], [3, 6, 5], [2, 1, 7], [2, 7, 6], [1, 0, 4], [1, 4, 7], [4, 5, 6], [4, 6, 7]], "vertices": [{"dtype": "compas.geometry/Point", "value": [-0.0074999999999999997, -0.0085000000000000006, -0.012], "guid": "173ac777-beaf-4189-ac49-5e9a090fc165"}, {"dtype": "compas.geometry/Point", "value": [-0.0074999999999999997, 0.0085000000000000006, -0.012], "guid": "d30c3d39-eb28-4e8b-bd34-30bbdd06142b"}, {"dtype": "compas.geometry/Point", "value": [0.0074999999999999997, 0.0085000000000000006, -0.012], "guid": "92c27f96-2899-4706-8092-4208af99fdc7"}, {"dtype": "compas.geometry/Point", "value": [0.0074999999999999997, -0.0085000000000000006, -0.012], "guid": "d6dfdf0f-10f1-451d-8ab7-8b205a183772"}, {"dtype": "compas.geometry/Point", "value": [-0.0074999999999999997, -0.0085000000000000006, 0.0], "guid": "7dfd6457-9a10-49c7-adf3-d4781d1cf8db"}, {"dtype": "compas.geometry/Point", "value": [0.0074999999999999997, -0.0085000000000000006, 0.0], "guid": "06a93eb5-a7c4-4ebc-9557-42c31fde8228"}, {"dtype": "compas.geometry/Point", "value": [0.0074999999999999997, 0.0085000000000000006, 0.0], "guid": "24c369b8-e1bd-49e1-9673-82135ddb4919"}, {"dtype": "compas.geometry/Point", "value": [-0.0074999999999999997, 0.0085000000000000006, 0.0], "guid": "4b122d7d-7ff5-4733-bd8d-6858e64df08c"}]}, "frame": {"yaxis": [-0.46809300358795042, -0.88367920649521403, 0.0], "xaxis": [0.88367920649521403, -0.46809300358795042, -9.2184403503166997e-17], "point": [0.11687739133646761, -0.023451851418605046, 0.054860411226359013]}, "attributes": {"ysize": 0.017000000000000001, "xsize": 0.014999999999999999, "n": 5, "course": 4, "name": "Part", "zsize": 0.012}, "key": 27, "transformations": [], "features": []}, "guid": "75f7c1db-04bb-402e-8778-65aa3a4bf4ab"}}, "12": {"part": {"dtype": "compas.datastructures/Part", "value": {"shape": {"faces": [[0, 1, 2], [0, 2, 3], [0, 3, 5], [0, 5, 4], [3, 2, 6], [3, 6, 5], [2, 1, 7], [2, 7, 6], [1, 0, 4], [1, 4, 7], [4, 5, 6], [4, 6, 7]], "vertices": [{"dtype": "compas.geometry/Point", "value": [-0.014999999999999999, -0.0085000000000000006, -0.012], "guid": "78086417-6db9-4adb-9237-328e268b658a"}, {"dtype": "compas.geometry/Point", "value": [-0.014999999999999999, 0.0085000000000000006, -0.012], "guid": "cb6f9984-cb4d-4976-9854-fc153694bc2e"}, {"dtype": "compas.geometry/Point", "value": [0.014999999999999999, 0.0085000000000000006, -0.012], "guid": "212b2413-9c6c-4696-9b54-9b536d701517"}, {"dtype": "compas.geometry/Point", "value": [0.014999999999999999, -0.0085000000000000006, -0.012], "guid": "455a95b0-231a-4f3e-8a6c-c07653160fa0"}, {"dtype": "compas.geometry/Point", "value": [-0.014999999999999999, -0.0085000000000000006, 0.0], "guid": "c000f5e6-e476-45a2-baa8-f428341059f3"}, {"dtype": "compas.geometry/Point", "value": [0.014999999999999999, -0.0085000000000000006, 0.0], "guid": "3263f72f-ff16-46a3-b1a2-5d6b823eb90a"}, {"dtype": "compas.geometry/Point", "value": [0.014999999999999999, 0.0085000000000000006, 0.0], "guid": "149b3e16-f132-444c-9b71-f810f64213c8"}, {"dtype": "compas.geometry/Point", "value": [-0.014999999999999999, 0.0085000000000000006, 0.0], "guid": "e605c13f-81c0-4696-8860-136c8a5fe290"}]}, "frame": {"yaxis": [-0.99094529550274868, -0.13426623298867865, 0.0], "xaxis": [0.13426623298867865, -0.99094529550274868, 0.0], "point": [0.051291127902166556, 0.083035876132208281, 0.027802592236588996]}, "attributes": {"ysize": 0.017000000000000001, "xsize": 0.029999999999999999, "n": 1, "course": 2, "name": "Part", "zsize": 0.012}, "key": 12, "transformations": [], "features": []}, "guid": "a45fc62b-786f-4a8c-bd28-8611c60ac9a5"}}, "22": {"part": {"dtype": "compas.datastructures/Part", "value": {"shape": {"faces": [[0, 1, 2], [0, 2, 3], [0, 3, 5], [0, 5, 4], [3, 2, 6], [3, 6, 5], [2, 1, 7], [2, 7, 6], [1, 0, 4], [1, 4, 7], [4, 5, 6], [4, 6, 7]], "vertices": [{"dtype": "compas.geometry/Point", "value": [-0.0074999999999999997, -0.0085000000000000006, -0.012], "guid": "81bb7963-e0e3-4bfe-b604-17147a4447a5"}, {"dtype": "compas.geometry/Point", "value": [-0.0074999999999999997, 0.0085000000000000006, -0.012], "guid": "3c4ab2b7-8413-4de2-87b1-a28e5d3c07b7"}, {"dtype": "compas.geometry/Point", "value": [0.0074999999999999997, 0.0085000000000000006, -0.012], "guid": "f098993e-575b-40d4-9d17-4bc8a4b477b0"}, {"dtype": "compas.geometry/Point", "value": [0.0074999999999999997, -0.0085000000000000006, -0.012], "guid": "7becafa9-1537-44e0-b035-69f058ad3ec3"}, {"dtype": "compas.geometry/Point", "value": [-0.0074999999999999997, -0.0085000000000000006, 0.0], "guid": "0e68636a-a906-4946-9cdf-4e2ef823b8a3"}, {"dtype": "compas.geometry/Point", "value": [0.0074999999999999997, -0.0085000000000000006, 0.0], "guid": "b6a5e560-93b6-47b9-a275-45dd33453e4f"}, {"dtype": "compas.geometry/Point", "value": [0.0074999999999999997, 0.0085000000000000006, 0.0], "guid": "579d6b11-fe9d-4dce-aaa3-4e58b42ed733"}, {"dtype": "compas.geometry/Point", "value": [-0.0074999999999999997, 0.0085000000000000006, 0.0], "guid": "029071b0-cb1f-4239-9a39-b21050f49b41"}]}, "frame": {"yaxis": [-0.9178258272189953, -0.39698331311248725, 6.1629758220391547e-33], "xaxis": [0.39698331311248725, -0.9178258272189953, 1.1022298938072305e-16], "point": [0.049895374260537868, 0.10869909488079191, 0.054860411226359013]}, "attributes": {"ysize": 0.017000000000000001, "xsize": 0.014999999999999999, "n": 0, "course": 4, "name": "Part", "zsize": 0.012}, "key": 22, "transformations": [], "features": []}, "guid": "b4d06d45-bd2b-4bb1-800c-017512ca2a43"}}, "19": {"part": {"dtype": "compas.datastructures/Part", "value": {"shape": {"faces": [[0, 1, 2], [0, 2, 3], [0, 3, 5], [0, 5, 4], [3, 2, 6], [3, 6, 5], [2, 1, 7], [2, 7, 6], [1, 0, 4], [1, 4, 7], [4, 5, 6], [4, 6, 7]], "vertices": [{"dtype": "compas.geometry/Point", "value": [-0.014999999999999999, -0.0085000000000000006, -0.012], "guid": "8b2d6f7b-5794-423e-8902-c4f4517eeba2"}, {"dtype": "compas.geometry/Point", "value": [-0.014999999999999999, 0.0085000000000000006, -0.012], "guid": "5a9d739e-4fbd-4aa4-af9e-0da8c53389d7"}, {"dtype": "compas.geometry/Point", "value": [0.014999999999999999, 0.0085000000000000006, -0.012], "guid": "9e1751fb-2078-4a7c-b257-e8094f8d996d"}, {"dtype": "compas.geometry/Point", "value": [0.014999999999999999, -0.0085000000000000006, -0.012], "guid": "cfe261a6-7042-451b-b2e1-533ab90e68c6"}, {"dtype": "compas.geometry/Point", "value": [-0.014999999999999999, -0.0085000000000000006, 0.0], "guid": "2b8c552b-5723-4e8e-a460-1b8af9b29d9b"}, {"dtype": "compas.geometry/Point", "value": [0.014999999999999999, -0.0085000000000000006, 0.0], "guid": "dd6df4f0-0580-4d79-a11b-f55eda02ca29"}, {"dtype": "compas.geometry/Point", "value": [0.014999999999999999, 0.0085000000000000006, 0.0], "guid": "592e3cd2-c580-4097-a8cd-02ec00836163"}, {"dtype": "compas.geometry/Point", "value": [-0.014999999999999999, 0.0085000000000000006, 0.0], "guid": "b0464df9-be50-4862-b95a-7134d645c933"}]}, "frame": {"yaxis": [-0.91078094457774394, -0.41288990178263335, 0.0], "xaxis": [0.41288990178263335, -0.91078094457774394, 0.0], "point": [0.069323536301058961, 0.034928268988185164, 0.041331501731473999]}, "attributes": {"ysize": 0.017000000000000001, "xsize": 0.029999999999999999, "n": 2, "course": 3, "name": "Part", "zsize": 0.012}, "key": 19, "transformations": [], "features": []}, "guid": "42fc3293-ef1b-4801-807f-2274e67f8f59"}}, "11": {"part": {"dtype": "compas.datastructures/Part", "value": {"shape": {"faces": [[0, 1, 2], [0, 2, 3], [0, 3, 5], [0, 5, 4], [3, 2, 6], [3, 6, 5], [2, 1, 7], [2, 7, 6], [1, 0, 4], [1, 4, 7], [4, 5, 6], [4, 6, 7]], "vertices": [{"dtype": "compas.geometry/Point", "value": [-0.0074999999999999997, -0.0085000000000000006, -0.012], "guid": "1cd311fe-6a62-4398-aa85-6243d7708138"}, {"dtype": "compas.geometry/Point", "value": [-0.0074999999999999997, 0.0085000000000000006, -0.012], "guid": "9c905174-018d-4262-82bf-35a4813e6c73"}, {"dtype": "compas.geometry/Point", "value": [0.0074999999999999997, 0.0085000000000000006, -0.012], "guid": "06f92096-c51c-4185-9f43-ab62639fae61"}, {"dtype": "compas.geometry/Point", "value": [0.0074999999999999997, -0.0085000000000000006, -0.012], "guid": "945cb030-4d51-44e8-bea9-e266fa9cbf05"}, {"dtype": "compas.geometry/Point", "value": [-0.0074999999999999997, -0.0085000000000000006, 0.0], "guid": "2cc0a960-793a-4792-8ad7-d6cc82dda435"}, {"dtype": "compas.geometry/Point", "value": [0.0074999999999999997, -0.0085000000000000006, 0.0], "guid": "5585944b-5173-4d20-b28c-d7b350ef4954"}, {"dtype": "compas.geometry/Point", "value": [0.0074999999999999997, 0.0085000000000000006, 0.0], "guid": "d0d608d5-fa4c-4ec7-afaa-3e32461516c4"}, {"dtype": "compas.geometry/Point", "value": [-0.0074999999999999997, 0.0085000000000000006, 0.0], "guid": "658b1432-b100-4969-b678-211ad2dc03ff"}]}, "frame": {"yaxis": [-0.99544092618652491, 0.095380094741583599, 0.0], "xaxis": [-0.095380094741583599, -0.99544092618652491, 0.0], "point": [0.050872059741417133, 0.10826974233605591, 0.027802592236588999]}, "attributes": {"ysize": 0.017000000000000001, "xsize": 0.014999999999999999, "n": 0, "course": 2, "name": "Part", "zsize": 0.012}, "key": 11, "transformations": [], "features": []}, "guid": "0f76baa4-be74-4ca6-a397-76262f708219"}}, "5": {"part": {"dtype": "compas.datastructures/Part", "value": {"shape": {"faces": [[0, 1, 2], [0, 2, 3], [0, 3, 5], [0, 5, 4], [3, 2, 6], [3, 6, 5], [2, 1, 7], [2, 7, 6], [1, 0, 4], [1, 4, 7], [4, 5, 6], [4, 6, 7]], "vertices": [{"dtype": "compas.geometry/Point", "value": [-0.0074999999999999997, -0.0085000000000000006, -0.012], "guid": "c69c36cf-baf4-4156-b59c-643a996df585"}, {"dtype": "compas.geometry/Point", "value": [-0.0074999999999999997, 0.0085000000000000006, -0.012], "guid": "b59316ef-ec1d-4151-bacc-557917d7ee7b"}, {"dtype": "compas.geometry/Point", "value": [0.0074999999999999997, 0.0085000000000000006, -0.012], "guid": "a9768f96-16d6-4e7c-ba84-a18487ec26c1"}, {"dtype": "compas.geometry/Point", "value": [0.0074999999999999997, -0.0085000000000000006, -0.012], "guid": "1477b350-4bc4-4832-9543-0400ee3623c5"}, {"dtype": "compas.geometry/Point", "value": [-0.0074999999999999997, -0.0085000000000000006, 0.0], "guid": "8062d3f5-17e6-48a1-b835-8e14dd95395d"}, {"dtype": "compas.geometry/Point", "value": [0.0074999999999999997, -0.0085000000000000006, 0.0], "guid": "f05b9a7b-be02-4c6f-aea6-b407e3597a95"}, {"dtype": "compas.geometry/Point", "value": [0.0074999999999999997, 0.0085000000000000006, 0.0], "guid": "ae97015f-54ab-4b57-8b89-353c4c0973fd"}, {"dtype": "compas.geometry/Point", "value": [-0.0074999999999999997, 0.0085000000000000006, 0.0], "guid": "f9d1c2ba-f03b-4cfe-b1d9-d26925e01ef8"}]}, "frame": {"yaxis": [-0.95605247687018402, -0.29319560274735779, 0.0], "xaxis": [0.29319560274735779, -0.95605247687018402, -0.0], "point": [0.12352986875478771, -0.01849662794337591, 0.00074477324681896523]}, "attributes": {"ysize": 0.017000000000000001, "xsize": 0.014999999999999999, "n": 5, "course": 0, "name": "Part", "zsize": 0.012}, "key": 5, "transformations": [], "features": []}, "guid": "bd93a81e-0451-4279-9a52-0169183074a9"}}, "4": {"part": {"dtype": "compas.datastructures/Part", "value": {"shape": {"faces": [[0, 1, 2], [0, 2, 3], [0, 3, 5], [0, 5, 4], [3, 2, 6], [3, 6, 5], [2, 1, 7], [2, 7, 6], [1, 0, 4], [1, 4, 7], [4, 5, 6], [4, 6, 7]], "vertices": [{"dtype": "compas.geometry/Point", "value": [-0.014999999999999999, -0.0085000000000000006, -0.012], "guid": "41b35b9f-24b7-4fac-baa4-9565263d0b70"}, {"dtype": "compas.geometry/Point", "value": [-0.014999999999999999, 0.0085000000000000006, -0.012], "guid": "4507738c-88e3-42d8-b7cd-a0f06da4afe6"}, {"dtype": "compas.geometry/Point", "value": [0.014999999999999999, 0.0085000000000000006, -0.012], "guid": "2f525333-fb8b-44b8-97b5-6870d7f19a47"}, {"dtype": "compas.geometry/Point", "value": [0.014999999999999999, -0.0085000000000000006, -0.012], "guid": "f109ba3c-0162-4212-97cd-dfcaac6292c2"}, {"dtype": "compas.geometry/Point", "value": [-0.014999999999999999, -0.0085000000000000006, 0.0], "guid": "4bdfe006-1234-411e-b3dd-da513478e991"}, {"dtype": "compas.geometry/Point", "value": [0.014999999999999999, -0.0085000000000000006, 0.0], "guid": "003b3b0b-f360-4948-a7e2-f6c4fc1a4baf"}, {"dtype": "compas.geometry/Point", "value": [0.014999999999999999, 0.0085000000000000006, 0.0], "guid": "cd78de27-384d-4e8f-bd4f-a755e3f36112"}, {"dtype": "compas.geometry/Point", "value": [-0.014999999999999999, 0.0085000000000000006, 0.0], "guid": "105457b2-8bb6-4255-9eaf-082de9b82dbb"}]}, "frame": {"yaxis": [-0.69635751891371611, -0.7176950646704584, 0.0], "xaxis": [0.7176950646704584, -0.69635751891371611, -0.0], "point": [0.10830450928352861, 0.0031144235930424648, 0.00074477324681896523]}, "attributes": {"ysize": 0.017000000000000001, "xsize": 0.029999999999999999, "n": 4, "course": 0, "name": "Part", "zsize": 0.012}, "key": 4, "transformations": [], "features": []}, "guid": "0ea019cb-3e95-450a-b537-fff003234c93"}}, "7": {"part": {"dtype": "compas.datastructures/Part", "value": {"shape": {"faces": [[0, 1, 2], [0, 2, 3], [0, 3, 5], [0, 5, 4], [3, 2, 6], [3, 6, 5], [2, 1, 7], [2, 7, 6], [1, 0, 4], [1, 4, 7], [4, 5, 6], [4, 6, 7]], "vertices": [{"dtype": "compas.geometry/Point", "value": [-0.014999999999999999, -0.0085000000000000006, -0.012], "guid": "f78e07dd-daff-45cc-b7bf-5a8c1c1cabbb"}, {"dtype": "compas.geometry/Point", "value": [-0.014999999999999999, 0.0085000000000000006, -0.012], "guid": "a4f9b747-2a3d-43a2-aed7-a6add512f3c3"}, {"dtype": "compas.geometry/Point", "value": [0.014999999999999999, 0.0085000000000000006, -0.012], "guid": "d7ad8e02-9a84-476e-94f9-401d209fd5d6"}, {"dtype": "compas.geometry/Point", "value": [0.014999999999999999, -0.0085000000000000006, -0.012], "guid": "368d3066-b79f-45d0-a825-3d409bb6fee6"}, {"dtype": "compas.geometry/Point", "value": [-0.014999999999999999, -0.0085000000000000006, 0.0], "guid": "de59bbdd-f252-45c4-8e22-65ff88811eb6"}, {"dtype": "compas.geometry/Point", "value": [0.014999999999999999, -0.0085000000000000006, 0.0], "guid": "cf3c207d-4d7b-4e64-b287-fe4c05d4ae3e"}, {"dtype": "compas.geometry/Point", "value": [0.014999999999999999, 0.0085000000000000006, 0.0], "guid": "65e77f1b-ac14-4943-a113-33dadc14ed8f"}, {"dtype": "compas.geometry/Point", "value": [-0.014999999999999999, 0.0085000000000000006, 0.0], "guid": "ac942948-6024-4f88-ac84-f0ac2981b4ac"}]}, "frame": {"yaxis": [-0.94442848559679127, -0.32871695361412617, 0.0], "xaxis": [0.32871695361412617, -0.94442848559679127, 0.0], "point": [0.051157012585596642, 0.06664468820144924, 0.014273682741703981]}, "attributes": {"ysize": 0.017000000000000001, "xsize": 0.029999999999999999, "n": 1, "course": 1, "name": "Part", "zsize": 0.012}, "key": 7, "transformations": [], "features": []}, "guid": "a89c85bd-76bd-477d-8488-726b56b6be12"}}, "6": {"part": {"dtype": "compas.datastructures/Part", "value": {"shape": {"faces": [[0, 1, 2], [0, 2, 3], [0, 3, 5], [0, 5, 4], [3, 2, 6], [3, 6, 5], [2, 1, 7], [2, 7, 6], [1, 0, 4], [1, 4, 7], [4, 5, 6], [4, 6, 7]], "vertices": [{"dtype": "compas.geometry/Point", "value": [-0.014999999999999999, -0.0085000000000000006, -0.012], "guid": "89451014-7eb1-4bd2-bc4c-a157a4e093ac"}, {"dtype": "compas.geometry/Point", "value": [-0.014999999999999999, 0.0085000000000000006, -0.012], "guid": "d8ff8bc4-427a-4b96-b4f8-015216ffa8a7"}, {"dtype": "compas.geometry/Point", "value": [0.014999999999999999, 0.0085000000000000006, -0.012], "guid": "ed551d26-e7a8-4eb8-b129-382d283326af"}, {"dtype": "compas.geometry/Point", "value": [0.014999999999999999, -0.0085000000000000006, -0.012], "guid": "d5f6de82-f707-4722-ad40-09a1611e9098"}, {"dtype": "compas.geometry/Point", "value": [-0.014999999999999999, -0.0085000000000000006, 0.0], "guid": "a49e13e9-7aa9-439b-8f3f-76a0fb280bab"}, {"dtype": "compas.geometry/Point", "value": [0.014999999999999999, -0.0085000000000000006, 0.0], "guid": "2cb30faf-a1ff-4678-b1c0-1ef4fda0e40c"}, {"dtype": "compas.geometry/Point", "value": [0.014999999999999999, 0.0085000000000000006, 0.0], "guid": "73f95313-e2d2-4d63-b317-a6bc7ed712b2"}, {"dtype": "compas.geometry/Point", "value": [-0.014999999999999999, 0.0085000000000000006, 0.0], "guid": "9f388589-ea0c-4ed8-b198-07ddb91f068b"}]}, "frame": {"yaxis": [-0.97626359831325449, 0.21658574885817555, 0.0], "xaxis": [-0.21658574885817555, -0.97626359831325449, 2.8798161907697051e-17], "point": [0.049259482689558952, 0.10048217294000565, 0.014273682741703975]}, "attributes": {"ysize": 0.017000000000000001, "xsize": 0.029999999999999999, "n": 0, "course": 1, "name": "Part", "zsize": 0.012}, "key": 6, "transformations": [], "features": []}, "guid": "469f4a41-7bd8-412f-9599-c56aa2b0160b"}}, "1": {"part": {"dtype": "compas.datastructures/Part", "value": {"shape": {"faces": [[0, 1, 2], [0, 2, 3], [0, 3, 5], [0, 5, 4], [3, 2, 6], [3, 6, 5], [2, 1, 7], [2, 7, 6], [1, 0, 4], [1, 4, 7], [4, 5, 6], [4, 6, 7]], "vertices": [{"dtype": "compas.geometry/Point", "value": [-0.014999999999999999, -0.0085000000000000006, -0.012], "guid": "9a106a34-0dbc-4366-a7b5-75c340f026d9"}, {"dtype": "compas.geometry/Point", "value": [-0.014999999999999999, 0.0085000000000000006, -0.012], "guid": "0795ed2f-cd98-4d96-a63c-31920e5ceddf"}, {"dtype": "compas.geometry/Point", "value": [0.014999999999999999, 0.0085000000000000006, -0.012], "guid": "ae3a2ac5-3ad2-4d6d-9d08-2d4c75fd99f3"}, {"dtype": "compas.geometry/Point", "value": [0.014999999999999999, -0.0085000000000000006, -0.012], "guid": "2d80794c-3553-4264-a38b-44b81771ff32"}, {"dtype": "compas.geometry/Point", "value": [-0.014999999999999999, -0.0085000000000000006, 0.0], "guid": "bd3e7054-7cbb-4c69-b754-d6d62c1dee69"}, {"dtype": "compas.geometry/Point", "value": [0.014999999999999999, -0.0085000000000000006, 0.0], "guid": "2e3e10ca-02db-4aea-ae04-236bb747e9ba"}, {"dtype": "compas.geometry/Point", "value": [0.014999999999999999, 0.0085000000000000006, 0.0], "guid": "09a42194-d3c9-4b10-8bef-7f6050d2dc9e"}, {"dtype": "compas.geometry/Point", "value": [-0.014999999999999999, 0.0085000000000000006, 0.0], "guid": "a53f4a60-5ac8-4769-9720-e1bc2bea86af"}]}, "frame": {"yaxis": [-0.9987706220792546, 0.049570600878130998, 0.0], "xaxis": [-0.049570600878130998, -0.9987706220792546, 0.0], "point": [0.044497099434879707, 0.084221355017665825, 0.00074477324681896523]}, "attributes": {"ysize": 0.017000000000000001, "xsize": 0.029999999999999999, "n": 1, "course": 0, "name": "Part", "zsize": 0.012}, "key": 1, "transformations": [], "features": []}, "guid": "da2393f9-1982-4705-b6b9-ccb7f76137c8"}}, "0": {"part": {"dtype": "compas.datastructures/Part", "value": {"shape": {"faces": [[0, 1, 2], [0, 2, 3], [0, 3, 5], [0, 5, 4], [3, 2, 6], [3, 6, 5], [2, 1, 7], [2, 7, 6], [1, 0, 4], [1, 4, 7], [4, 5, 6], [4, 6, 7]], "vertices": [{"dtype": "compas.geometry/Point", "value": [-0.0074999999999999997, -0.0085000000000000006, -0.012], "guid": "eb99e222-16ae-4d5a-bd5e-d2482a13902e"}, {"dtype": "compas.geometry/Point", "value": [-0.0074999999999999997, 0.0085000000000000006, -0.012], "guid": "47b0d396-ac7a-4049-bb7f-d882ef80c3bc"}, {"dtype": "compas.geometry/Point", "value": [0.0074999999999999997, 0.0085000000000000006, -0.012], "guid": "fbb6522d-393f-46b1-8c6d-30250d2fbd8a"}, {"dtype": "compas.geometry/Point", "value": [0.0074999999999999997, -0.0085000000000000006, -0.012], "guid": "989acdf5-a5d7-40e4-9a41-950bf018dad3"}, {"dtype": "compas.geometry/Point", "value": [-0.0074999999999999997, -0.0085000000000000006, 0.0], "guid": "0dd839ee-1164-44ff-bb12-2524d21c316c"}, {"dtype": "compas.geometry/Point", "value": [0.0074999999999999997, -0.0085000000000000006, 0.0], "guid": "20211e17-1a76-414a-b180-48952d09dcc6"}, {"dtype": "compas.geometry/Point", "value": [0.0074999999999999997, 0.0085000000000000006, 0.0], "guid": "ef15bf0a-c357-4520-9127-7984bd9c2188"}, {"dtype": "compas.geometry/Point", "value": [-0.0074999999999999997, 0.0085000000000000006, 0.0], "guid": "139569fa-500e-477a-be73-e62f87a7a195"}]}, "frame": {"yaxis": [-0.86110412971241002, 0.50842863588927911, 0.0], "xaxis": [-0.50842863588927911, -0.86110412971241002, 0.0], "point": [0.052749926292902448, 0.1093457100476844, 0.00074477324681896523]}, "attributes": {"ysize": 0.017000000000000001, "xsize": 0.014999999999999999, "n": 0, "course": 0, "name": "Part", "zsize": 0.012}, "key": 0, "transformations": [], "features": []}, "guid": "71dec74a-adae-4b66-a7da-db49b15e8ce5"}}, "3": {"part": {"dtype": "compas.datastructures/Part", "value": {"shape": {"faces": [[0, 1, 2], [0, 2, 3], [0, 3, 5], [0, 5, 4], [3, 2, 6], [3, 6, 5], [2, 1, 7], [2, 7, 6], [1, 0, 4], [1, 4, 7], [4, 5, 6], [4, 6, 7]], "vertices": [{"dtype": "compas.geometry/Point", "value": [-0.014999999999999999, -0.0085000000000000006, -0.012], "guid": "3f3787f8-ffde-470f-9dc3-7d16d507d1a8"}, {"dtype": "compas.geometry/Point", "value": [-0.014999999999999999, 0.0085000000000000006, -0.012], "guid": "eeb005e0-1ce5-4dae-b9b8-27cb8d31f2bf"}, {"dtype": "compas.geometry/Point", "value": [0.014999999999999999, 0.0085000000000000006, -0.012], "guid": "109d4d32-3a5d-4529-ae6b-35b4edc0917c"}, {"dtype": "compas.geometry/Point", "value": [0.014999999999999999, -0.0085000000000000006, -0.012], "guid": "33a434fa-3c88-4c76-afd5-46ba1f019749"}, {"dtype": "compas.geometry/Point", "value": [-0.014999999999999999, -0.0085000000000000006, 0.0], "guid": "46705f67-5d70-4d30-9f08-c678d874f09d"}, {"dtype": "compas.geometry/Point", "value": [0.014999999999999999, -0.0085000000000000006, 0.0], "guid": "b68a198f-cc5a-4cad-9430-f69766ba13cb"}, {"dtype": "compas.geometry/Point", "value": [0.014999999999999999, 0.0085000000000000006, 0.0], "guid": "98df1211-8cf5-4b71-82f6-ebc8d249adae"}, {"dtype": "compas.geometry/Point", "value": [-0.014999999999999999, 0.0085000000000000006, 0.0], "guid": "4cc7965b-6efe-41f8-a8d8-021783f2d451"}]}, "frame": {"yaxis": [-0.64407349564718974, -0.76496361495486154, 0.0], "xaxis": [0.76496361495486154, -0.64407349564718974, -0.0], "point": [0.081267634069731934, 0.026275651749785214, 0.00074477324681896523]}, "attributes": {"ysize": 0.017000000000000001, "xsize": 0.029999999999999999, "n": 3, "course": 0, "name": "Part", "zsize": 0.012}, "key": 3, "transformations": [], "features": []}, "guid": "e555cdae-ca08-42c2-9e61-119e3b0fe6ad"}}, "2": {"part": {"dtype": "compas.datastructures/Part", "value": {"shape": {"faces": [[0, 1, 2], [0, 2, 3], [0, 3, 5], [0, 5, 4], [3, 2, 6], [3, 6, 5], [2, 1, 7], [2, 7, 6], [1, 0, 4], [1, 4, 7], [4, 5, 6], [4, 6, 7]], "vertices": [{"dtype": "compas.geometry/Point", "value": [-0.014999999999999999, -0.0085000000000000006, -0.012], "guid": "59fa51f8-5b84-4488-8bed-0cca6409ce0c"}, {"dtype": "compas.geometry/Point", "value": [-0.014999999999999999, 0.0085000000000000006, -0.012], "guid": "16572072-17f6-438e-9d63-090c99142eb3"}, {"dtype": "compas.geometry/Point", "value": [0.014999999999999999, 0.0085000000000000006, -0.012], "guid": "399d9f39-3fed-4a62-89e1-f9f7febecae0"}, {"dtype": "compas.geometry/Point", "value": [0.014999999999999999, -0.0085000000000000006, -0.012], "guid": "7fd12fce-95e8-4e5b-88e5-659756a64ae1"}, {"dtype": "compas.geometry/Point", "value": [-0.014999999999999999, -0.0085000000000000006, 0.0], "guid": "6f59e206-a5d5-46cc-abbf-40f7bb5c2176"}, {"dtype": "compas.geometry/Point", "value": [0.014999999999999999, -0.0085000000000000006, 0.0], "guid": "b6a678f2-28ca-4a73-9039-4372421f3d54"}, {"dtype": "compas.geometry/Point", "value": [0.014999999999999999, 0.0085000000000000006, 0.0], "guid": "8ab4bf0d-1b34-4afe-95df-83b4b7b1d4cc"}, {"dtype": "compas.geometry/Point", "value": [-0.014999999999999999, 0.0085000000000000006, 0.0], "guid": "9f0a8978-a8a1-4c79-b430-557884c95911"}]}, "frame": {"yaxis": [-0.79767203563418865, -0.60309147197353874, 0.0], "xaxis": [0.60309147197353874, -0.79767203563418865, 2.8813979785350807e-18], "point": [0.056079229235491607, 0.05134265514437833, 0.0007447732468189648]}, "attributes": {"ysize": 0.017000000000000001, "xsize": 0.029999999999999999, "n": 2, "course": 0, "name": "Part", "zsize": 0.012}, "key": 2, "transformations": [], "features": []}, "guid": "7b36fe7d-1b15-4aa5-91a9-8a88008f6268"}}, "21": {"part": {"dtype": "compas.datastructures/Part", "value": {"shape": {"faces": [[0, 1, 2], [0, 2, 3], [0, 3, 5], [0, 5, 4], [3, 2, 6], [3, 6, 5], [2, 1, 7], [2, 7, 6], [1, 0, 4], [1, 4, 7], [4, 5, 6], [4, 6, 7]], "vertices": [{"dtype": "compas.geometry/Point", "value": [-0.014999999999999999, -0.0085000000000000006, -0.012], "guid": "2640fdcf-375a-4a4e-9496-0cb3c909b0cf"}, {"dtype": "compas.geometry/Point", "value": [-0.014999999999999999, 0.0085000000000000006, -0.012], "guid": "16fd22af-317c-47b6-8865-1608eb312fb4"}, {"dtype": "compas.geometry/Point", "value": [0.014999999999999999, 0.0085000000000000006, -0.012], "guid": "c52351e7-3158-410d-8939-c351c8a3c92d"}, {"dtype": "compas.geometry/Point", "value": [0.014999999999999999, -0.0085000000000000006, -0.012], "guid": "3add1d69-1d89-4b54-b489-67748f450544"}, {"dtype": "compas.geometry/Point", "value": [-0.014999999999999999, -0.0085000000000000006, 0.0], "guid": "a25ebc95-a498-4484-8342-92be81fc3b6b"}, {"dtype": "compas.geometry/Point", "value": [0.014999999999999999, -0.0085000000000000006, 0.0], "guid": "b1965a01-d6f6-45dd-a6cb-6f05706e501a"}, {"dtype": "compas.geometry/Point", "value": [0.014999999999999999, 0.0085000000000000006, 0.0], "guid": "fa1834d4-3b4c-45c2-8373-441ba31c550e"}, {"dtype": "compas.geometry/Point", "value": [-0.014999999999999999, 0.0085000000000000006, 0.0], "guid": "a97c2d25-7aa2-4aa3-b84d-41652727c800"}]}, "frame": {"yaxis": [-0.62221302732101569, -0.78284797287341623, 0.0], "xaxis": [0.78284797287341623, -0.62221302732101569, -0.0], "point": [0.11093165389685039, -0.017361588017759708, 0.041331501731474006]}, "attributes": {"ysize": 0.017000000000000001, "xsize": 0.029999999999999999, "n": 4, "course": 3, "name": "Part", "zsize": 0.012}, "key": 21, "transformations": [], "features": []}, "guid": "c9113ec9-d604-4139-afc5-5fcfb0d67d03"}}, "9": {"part": {"dtype": "compas.datastructures/Part", "value": {"shape": {"faces": [[0, 1, 2], [0, 2, 3], [0, 3, 5], [0, 5, 4], [3, 2, 6], [3, 6, 5], [2, 1, 7], [2, 7, 6], [1, 0, 4], [1, 4, 7], [4, 5, 6], [4, 6, 7]], "vertices": [{"dtype": "compas.geometry/Point", "value": [-0.014999999999999999, -0.0085000000000000006, -0.012], "guid": "57ed2a29-e6af-45ec-b81e-5d90e68f652e"}, {"dtype": "compas.geometry/Point", "value": [-0.014999999999999999, 0.0085000000000000006, -0.012], "guid": "4dda74e7-3fab-4e13-8cb4-1d5031249f8b"}, {"dtype": "compas.geometry/Point", "value": [0.014999999999999999, 0.0085000000000000006, -0.012], "guid": "c5c2a210-6313-429b-a21f-7500dafd6ba5"}, {"dtype": "compas.geometry/Point", "value": [0.014999999999999999, -0.0085000000000000006, -0.012], "guid": "cdeefd0a-54ba-42e0-a394-53e55996dd36"}, {"dtype": "compas.geometry/Point", "value": [-0.014999999999999999, -0.0085000000000000006, 0.0], "guid": "f7a35086-7349-497c-a3db-db0721e9c176"}, {"dtype": "compas.geometry/Point", "value": [0.014999999999999999, -0.0085000000000000006, 0.0], "guid": "3f181e6d-a232-42ef-adc3-b473ce929e65"}, {"dtype": "compas.geometry/Point", "value": [0.014999999999999999, 0.0085000000000000006, 0.0], "guid": "7af6af9b-ab4a-4159-84ee-5ae7297b5ec4"}, {"dtype": "compas.geometry/Point", "value": [-0.014999999999999999, 0.0085000000000000006, 0.0], "guid": "dfc47f4c-0814-430d-aee6-e0bc7bb4d987"}]}, "frame": {"yaxis": [-0.69964480011667418, -0.71449083525941692, 0.0], "xaxis": [0.71449083525941692, -0.69964480011667418, -0.0], "point": [0.09246910707441762, 0.012554074770051316, 0.014273682741703982]}, "attributes": {"ysize": 0.017000000000000001, "xsize": 0.029999999999999999, "n": 3, "course": 1, "name": "Part", "zsize": 0.012}, "key": 9, "transformations": [], "features": []}, "guid": "1b443720-04b0-4289-8ade-ba8d90bb3f86"}}, "8": {"part": {"dtype": "compas.datastructures/Part", "value": {"shape": {"faces": [[0, 1, 2], [0, 2, 3], [0, 3, 5], [0, 5, 4], [3, 2, 6], [3, 6, 5], [2, 1, 7], [2, 7, 6], [1, 0, 4], [1, 4, 7], [4, 5, 6], [4, 6, 7]], "vertices": [{"dtype": "compas.geometry/Point", "value": [-0.014999999999999999, -0.0085000000000000006, -0.012], "guid": "e2704d64-f34b-46ed-98e1-985fabd5e1aa"}, {"dtype": "compas.geometry/Point", "value": [-0.014999999999999999, 0.0085000000000000006, -0.012], "guid": "cc6d1079-b666-42c1-92f8-5b73ed7d2640"}, {"dtype": "compas.geometry/Point", "value": [0.014999999999999999, 0.0085000000000000006, -0.012], "guid": "c3333502-ba4a-4393-8909-0eb5c62427f6"}, {"dtype": "compas.geometry/Point", "value": [0.014999999999999999, -0.0085000000000000006, -0.012], "guid": "f0460d78-0962-422e-b715-8c1e6c752468"}, {"dtype": "compas.geometry/Point", "value": [-0.014999999999999999, -0.0085000000000000006, 0.0], "guid": "04db9ec6-826e-40ad-b2c2-16226f681aae"}, {"dtype": "compas.geometry/Point", "value": [0.014999999999999999, -0.0085000000000000006, 0.0], "guid": "b2282f89-614f-48b2-aa45-b7456b260dcc"}, {"dtype": "compas.geometry/Point", "value": [0.014999999999999999, 0.0085000000000000006, 0.0], "guid": "410a95eb-75ff-406c-9ceb-028679f4acab"}, {"dtype": "compas.geometry/Point", "value": [-0.014999999999999999, 0.0085000000000000006, 0.0], "guid": "0f992f26-f8a5-4ac6-aa41-f61c7ddef5ca"}]}, "frame": {"yaxis": [-0.76811357223363341, -0.64031362639763245, 0.0], "xaxis": [0.64031362639763245, -0.76811357223363341, 0.0], "point": [0.068740274373774349, 0.037360768848191353, 0.014273682741703979]}, "attributes": {"ysize": 0.017000000000000001, "xsize": 0.029999999999999999, "n": 2, "course": 1, "name": "Part", "zsize": 0.012}, "key": 8, "transformations": [], "features": []}, "guid": "5711f498-802b-4355-86cf-6cbb3633c3a6"}}, "14": {"part": {"dtype": "compas.datastructures/Part", "value": {"shape": {"faces": [[0, 1, 2], [0, 2, 3], [0, 3, 5], [0, 5, 4], [3, 2, 6], [3, 6, 5], [2, 1, 7], [2, 7, 6], [1, 0, 4], [1, 4, 7], [4, 5, 6], [4, 6, 7]], "vertices": [{"dtype": "compas.geometry/Point", "value": [-0.014999999999999999, -0.0085000000000000006, -0.012], "guid": "6098f06f-87c0-4184-bbea-4210b17a90f7"}, {"dtype": "compas.geometry/Point", "value": [-0.014999999999999999, 0.0085000000000000006, -0.012], "guid": "80b6cb34-4ff0-4667-918e-c5e0981b3e6f"}, {"dtype": "compas.geometry/Point", "value": [0.014999999999999999, 0.0085000000000000006, -0.012], "guid": "91ed4760-4709-426e-a1bf-b75aecadc557"}, {"dtype": "compas.geometry/Point", "value": [0.014999999999999999, -0.0085000000000000006, -0.012], "guid": "d3c38593-1d0b-406a-a597-abf8bd01ae35"}, {"dtype": "compas.geometry/Point", "value": [-0.014999999999999999, -0.0085000000000000006, 0.0], "guid": "34ddc68b-7cd2-46f9-9657-481d0b8234a8"}, {"dtype": "compas.geometry/Point", "value": [0.014999999999999999, -0.0085000000000000006, 0.0], "guid": "4e1aa55a-f4ed-4f47-8a1e-19a9e613d717"}, {"dtype": "compas.geometry/Point", "value": [0.014999999999999999, 0.0085000000000000006, 0.0], "guid": "49ee738d-aa0f-4145-bd08-0d3b5ca8c95a"}, {"dtype": "compas.geometry/Point", "value": [-0.014999999999999999, 0.0085000000000000006, 0.0], "guid": "41f4c2e6-7d31-47ad-b074-f8528aa9b058"}]}, "frame": {"yaxis": [-0.78826653113436862, -0.61533395477040709, 0.0], "xaxis": [0.61533395477040709, -0.78826653113436862, -0.0], "point": [0.079076939985443628, 0.022473524670220919, 0.027802592236588999]}, "attributes": {"ysize": 0.017000000000000001, "xsize": 0.029999999999999999, "n": 3, "course": 2, "name": "Part", "zsize": 0.012}, "key": 14, "transformations": [], "features": []}, "guid": "70607f63-ffbe-4df9-8c4b-8e41d412ebb3"}}, "24": {"part": {"dtype": "compas.datastructures/Part", "value": {"shape": {"faces": [[0, 1, 2], [0, 2, 3], [0, 3, 5], [0, 5, 4], [3, 2, 6], [3, 6, 5], [2, 1, 7], [2, 7, 6], [1, 0, 4], [1, 4, 7], [4, 5, 6], [4, 6, 7]], "vertices": [{"dtype": "compas.geometry/Point", "value": [-0.014999999999999999, -0.0085000000000000006, -0.012], "guid": "1497e509-918d-473c-8d11-0c70e1f0e5a4"}, {"dtype": "compas.geometry/Point", "value": [-0.014999999999999999, 0.0085000000000000006, -0.012], "guid": "29db882d-9d59-4367-835f-65a84f496d34"}, {"dtype": "compas.geometry/Point", "value": [0.014999999999999999, 0.0085000000000000006, -0.012], "guid": "9ab99983-f1ef-4e16-b58e-1fdd161c6221"}, {"dtype": "compas.geometry/Point", "value": [0.014999999999999999, -0.0085000000000000006, -0.012], "guid": "fc78857d-e5b0-4cd1-b585-a6c0617a2c11"}, {"dtype": "compas.geometry/Point", "value": [-0.014999999999999999, -0.0085000000000000006, 0.0], "guid": "76ecdad1-fc18-4dd6-82fb-d3b8240400f2"}, {"dtype": "compas.geometry/Point", "value": [0.014999999999999999, -0.0085000000000000006, 0.0], "guid": "35a081be-a766-4678-b683-cd85589cd08f"}, {"dtype": "compas.geometry/Point", "value": [0.014999999999999999, 0.0085000000000000006, 0.0], "guid": "846134cd-3629-4d34-a35f-c67c0a846349"}, {"dtype": "compas.geometry/Point", "value": [-0.014999999999999999, 0.0085000000000000006, 0.0], "guid": "d4686b5a-871c-4a1e-8490-419aeb6eb2d4"}]}, "frame": {"yaxis": [-0.98291819708038031, -0.18404297826392294, 0.0], "xaxis": [0.18404297826392294, -0.98291819708038031, 0.0], "point": [0.065030673901233405, 0.050619321727930017, 0.054860411226359033]}, "attributes": {"ysize": 0.017000000000000001, "xsize": 0.029999999999999999, "n": 2, "course": 4, "name": "Part", "zsize": 0.012}, "key": 24, "transformations": [], "features": []}, "guid": "7615b02c-2fa8-46d3-858b-1771e11c4971"}}, "13": {"part": {"dtype": "compas.datastructures/Part", "value": {"shape": {"faces": [[0, 1, 2], [0, 2, 3], [0, 3, 5], [0, 5, 4], [3, 2, 6], [3, 6, 5], [2, 1, 7], [2, 7, 6], [1, 0, 4], [1, 4, 7], [4, 5, 6], [4, 6, 7]], "vertices": [{"dtype": "compas.geometry/Point", "value": [-0.014999999999999999, -0.0085000000000000006, -0.012], "guid": "d5250427-52f6-4459-877f-781fdad7d849"}, {"dtype": "compas.geometry/Point", "value": [-0.014999999999999999, 0.0085000000000000006, -0.012], "guid": "4797db89-d77a-4a56-9395-4b34519066fb"}, {"dtype": "compas.geometry/Point", "value": [0.014999999999999999, 0.0085000000000000006, -0.012], "guid": "8a158f53-e0de-49ad-b0ba-0a922669821d"}, {"dtype": "compas.geometry/Point", "value": [0.014999999999999999, -0.0085000000000000006, -0.012], "guid": "c479e8d6-2943-43f0-9fc1-e93f1fd54b47"}, {"dtype": "compas.geometry/Point", "value": [-0.014999999999999999, -0.0085000000000000006, 0.0], "guid": "b12f72f9-80d4-4d4b-8066-38249967c65b"}, {"dtype": "compas.geometry/Point", "value": [0.014999999999999999, -0.0085000000000000006, 0.0], "guid": "4603dbe5-45e4-4544-8fe8-a1b191e33c41"}, {"dtype": "compas.geometry/Point", "value": [0.014999999999999999, 0.0085000000000000006, 0.0], "guid": "487ee500-60e9-4962-a369-6977d61dc0ef"}, {"dtype": "compas.geometry/Point", "value": [-0.014999999999999999, 0.0085000000000000006, 0.0], "guid": "7f96fe56-3346-4050-bda8-6113e830bc2f"}]}, "frame": {"yaxis": [-0.90188201902954113, -0.43198243454010776, 0.0], "xaxis": [0.43198243454010776, -0.90188201902954113, 0.0], "point": [0.061053933539858322, 0.050900128910657302, 0.027802592236588999]}, "attributes": {"ysize": 0.017000000000000001, "xsize": 0.029999999999999999, "n": 2, "course": 2, "name": "Part", "zsize": 0.012}, "key": 13, "transformations": [], "features": []}, "guid": "140f54a5-8b17-4ae0-ba15-d1342d81e9fe"}}, "23": {"part": {"dtype": "compas.datastructures/Part", "value": {"shape": {"faces": [[0, 1, 2], [0, 2, 3], [0, 3, 5], [0, 5, 4], [3, 2, 6], [3, 6, 5], [2, 1, 7], [2, 7, 6], [1, 0, 4], [1, 4, 7], [4, 5, 6], [4, 6, 7]], "vertices": [{"dtype": "compas.geometry/Point", "value": [-0.014999999999999999, -0.0085000000000000006, -0.012], "guid": "ede7eccd-b0ca-455e-97dc-5e960277a45f"}, {"dtype": "compas.geometry/Point", "value": [-0.014999999999999999, 0.0085000000000000006, -0.012], "guid": "f4b583ae-c9d0-47c4-b4e5-db196cc35fc1"}, {"dtype": "compas.geometry/Point", "value": [0.014999999999999999, 0.0085000000000000006, -0.012], "guid": "c601edd3-c474-44e3-97f4-8ace45dcd52b"}, {"dtype": "compas.geometry/Point", "value": [0.014999999999999999, -0.0085000000000000006, -0.012], "guid": "728a035a-354b-44f0-9613-a2f642dd2c7f"}, {"dtype": "compas.geometry/Point", "value": [-0.014999999999999999, -0.0085000000000000006, 0.0], "guid": "9d8dd060-6ac8-491e-ac3e-9daa833ff08c"}, {"dtype": "compas.geometry/Point", "value": [0.014999999999999999, -0.0085000000000000006, 0.0], "guid": "14900824-a41e-45a6-b644-4cdaa97571b6"}, {"dtype": "compas.geometry/Point", "value": [0.014999999999999999, 0.0085000000000000006, 0.0], "guid": "f668be45-1c68-4281-8e18-5e27aa46a7a6"}, {"dtype": "compas.geometry/Point", "value": [-0.014999999999999999, 0.0085000000000000006, 0.0], "guid": "c288737c-3ef2-43b9-840e-442a3358a486"}]}, "frame": {"yaxis": [-0.96780897953710332, -0.25168587391300073, 0.0], "xaxis": [0.25168587391300073, -0.96780897953710332, 0.0], "point": [0.058194506457736592, 0.084309215005595878, 0.054860411226359033]}, "attributes": {"ysize": 0.017000000000000001, "xsize": 0.029999999999999999, "n": 1, "course": 4, "name": "Part", "zsize": 0.012}, "key": 23, "transformations": [], "features": []}, "guid": "5281e405-9b32-46ab-b238-faf5e58aad0b"}}}, "max_node": 27, "attributes": {"name": "Graph"}, "dna": {}, "edge": {"16": {}, "26": {}, "15": {}, "18": {}, "25": {}, "10": {}, "20": {}, "17": {}, "27": {}, "12": {}, "22": {}, "19": {}, "11": {}, "5": {}, "4": {}, "7": {}, "6": {}, "1": {}, "0": {}, "3": {}, "2": {}, "21": {}, "9": {}, "8": {}, "14": {}, "24": {}, "13": {}, "23": {}}}, "attributes": {"name": "Assembly", "courses": 4}}]</item>
+                              </items>
+                            </chunk>
+                          </chunks>
+                        </chunk>
+                      </chunks>
+                    </chunk>
+                  </chunks>
+                </chunk>
+              </chunks>
+            </chunk>
+            <chunk name="Object" index="146">
+              <items count="3">
+                <item name="GUID" type_name="gh_guid" type_code="9">410755b1-224a-4c1e-a407-bf32fb45ea7e</item>
+                <item name="Lib" type_name="gh_guid" type_code="9">00000000-0000-0000-0000-000000000000</item>
+                <item name="Name" type_name="gh_string" type_code="10">GhPython Script</item>
+              </items>
+              <chunks count="1">
+                <chunk name="Container">
+                  <items count="13">
+                    <item name="CodeInput" type_name="gh_string" type_code="10">from compas.datastructures import Assembly
+from compas.data import json_loads, json_dumps
+
+assembly_data = json_loads(x)
+a = Assembly(assembly_data)</item>
+                    <item name="Description" type_name="gh_string" type_code="10">GhPython provides a Python script component</item>
+                    <item name="EditorLocation" type_name="gh_drawing_point" type_code="30">
+                      <X>160</X>
+                      <Y>160</Y>
+                    </item>
+                    <item name="EditorSize" type_name="gh_drawing_size" type_code="32">
+                      <W>741</W>
+                      <H>702</H>
+                    </item>
+                    <item name="HideInput" type_name="gh_bool" type_code="1">true</item>
+                    <item name="HideOutput" type_name="gh_bool" type_code="1">false</item>
+                    <item name="InputIsPath" type_name="gh_bool" type_code="1">false</item>
+                    <item name="InstanceGuid" type_name="gh_guid" type_code="9">fca9d821-4b47-4bef-b669-21277eb7712e</item>
+                    <item name="IsAdvancedMode" type_name="gh_bool" type_code="1">false</item>
+                    <item name="Locked" type_name="gh_bool" type_code="1">true</item>
+                    <item name="MarshalOutGuids" type_name="gh_bool" type_code="1">true</item>
+                    <item name="Name" type_name="gh_string" type_code="10">GhPython Script</item>
+                    <item name="NickName" type_name="gh_string" type_code="10">GhPython Script</item>
+                  </items>
+                  <chunks count="2">
+                    <chunk name="Attributes">
+                      <items count="2">
+                        <item name="Bounds" type_name="gh_drawing_rectanglef" type_code="35">
+                          <X>3767</X>
+                          <Y>1102</Y>
+                          <W>72</W>
+                          <H>44</H>
+                        </item>
+                        <item name="Pivot" type_name="gh_drawing_pointf" type_code="31">
+                          <X>3796</X>
+                          <Y>1124</Y>
+                        </item>
+                      </items>
+                    </chunk>
+                    <chunk name="ParameterData">
+                      <items count="6">
+                        <item name="InputCount" type_name="gh_int32" type_code="3">2</item>
+                        <item name="InputId" index="0" type_name="gh_guid" type_code="9">84fa917c-1ed8-4db3-8be1-7bdc4a6495a2</item>
+                        <item name="InputId" index="1" type_name="gh_guid" type_code="9">84fa917c-1ed8-4db3-8be1-7bdc4a6495a2</item>
+                        <item name="OutputCount" type_name="gh_int32" type_code="3">2</item>
+                        <item name="OutputId" index="0" type_name="gh_guid" type_code="9">3ede854e-c753-40eb-84cb-b48008f14fd4</item>
+                        <item name="OutputId" index="1" type_name="gh_guid" type_code="9">8ec86459-bf01-4409-baee-174d0d2b13d0</item>
+                      </items>
+                      <chunks count="4">
+                        <chunk name="InputParam" index="0">
+                          <items count="12">
+                            <item name="AllowTreeAccess" type_name="gh_bool" type_code="1">true</item>
+                            <item name="Description" type_name="gh_string" type_code="10">Script variable Python</item>
+                            <item name="InstanceGuid" type_name="gh_guid" type_code="9">6e37c93c-90f0-49d6-8dce-1084a4fc06e8</item>
+                            <item name="Locked" type_name="gh_bool" type_code="1">true</item>
+                            <item name="Name" type_name="gh_string" type_code="10">x</item>
+                            <item name="NickName" type_name="gh_string" type_code="10">x</item>
+                            <item name="Optional" type_name="gh_bool" type_code="1">true</item>
+                            <item name="ScriptParamAccess" type_name="gh_int32" type_code="3">0</item>
+                            <item name="ShowTypeHints" type_name="gh_bool" type_code="1">true</item>
+                            <item name="Source" index="0" type_name="gh_guid" type_code="9">69aee81d-c216-4f77-806c-791f4b054e7f</item>
+                            <item name="SourceCount" type_name="gh_int32" type_code="3">1</item>
+                            <item name="TypeHintID" type_name="gh_guid" type_code="9">87f87f55-5b71-41f4-8aea-21d494016f81</item>
+                          </items>
+                          <chunks count="1">
+                            <chunk name="Attributes">
+                              <items count="2">
+                                <item name="Bounds" type_name="gh_drawing_rectanglef" type_code="35">
+                                  <X>3769</X>
+                                  <Y>1104</Y>
+                                  <W>12</W>
+                                  <H>20</H>
+                                </item>
+                                <item name="Pivot" type_name="gh_drawing_pointf" type_code="31">
+                                  <X>3776.5</X>
+                                  <Y>1114</Y>
+                                </item>
+                              </items>
+                            </chunk>
+                          </chunks>
+                        </chunk>
+                        <chunk name="InputParam" index="1">
+                          <items count="11">
+                            <item name="AllowTreeAccess" type_name="gh_bool" type_code="1">true</item>
+                            <item name="Description" type_name="gh_string" type_code="10">Script input y.</item>
+                            <item name="InstanceGuid" type_name="gh_guid" type_code="9">b382ebbb-cafb-4cb3-909c-8f1949dee01c</item>
+                            <item name="Locked" type_name="gh_bool" type_code="1">true</item>
+                            <item name="Name" type_name="gh_string" type_code="10">y</item>
+                            <item name="NickName" type_name="gh_string" type_code="10">y</item>
+                            <item name="Optional" type_name="gh_bool" type_code="1">true</item>
+                            <item name="ScriptParamAccess" type_name="gh_int32" type_code="3">0</item>
+                            <item name="ShowTypeHints" type_name="gh_bool" type_code="1">true</item>
+                            <item name="SourceCount" type_name="gh_int32" type_code="3">0</item>
+                            <item name="TypeHintID" type_name="gh_guid" type_code="9">87f87f55-5b71-41f4-8aea-21d494016f81</item>
+                          </items>
+                          <chunks count="1">
+                            <chunk name="Attributes">
+                              <items count="2">
+                                <item name="Bounds" type_name="gh_drawing_rectanglef" type_code="35">
+                                  <X>3769</X>
+                                  <Y>1124</Y>
+                                  <W>12</W>
+                                  <H>20</H>
+                                </item>
+                                <item name="Pivot" type_name="gh_drawing_pointf" type_code="31">
+                                  <X>3776.5</X>
+                                  <Y>1134</Y>
+                                </item>
+                              </items>
+                            </chunk>
+                          </chunks>
+                        </chunk>
+                        <chunk name="OutputParam" index="0">
+                          <items count="7">
+                            <item name="Description" type_name="gh_string" type_code="10">The execution information, as output and error streams</item>
+                            <item name="InstanceGuid" type_name="gh_guid" type_code="9">6234b89b-2446-402e-a2ca-2eaa89ddb491</item>
+                            <item name="Locked" type_name="gh_bool" type_code="1">true</item>
+                            <item name="Name" type_name="gh_string" type_code="10">out</item>
+                            <item name="NickName" type_name="gh_string" type_code="10">out</item>
+                            <item name="Optional" type_name="gh_bool" type_code="1">false</item>
+                            <item name="SourceCount" type_name="gh_int32" type_code="3">0</item>
+                          </items>
+                          <chunks count="1">
+                            <chunk name="Attributes">
+                              <items count="2">
+                                <item name="Bounds" type_name="gh_drawing_rectanglef" type_code="35">
+                                  <X>3811</X>
+                                  <Y>1104</Y>
+                                  <W>26</W>
+                                  <H>20</H>
+                                </item>
+                                <item name="Pivot" type_name="gh_drawing_pointf" type_code="31">
+                                  <X>3824</X>
+                                  <Y>1114</Y>
+                                </item>
+                              </items>
+                            </chunk>
+                          </chunks>
+                        </chunk>
+                        <chunk name="OutputParam" index="1">
+                          <items count="7">
+                            <item name="Description" type_name="gh_string" type_code="10">Script output a.</item>
+                            <item name="InstanceGuid" type_name="gh_guid" type_code="9">9c77ac7a-6c53-48d9-8fcc-fb3479711df0</item>
+                            <item name="Locked" type_name="gh_bool" type_code="1">true</item>
+                            <item name="Name" type_name="gh_string" type_code="10">a</item>
+                            <item name="NickName" type_name="gh_string" type_code="10">a</item>
+                            <item name="Optional" type_name="gh_bool" type_code="1">false</item>
+                            <item name="SourceCount" type_name="gh_int32" type_code="3">0</item>
+                          </items>
+                          <chunks count="1">
+                            <chunk name="Attributes">
+                              <items count="2">
+                                <item name="Bounds" type_name="gh_drawing_rectanglef" type_code="35">
+                                  <X>3811</X>
+                                  <Y>1124</Y>
+                                  <W>26</W>
+                                  <H>20</H>
+                                </item>
+                                <item name="Pivot" type_name="gh_drawing_pointf" type_code="31">
+                                  <X>3824</X>
+                                  <Y>1134</Y>
+                                </item>
+                              </items>
+                            </chunk>
+                          </chunks>
+                        </chunk>
+                      </chunks>
+                    </chunk>
+                  </chunks>
+                </chunk>
+              </chunks>
+            </chunk>
+            <chunk name="Object" index="147">
+              <items count="3">
+                <item name="GUID" type_name="gh_guid" type_code="9">410755b1-224a-4c1e-a407-bf32fb45ea7e</item>
+                <item name="Lib" type_name="gh_guid" type_code="9">00000000-0000-0000-0000-000000000000</item>
+                <item name="Name" type_name="gh_string" type_code="10">GhPython Script</item>
+              </items>
+              <chunks count="1">
+                <chunk name="Container">
+                  <items count="12">
+                    <item name="CodeInput" type_name="gh_string" type_code="10">from compas.datastructures import Assembly, Part
+from compas.geometry import Frame
+from compas.data import json_dumps
+from compas.data import Data
+
+p1 = Part("part1", frame=Frame.worldXY())
+p2 = Part("part2", frame=Frame.worldXY())
+
+assembly = Assembly()
+
+assembly.add_part(p1)
+assembly.add_part(p2)
+assembly.add_connection(p1, p2)
+
+assembly_data = assembly.to_data()
+
+
+#print(json_dumps(assembly, pretty=True))
+
+</item>
+                    <item name="Description" type_name="gh_string" type_code="10">GhPython provides a Python script component</item>
+                    <item name="EditorLocation" type_name="gh_drawing_point" type_code="30">
+                      <X>64</X>
+                      <Y>64</Y>
+                    </item>
+                    <item name="EditorSize" type_name="gh_drawing_size" type_code="32">
+                      <W>1162</W>
+                      <H>845</H>
+                    </item>
+                    <item name="HideInput" type_name="gh_bool" type_code="1">true</item>
+                    <item name="HideOutput" type_name="gh_bool" type_code="1">false</item>
+                    <item name="InputIsPath" type_name="gh_bool" type_code="1">false</item>
+                    <item name="InstanceGuid" type_name="gh_guid" type_code="9">55afb21f-e948-4b43-8df1-c6b65012fbe6</item>
+                    <item name="IsAdvancedMode" type_name="gh_bool" type_code="1">false</item>
+                    <item name="MarshalOutGuids" type_name="gh_bool" type_code="1">true</item>
+                    <item name="Name" type_name="gh_string" type_code="10">GhPython Script</item>
+                    <item name="NickName" type_name="gh_string" type_code="10">GhPython Script</item>
+                  </items>
+                  <chunks count="2">
+                    <chunk name="Attributes">
+                      <items count="2">
+                        <item name="Bounds" type_name="gh_drawing_rectanglef" type_code="35">
+                          <X>3554</X>
+                          <Y>1309</Y>
+                          <W>127</W>
+                          <H>84</H>
+                        </item>
+                        <item name="Pivot" type_name="gh_drawing_pointf" type_code="31">
+                          <X>3583</X>
+                          <Y>1351</Y>
+                        </item>
+                      </items>
+                    </chunk>
+                    <chunk name="ParameterData">
+                      <items count="8">
+                        <item name="InputCount" type_name="gh_int32" type_code="3">2</item>
+                        <item name="InputId" index="0" type_name="gh_guid" type_code="9">84fa917c-1ed8-4db3-8be1-7bdc4a6495a2</item>
+                        <item name="InputId" index="1" type_name="gh_guid" type_code="9">84fa917c-1ed8-4db3-8be1-7bdc4a6495a2</item>
+                        <item name="OutputCount" type_name="gh_int32" type_code="3">4</item>
+                        <item name="OutputId" index="0" type_name="gh_guid" type_code="9">3ede854e-c753-40eb-84cb-b48008f14fd4</item>
+                        <item name="OutputId" index="1" type_name="gh_guid" type_code="9">8ec86459-bf01-4409-baee-174d0d2b13d0</item>
+                        <item name="OutputId" index="2" type_name="gh_guid" type_code="9">8ec86459-bf01-4409-baee-174d0d2b13d0</item>
+                        <item name="OutputId" index="3" type_name="gh_guid" type_code="9">8ec86459-bf01-4409-baee-174d0d2b13d0</item>
+                      </items>
+                      <chunks count="6">
+                        <chunk name="InputParam" index="0">
+                          <items count="10">
+                            <item name="AllowTreeAccess" type_name="gh_bool" type_code="1">true</item>
+                            <item name="Description" type_name="gh_string" type_code="10">Script variable Python</item>
+                            <item name="InstanceGuid" type_name="gh_guid" type_code="9">0ec9e94c-5337-422a-a18a-63f72010c1e7</item>
+                            <item name="Name" type_name="gh_string" type_code="10">x</item>
+                            <item name="NickName" type_name="gh_string" type_code="10">x</item>
+                            <item name="Optional" type_name="gh_bool" type_code="1">true</item>
+                            <item name="ScriptParamAccess" type_name="gh_int32" type_code="3">0</item>
+                            <item name="ShowTypeHints" type_name="gh_bool" type_code="1">true</item>
+                            <item name="SourceCount" type_name="gh_int32" type_code="3">0</item>
+                            <item name="TypeHintID" type_name="gh_guid" type_code="9">87f87f55-5b71-41f4-8aea-21d494016f81</item>
+                          </items>
+                          <chunks count="1">
+                            <chunk name="Attributes">
+                              <items count="2">
+                                <item name="Bounds" type_name="gh_drawing_rectanglef" type_code="35">
+                                  <X>3556</X>
+                                  <Y>1311</Y>
+                                  <W>12</W>
+                                  <H>40</H>
+                                </item>
+                                <item name="Pivot" type_name="gh_drawing_pointf" type_code="31">
+                                  <X>3563.5</X>
+                                  <Y>1331</Y>
+                                </item>
+                              </items>
+                            </chunk>
+                          </chunks>
+                        </chunk>
+                        <chunk name="InputParam" index="1">
+                          <items count="10">
+                            <item name="AllowTreeAccess" type_name="gh_bool" type_code="1">true</item>
+                            <item name="Description" type_name="gh_string" type_code="10">Script input y.</item>
+                            <item name="InstanceGuid" type_name="gh_guid" type_code="9">34197322-a1a7-4834-b114-ba04864304f1</item>
+                            <item name="Name" type_name="gh_string" type_code="10">y</item>
+                            <item name="NickName" type_name="gh_string" type_code="10">y</item>
+                            <item name="Optional" type_name="gh_bool" type_code="1">true</item>
+                            <item name="ScriptParamAccess" type_name="gh_int32" type_code="3">0</item>
+                            <item name="ShowTypeHints" type_name="gh_bool" type_code="1">true</item>
+                            <item name="SourceCount" type_name="gh_int32" type_code="3">0</item>
+                            <item name="TypeHintID" type_name="gh_guid" type_code="9">87f87f55-5b71-41f4-8aea-21d494016f81</item>
+                          </items>
+                          <chunks count="1">
+                            <chunk name="Attributes">
+                              <items count="2">
+                                <item name="Bounds" type_name="gh_drawing_rectanglef" type_code="35">
+                                  <X>3556</X>
+                                  <Y>1351</Y>
+                                  <W>12</W>
+                                  <H>40</H>
+                                </item>
+                                <item name="Pivot" type_name="gh_drawing_pointf" type_code="31">
+                                  <X>3563.5</X>
+                                  <Y>1371</Y>
+                                </item>
+                              </items>
+                            </chunk>
+                          </chunks>
+                        </chunk>
+                        <chunk name="OutputParam" index="0">
+                          <items count="6">
+                            <item name="Description" type_name="gh_string" type_code="10">The execution information, as output and error streams</item>
+                            <item name="InstanceGuid" type_name="gh_guid" type_code="9">57819e9e-ec58-41a3-b7e8-c5c5c0d0c40f</item>
+                            <item name="Name" type_name="gh_string" type_code="10">out</item>
+                            <item name="NickName" type_name="gh_string" type_code="10">out</item>
+                            <item name="Optional" type_name="gh_bool" type_code="1">false</item>
+                            <item name="SourceCount" type_name="gh_int32" type_code="3">0</item>
+                          </items>
+                          <chunks count="1">
+                            <chunk name="Attributes">
+                              <items count="2">
+                                <item name="Bounds" type_name="gh_drawing_rectanglef" type_code="35">
+                                  <X>3598</X>
+                                  <Y>1311</Y>
+                                  <W>81</W>
+                                  <H>20</H>
+                                </item>
+                                <item name="Pivot" type_name="gh_drawing_pointf" type_code="31">
+                                  <X>3638.5</X>
+                                  <Y>1321</Y>
+                                </item>
+                              </items>
+                            </chunk>
+                          </chunks>
+                        </chunk>
+                        <chunk name="OutputParam" index="1">
+                          <items count="6">
+                            <item name="Description" type_name="gh_string" type_code="10">Script output assembly.</item>
+                            <item name="InstanceGuid" type_name="gh_guid" type_code="9">ca425a01-74e0-48e9-bda0-46ff4154461c</item>
+                            <item name="Name" type_name="gh_string" type_code="10">assembly</item>
+                            <item name="NickName" type_name="gh_string" type_code="10">assembly</item>
+                            <item name="Optional" type_name="gh_bool" type_code="1">false</item>
+                            <item name="SourceCount" type_name="gh_int32" type_code="3">0</item>
+                          </items>
+                          <chunks count="1">
+                            <chunk name="Attributes">
+                              <items count="2">
+                                <item name="Bounds" type_name="gh_drawing_rectanglef" type_code="35">
+                                  <X>3598</X>
+                                  <Y>1331</Y>
+                                  <W>81</W>
+                                  <H>20</H>
+                                </item>
+                                <item name="Pivot" type_name="gh_drawing_pointf" type_code="31">
+                                  <X>3638.5</X>
+                                  <Y>1341</Y>
+                                </item>
+                              </items>
+                            </chunk>
+                          </chunks>
+                        </chunk>
+                        <chunk name="OutputParam" index="2">
+                          <items count="6">
+                            <item name="Description" type_name="gh_string" type_code="10">Script output assembly_data.</item>
+                            <item name="InstanceGuid" type_name="gh_guid" type_code="9">084b89a1-f3d6-4da1-9b8c-104c27e3aaee</item>
+                            <item name="Name" type_name="gh_string" type_code="10">assembly_data</item>
+                            <item name="NickName" type_name="gh_string" type_code="10">assembly_data</item>
+                            <item name="Optional" type_name="gh_bool" type_code="1">false</item>
+                            <item name="SourceCount" type_name="gh_int32" type_code="3">0</item>
+                          </items>
+                          <chunks count="1">
+                            <chunk name="Attributes">
+                              <items count="2">
+                                <item name="Bounds" type_name="gh_drawing_rectanglef" type_code="35">
+                                  <X>3598</X>
+                                  <Y>1351</Y>
+                                  <W>81</W>
+                                  <H>20</H>
+                                </item>
+                                <item name="Pivot" type_name="gh_drawing_pointf" type_code="31">
+                                  <X>3638.5</X>
+                                  <Y>1361</Y>
+                                </item>
+                              </items>
+                            </chunk>
+                          </chunks>
+                        </chunk>
+                        <chunk name="OutputParam" index="3">
+                          <items count="6">
+                            <item name="Description" type_name="gh_string" type_code="10">Script output frame_data.</item>
+                            <item name="InstanceGuid" type_name="gh_guid" type_code="9">07d2e147-31e0-4837-b47d-3722e490f263</item>
+                            <item name="Name" type_name="gh_string" type_code="10">frame_data</item>
+                            <item name="NickName" type_name="gh_string" type_code="10">frame_data</item>
+                            <item name="Optional" type_name="gh_bool" type_code="1">false</item>
+                            <item name="SourceCount" type_name="gh_int32" type_code="3">0</item>
+                          </items>
+                          <chunks count="1">
+                            <chunk name="Attributes">
+                              <items count="2">
+                                <item name="Bounds" type_name="gh_drawing_rectanglef" type_code="35">
+                                  <X>3598</X>
+                                  <Y>1371</Y>
+                                  <W>81</W>
+                                  <H>20</H>
+                                </item>
+                                <item name="Pivot" type_name="gh_drawing_pointf" type_code="31">
+                                  <X>3638.5</X>
+                                  <Y>1381</Y>
+                                </item>
+                              </items>
+                            </chunk>
+                          </chunks>
+                        </chunk>
+                      </chunks>
+                    </chunk>
+                  </chunks>
+                </chunk>
+              </chunks>
+            </chunk>
+            <chunk name="Object" index="148">
+              <items count="2">
+                <item name="GUID" type_name="gh_guid" type_code="9">7f5c6c55-f846-4a08-9c9a-cfdc285cc6fe</item>
+                <item name="Name" type_name="gh_string" type_code="10">Scribble</item>
+              </items>
+              <chunks count="1">
+                <chunk name="Container">
+                  <items count="13">
+                    <item name="Bold" type_name="gh_bool" type_code="1">true</item>
+                    <item name="Ca" type_name="gh_drawing_pointf" type_code="31">
+                      <X>3535.088</X>
+                      <Y>1283.322</Y>
+                    </item>
+                    <item name="Cb" type_name="gh_drawing_pointf" type_code="31">
+                      <X>3863.006</X>
+                      <Y>1283.322</Y>
+                    </item>
+                    <item name="Cc" type_name="gh_drawing_pointf" type_code="31">
+                      <X>3863.006</X>
+                      <Y>1307.26</Y>
+                    </item>
+                    <item name="Cd" type_name="gh_drawing_pointf" type_code="31">
+                      <X>3535.088</X>
+                      <Y>1307.26</Y>
+                    </item>
+                    <item name="Description" type_name="gh_string" type_code="10">A quick note</item>
+                    <item name="Font" type_name="gh_string" type_code="10">Microsoft Sans Serif</item>
+                    <item name="InstanceGuid" type_name="gh_guid" type_code="9">4696027d-90a5-4397-bdaa-a020fcd9693f</item>
+                    <item name="Italic" type_name="gh_bool" type_code="1">false</item>
+                    <item name="Name" type_name="gh_string" type_code="10">Scribble</item>
+                    <item name="NickName" type_name="gh_string" type_code="10">Scribble</item>
+                    <item name="Size" type_name="gh_single" type_code="5">25</item>
+                    <item name="Text" type_name="gh_string" type_code="10">Genaric Assembly and Data</item>
+                  </items>
+                  <chunks count="1">
+                    <chunk name="Attributes">
+                      <items count="2">
+                        <item name="Bounds" type_name="gh_drawing_rectanglef" type_code="35">
+                          <X>3530.088</X>
+                          <Y>1278.322</Y>
+                          <W>337.9175</W>
+                          <H>33.93799</H>
+                        </item>
+                        <item name="Pivot" type_name="gh_drawing_pointf" type_code="31">
+                          <X>3535.088</X>
+                          <Y>1283.322</Y>
+                        </item>
+                      </items>
+                    </chunk>
+                  </chunks>
+                </chunk>
+              </chunks>
+            </chunk>
+            <chunk name="Object" index="149">
+              <items count="2">
+                <item name="GUID" type_name="gh_guid" type_code="9">c552a431-af5b-46a9-a8a4-0fcbc27ef596</item>
+                <item name="Name" type_name="gh_string" type_code="10">Group</item>
+              </items>
+              <chunks count="1">
+                <chunk name="Container">
+                  <items count="9">
+                    <item name="Border" type_name="gh_int32" type_code="3">1</item>
+                    <item name="Colour" type_name="gh_drawing_color" type_code="36">
+                      <ARGB>150;255;255;255</ARGB>
+                    </item>
+                    <item name="Description" type_name="gh_string" type_code="10">A group of Grasshopper objects</item>
+                    <item name="ID" index="0" type_name="gh_guid" type_code="9">55afb21f-e948-4b43-8df1-c6b65012fbe6</item>
+                    <item name="ID" index="1" type_name="gh_guid" type_code="9">4696027d-90a5-4397-bdaa-a020fcd9693f</item>
+                    <item name="ID_Count" type_name="gh_int32" type_code="3">2</item>
+                    <item name="InstanceGuid" type_name="gh_guid" type_code="9">7fa9f994-788f-437e-bc4e-89b8ea28e196</item>
+                    <item name="Name" type_name="gh_string" type_code="10">Group</item>
+                    <item name="NickName" type_name="gh_string" type_code="10"></item>
+                  </items>
+                  <chunks count="1">
+                    <chunk name="Attributes" />
+                  </chunks>
+                </chunk>
+              </chunks>
+            </chunk>
           </chunks>
         </chunk>
       </chunks>
@@ -14340,7 +14884,7 @@ if frame_data:
     <chunk name="Thumbnail">
       <items count="1">
         <item name="Thumbnail" type_name="gh_drawing_bitmap" type_code="37">
-          <bitmap length="7888">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</bitmap>
+          <bitmap length="5251">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</bitmap>
         </item>
       </items>
     </chunk>

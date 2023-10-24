@@ -221,13 +221,9 @@ class Storage(StorageInterface):
             # Shared storage instance with a specification of file name.
             storage_refrence = Storage._shared_storage.Child(path_on_cloud)
                 
-            data = assembly.data
+            data = json_dumps(assembly, pretty=True)
 
-            #Serialize data
-            serialized_data = json_dumps(data)
-            print (serialized_data)
-
-            byte_data = Encoding.UTF8.GetBytes(serialized_data)
+            byte_data = Encoding.UTF8.GetBytes(data)
             stream = MemoryStream(byte_data)
 
             def _begin_upload(result):
@@ -269,12 +265,8 @@ class Storage(StorageInterface):
 
             assembly_serialized = json_dumps(json_assembly)
             desearialized_data = json_loads(assembly_serialized)
-            # print ("desearialized_data", desearialized_data)
 
-            assembly = Assembly.from_data(desearialized_data)
-            # print ("assembly", assembly)
-
-            return assembly
+            return desearialized_data
 
     def upload_data(self, path_on_cloud, data):
         if Storage._shared_storage:
