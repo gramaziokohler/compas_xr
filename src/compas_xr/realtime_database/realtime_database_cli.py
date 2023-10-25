@@ -142,7 +142,7 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
         else:
             raise Exception("You need a DB reference!")
     
-    #Function for uploading json parameters vs nested json paramaters    
+    #Function for uploading json parameters and nested json paramaters    
     def upload_file(self, json_path, parentname, parentparamater, parameters, nestedparams=True):
         
         if RealtimeDatabase._shared_database:
@@ -172,11 +172,33 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
                     parameters_dict = {param: values}
                     parameters_list.update(parameters_dict)
 
-            print ("paramaters list", parameters_list)
             serialized_data = json_dumps(parameters_list)
             database_reference = RealtimeDatabase._shared_database 
 
             def _begin_upload(result):
+                uploadtask = database_reference.Child(parentname).PutAsync(serialized_data)
+                task_upload = uploadtask.GetAwaiter()
+                task_upload.OnCompleted(lambda: result["event"].set())
+                result["event"].wait()
+                result["data"] = True
+            
+            upload = self._start_async_call(_begin_upload)
+            print (upload)
+
+        #TODO: Do I need this?
+        else:
+            raise Exception("You need a DB reference!")
+
+    def upload_assembly_all(self, assembly, parentname):
+        
+        if RealtimeDatabase._shared_database:
+
+            data = assembly.data
+            serialized_data = json_dumps(data)
+            database_reference = RealtimeDatabase._shared_database 
+
+            def _begin_upload(result):
+                print ("inside of begin upload")
                 uploadtask = database_reference.Child(parentname).PutAsync(serialized_data)
                 print (uploadtask)
                 task_upload = uploadtask.GetAwaiter()
@@ -192,8 +214,6 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
         #TODO: Do I need this?
         else:
             raise Exception("You need a DB reference!")
-
-    
     
     
     
