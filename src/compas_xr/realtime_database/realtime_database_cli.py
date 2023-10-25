@@ -153,9 +153,8 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
             parameters_list = {}
 
             #Upload Nested Data or not.
-            if nestedparams:
+            if nestedparams == True:
                 paramaters_nested = {}
-                
                 for param in parameters:
                     print (param)
                     values = json_data[parentparamater][param]
@@ -168,7 +167,7 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
 
             else: 
                 for param in parameters:
-                    values = json_data[parentparamater]
+                    values = json_data[param]
                     parameters_dict = {param: values}
                     parameters_list.update(parameters_dict)
 
@@ -215,10 +214,120 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
         else:
             raise Exception("You need a DB reference!")
     
+    def upload_assembly(self, assembly, parentname, parentparamater, parameters, nestedparams=True):
+        
+        if RealtimeDatabase._shared_database:
+
+            data = assembly.data
+            
+            parameters_list = {}
+
+            #Upload Nested Data or not.
+            if nestedparams:
+                paramaters_nested = {}
+                
+                for param in parameters:
+                    print (param)
+                    values = data[parentparamater][param]
+                    parameters_dict = {param: values}
+                    paramaters_nested.update(parameters_dict)
+
+                nested_dict = {parentparamater: paramaters_nested}
+                # print (nested_dict)
+                parameters_list.update(nested_dict)
+
+            else: 
+                for param in parameters:
+                    values = data[param]
+                    parameters_dict = {param: values}
+                    parameters_list.update(parameters_dict)
+
+            serialized_data = json_dumps(parameters_list)
+            database_reference = RealtimeDatabase._shared_database 
+
+            def _begin_upload(result):
+                uploadtask = database_reference.Child(parentname).PutAsync(serialized_data)
+                task_upload = uploadtask.GetAwaiter()
+                task_upload.OnCompleted(lambda: result["event"].set())
+                result["event"].wait()
+                result["data"] = True
+            
+            upload = self._start_async_call(_begin_upload)
+            print (upload)
+
+        #TODO: Do I need this?
+        else:
+            raise Exception("You need a DB reference!")
+
+    def upload_data_all(self, data, parentname):
+        
+        if RealtimeDatabase._shared_database:
+
+            serialized_data = json_dumps(data)
+            database_reference = RealtimeDatabase._shared_database 
+
+            def _begin_upload(result):
+                print ("inside of begin upload")
+                uploadtask = database_reference.Child(parentname).PutAsync(serialized_data)
+                print (uploadtask)
+                task_upload = uploadtask.GetAwaiter()
+                print (task_upload)
+                task_upload.OnCompleted(lambda: result["event"].set())
+                print
+                result["event"].wait()
+                result["data"] = True
+            
+            upload = self._start_async_call(_begin_upload)
+            print (upload)
+
+        #TODO: Do I need this?
+        else:
+            raise Exception("You need a DB reference!")
     
-    
-    
-    
+    def upload_data(self, data, parentname, parentparamater, parameters, nestedparams=True):
+        
+        if RealtimeDatabase._shared_database:
+            
+            parameters_list = {}
+
+            #Upload Nested Data or not.
+            if nestedparams:
+                paramaters_nested = {}
+                
+                for param in parameters:
+                    print (param)
+                    values = data[parentparamater][param]
+                    parameters_dict = {param: values}
+                    paramaters_nested.update(parameters_dict)
+
+                nested_dict = {parentparamater: paramaters_nested}
+                # print (nested_dict)
+                parameters_list.update(nested_dict)
+
+            else: 
+                for param in parameters:
+                    values = data[param]
+                    parameters_dict = {param: values}
+                    parameters_list.update(parameters_dict)
+
+            serialized_data = json_dumps(parameters_list)
+            database_reference = RealtimeDatabase._shared_database 
+
+            def _begin_upload(result):
+                uploadtask = database_reference.Child(parentname).PutAsync(serialized_data)
+                task_upload = uploadtask.GetAwaiter()
+                task_upload.OnCompleted(lambda: result["event"].set())
+                result["event"].wait()
+                result["data"] = True
+            
+            upload = self._start_async_call(_begin_upload)
+            print (upload)
+
+        #TODO: Do I need this?
+        else:
+            raise Exception("You need a DB reference!")
+
+
     #This function is only for first level paramaters, or would be great if we want to hard code "Graph param"    
     def upload_file_baselevel(self, json_path, parentname, parameters):
         
