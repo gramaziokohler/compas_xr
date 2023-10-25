@@ -99,7 +99,7 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
 
         # Still no storage? Fail, we can't do anything
         if not RealtimeDatabase._shared_database:
-            raise Exception("Could not initialize storage!")
+            raise Exception("Could not initialize Database!")
 
         return RealtimeDatabase._shared_database
 
@@ -142,29 +142,41 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
         else:
             raise Exception("You need a DB reference!")
     
-    
-    def upload_file(self, json_path, parentname, paramaters):
+    #Function for uploading json parameters vs nested json paramaters    
+    def upload_file(self, json_path, parentname, parentparamater, parameters, nestedparams=True):
         
         if RealtimeDatabase._shared_database:
 
             with open(json_path) as json_file:
                 json_data = json.load(json_file)
             
-            paramaters_list = {}
+            parameters_list = {}
 
-            for param in paramaters:
-                values = json_data[param]
-                paramaters_dict = {param: values}
-                paramaters_list.update(paramaters_dict)
-            
-            # print (type(paramaters_list))
-            # print (type(paramaters_list[0]))
+            #Upload Nested Data or not.
+            if nestedparams:
+                paramaters_nested = {}
+                
+                for param in parameters:
+                    print (param)
+                    values = json_data[parentparamater][param]
+                    parameters_dict = {param: values}
+                    paramaters_nested.update(parameters_dict)
 
-            serialized_data = json_dumps(paramaters_list)
+                nested_dict = {parentparamater: paramaters_nested}
+                # print (nested_dict)
+                parameters_list.update(nested_dict)
+
+            else: 
+                for param in parameters:
+                    values = json_data[parentparamater]
+                    parameters_dict = {param: values}
+                    parameters_list.update(parameters_dict)
+
+            print ("paramaters list", parameters_list)
+            serialized_data = json_dumps(parameters_list)
             database_reference = RealtimeDatabase._shared_database 
 
             def _begin_upload(result):
-                print ("inside of begin upload")
                 uploadtask = database_reference.Child(parentname).PutAsync(serialized_data)
                 print (uploadtask)
                 task_upload = uploadtask.GetAwaiter()
@@ -181,6 +193,51 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
         else:
             raise Exception("You need a DB reference!")
 
+    
+    
+    
+    
+    
+    
+    #This function is only for first level paramaters, or would be great if we want to hard code "Graph param"    
+    def upload_file_baselevel(self, json_path, parentname, parameters):
+        
+        if RealtimeDatabase._shared_database:
+
+            with open(json_path) as json_file:
+                json_data = json.load(json_file)
+            
+            parameters_list = {}
+
+            for param in parameters:
+                values = json_data[param]
+                parameters_dict = {param: values}
+                parameters_list.update(parameters_dict)
+            
+            serialized_data = json_dumps(parameters_list)
+            database_reference = RealtimeDatabase._shared_database 
+
+            def _begin_upload(result):
+                uploadtask = database_reference.Child(parentname).PutAsync(serialized_data)
+                print (uploadtask)
+                task_upload = uploadtask.GetAwaiter()
+                print (task_upload)
+                task_upload.OnCompleted(lambda: result["event"].set())
+                print
+                result["event"].wait()
+                result["data"] = True
+            
+            upload = self._start_async_call(_begin_upload)
+            print (upload)
+
+        #TODO: Do I need this?
+        else:
+            raise Exception("You need a DB reference!")
+
+
+
+
+    #TODO: This did not work, but reference code looks like we can double nest child references. This needs to be checked.
     def upload_file_all_as_child(self, json_path, parentname, childname):
         
         if RealtimeDatabase._shared_database:

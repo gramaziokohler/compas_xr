@@ -1,0 +1,513 @@
+{
+    "attributes": {
+        "name": "Assembly"
+    }, 
+    "graph": {
+        "attributes": {
+            "name": "Graph"
+        }, 
+        "dea": {}, 
+        "dna": {}, 
+        "edge": {
+            "0": {}, 
+            "1": {}, 
+            "10": {}, 
+            "11": {}, 
+            "12": {}, 
+            "13": {}, 
+            "14": {}, 
+            "15": {}, 
+            "2": {}, 
+            "3": {}, 
+            "4": {}, 
+            "5": {}, 
+            "6": {}, 
+            "7": {}, 
+            "8": {}, 
+            "9": {}
+        }, 
+        "max_node": 15, 
+        "node": {
+            "0": {
+                "part": {
+                    "data": {
+                        "attributes": {
+                            "name": "0"
+                        }, 
+                        "features": [], 
+                        "frame": {
+                            "point": [
+                                0.0, 
+                                0.0, 
+                                0.0
+                            ], 
+                            "xaxis": [
+                                1.0, 
+                                0.0, 
+                                0.0
+                            ], 
+                            "yaxis": [
+                                0.0, 
+                                1.0, 
+                                0.0
+                            ]
+                        }, 
+                        "key": 0
+                    }, 
+                    "dtype": "compas.datastructures/Part", 
+                    "guid": "be1a8d4e-b5c0-44fb-a3b0-3c71f0c1ddb8"
+                }
+            }, 
+            "1": {
+                "part": {
+                    "data": {
+                        "attributes": {
+                            "name": "1"
+                        }, 
+                        "features": [], 
+                        "frame": {
+                            "point": [
+                                0.0, 
+                                0.0, 
+                                1000.0
+                            ], 
+                            "xaxis": [
+                                1.0, 
+                                0.0, 
+                                0.0
+                            ], 
+                            "yaxis": [
+                                0.0, 
+                                1.0, 
+                                0.0
+                            ]
+                        }, 
+                        "key": 1
+                    }, 
+                    "dtype": "compas.datastructures/Part", 
+                    "guid": "d0d6016c-122a-415f-a65a-e48db8cfae32"
+                }
+            }, 
+            "10": {
+                "part": {
+                    "data": {
+                        "attributes": {
+                            "name": "10"
+                        }, 
+                        "features": [], 
+                        "frame": {
+                            "point": [
+                                2000.0, 
+                                0.0, 
+                                2000.0
+                            ], 
+                            "xaxis": [
+                                1.0, 
+                                0.0, 
+                                0.0
+                            ], 
+                            "yaxis": [
+                                0.0, 
+                                1.0, 
+                                0.0
+                            ]
+                        }, 
+                        "key": 10
+                    }, 
+                    "dtype": "compas.datastructures/Part", 
+                    "guid": "14507c24-84d0-46a2-8cbd-b274bf607a43"
+                }
+            }, 
+            "11": {
+                "part": {
+                    "data": {
+                        "attributes": {
+                            "name": "11"
+                        }, 
+                        "features": [], 
+                        "frame": {
+                            "point": [
+                                2000.0, 
+                                0.0, 
+                                3000.0
+                            ], 
+                            "xaxis": [
+                                1.0, 
+                                0.0, 
+                                0.0
+                            ], 
+                            "yaxis": [
+                                0.0, 
+                                1.0, 
+                                0.0
+                            ]
+                        }, 
+                        "key": 11
+                    }, 
+                    "dtype": "compas.datastructures/Part", 
+                    "guid": "e81023e4-57c9-48ba-baef-1cfb29f6b9e8"
+                }
+            }, 
+            "12": {
+                "part": {
+                    "data": {
+                        "attributes": {
+                            "name": "12"
+                        }, 
+                        "features": [], 
+                        "frame": {
+                            "point": [
+                                3000.0, 
+                                0.0, 
+                                0.0
+                            ], 
+                            "xaxis": [
+                                1.0, 
+                                0.0, 
+                                0.0
+                            ], 
+                            "yaxis": [
+                                0.0, 
+                                1.0, 
+                                0.0
+                            ]
+                        }, 
+                        "key": 12
+                    }, 
+                    "dtype": "compas.datastructures/Part", 
+                    "guid": "cb0d7717-7ad5-4860-8d04-e35211b65dd2"
+                }
+            }, 
+            "13": {
+                "part": {
+                    "data": {
+                        "attributes": {
+                            "name": "13"
+                        }, 
+                        "features": [], 
+                        "frame": {
+                            "point": [
+                                3000.0, 
+                                0.0, 
+                                1000.0
+                            ], 
+                            "xaxis": [
+                                1.0, 
+                                0.0, 
+                                0.0
+                            ], 
+                            "yaxis": [
+                                0.0, 
+                                1.0, 
+                                0.0
+                            ]
+                        }, 
+                        "key": 13
+                    }, 
+                    "dtype": "compas.datastructures/Part", 
+                    "guid": "0cd1604d-0f9e-42b9-bbda-77ca22be6418"
+                }
+            }, 
+            "14": {
+                "part": {
+                    "data": {
+                        "attributes": {
+                            "name": "14"
+                        }, 
+                        "features": [], 
+                        "frame": {
+                            "point": [
+                                3000.0, 
+                                0.0, 
+                                2000.0
+                            ], 
+                            "xaxis": [
+                                1.0, 
+                                0.0, 
+                                0.0
+                            ], 
+                            "yaxis": [
+                                0.0, 
+                                1.0, 
+                                0.0
+                            ]
+                        }, 
+                        "key": 14
+                    }, 
+                    "dtype": "compas.datastructures/Part", 
+                    "guid": "a1bffee8-b950-4309-8e52-b80e78255513"
+                }
+            }, 
+            "15": {
+                "part": {
+                    "data": {
+                        "attributes": {
+                            "name": "15"
+                        }, 
+                        "features": [], 
+                        "frame": {
+                            "point": [
+                                3000.0, 
+                                0.0, 
+                                3000.0
+                            ], 
+                            "xaxis": [
+                                1.0, 
+                                0.0, 
+                                0.0
+                            ], 
+                            "yaxis": [
+                                0.0, 
+                                1.0, 
+                                0.0
+                            ]
+                        }, 
+                        "key": 15
+                    }, 
+                    "dtype": "compas.datastructures/Part", 
+                    "guid": "6465432c-c26e-498d-94ed-e2bd865e42f7"
+                }
+            }, 
+            "2": {
+                "part": {
+                    "data": {
+                        "attributes": {
+                            "name": "2"
+                        }, 
+                        "features": [], 
+                        "frame": {
+                            "point": [
+                                0.0, 
+                                0.0, 
+                                2000.0
+                            ], 
+                            "xaxis": [
+                                1.0, 
+                                0.0, 
+                                0.0
+                            ], 
+                            "yaxis": [
+                                0.0, 
+                                1.0, 
+                                0.0
+                            ]
+                        }, 
+                        "key": 2
+                    }, 
+                    "dtype": "compas.datastructures/Part", 
+                    "guid": "a87e6795-9beb-4c4b-afc5-6c72ecbd531d"
+                }
+            }, 
+            "3": {
+                "part": {
+                    "data": {
+                        "attributes": {
+                            "name": "3"
+                        }, 
+                        "features": [], 
+                        "frame": {
+                            "point": [
+                                0.0, 
+                                0.0, 
+                                3000.0
+                            ], 
+                            "xaxis": [
+                                1.0, 
+                                0.0, 
+                                0.0
+                            ], 
+                            "yaxis": [
+                                0.0, 
+                                1.0, 
+                                0.0
+                            ]
+                        }, 
+                        "key": 3
+                    }, 
+                    "dtype": "compas.datastructures/Part", 
+                    "guid": "5169a434-b97e-4f94-b195-c37628d87e08"
+                }
+            }, 
+            "4": {
+                "part": {
+                    "data": {
+                        "attributes": {
+                            "name": "4"
+                        }, 
+                        "features": [], 
+                        "frame": {
+                            "point": [
+                                1000.0, 
+                                0.0, 
+                                0.0
+                            ], 
+                            "xaxis": [
+                                1.0, 
+                                0.0, 
+                                0.0
+                            ], 
+                            "yaxis": [
+                                0.0, 
+                                1.0, 
+                                0.0
+                            ]
+                        }, 
+                        "key": 4
+                    }, 
+                    "dtype": "compas.datastructures/Part", 
+                    "guid": "7f3bfe66-48a6-4639-8fb3-35c4e9249596"
+                }
+            }, 
+            "5": {
+                "part": {
+                    "data": {
+                        "attributes": {
+                            "name": "5"
+                        }, 
+                        "features": [], 
+                        "frame": {
+                            "point": [
+                                1000.0, 
+                                0.0, 
+                                1000.0
+                            ], 
+                            "xaxis": [
+                                1.0, 
+                                0.0, 
+                                0.0
+                            ], 
+                            "yaxis": [
+                                0.0, 
+                                1.0, 
+                                0.0
+                            ]
+                        }, 
+                        "key": 5
+                    }, 
+                    "dtype": "compas.datastructures/Part", 
+                    "guid": "d9906c3c-2847-43e9-9e8b-c500d859172f"
+                }
+            }, 
+            "6": {
+                "part": {
+                    "data": {
+                        "attributes": {
+                            "name": "6"
+                        }, 
+                        "features": [], 
+                        "frame": {
+                            "point": [
+                                1000.0, 
+                                0.0, 
+                                2000.0
+                            ], 
+                            "xaxis": [
+                                1.0, 
+                                0.0, 
+                                0.0
+                            ], 
+                            "yaxis": [
+                                0.0, 
+                                1.0, 
+                                0.0
+                            ]
+                        }, 
+                        "key": 6
+                    }, 
+                    "dtype": "compas.datastructures/Part", 
+                    "guid": "4af73de1-d1b5-4fc2-8e8d-c42a74ab48da"
+                }
+            }, 
+            "7": {
+                "part": {
+                    "data": {
+                        "attributes": {
+                            "name": "7"
+                        }, 
+                        "features": [], 
+                        "frame": {
+                            "point": [
+                                1000.0, 
+                                0.0, 
+                                3000.0
+                            ], 
+                            "xaxis": [
+                                1.0, 
+                                0.0, 
+                                0.0
+                            ], 
+                            "yaxis": [
+                                0.0, 
+                                1.0, 
+                                0.0
+                            ]
+                        }, 
+                        "key": 7
+                    }, 
+                    "dtype": "compas.datastructures/Part", 
+                    "guid": "3d98f0c7-efaf-45fb-8fc8-114b576fae0c"
+                }
+            }, 
+            "8": {
+                "part": {
+                    "data": {
+                        "attributes": {
+                            "name": "8"
+                        }, 
+                        "features": [], 
+                        "frame": {
+                            "point": [
+                                2000.0, 
+                                0.0, 
+                                0.0
+                            ], 
+                            "xaxis": [
+                                1.0, 
+                                0.0, 
+                                0.0
+                            ], 
+                            "yaxis": [
+                                0.0, 
+                                1.0, 
+                                0.0
+                            ]
+                        }, 
+                        "key": 8
+                    }, 
+                    "dtype": "compas.datastructures/Part", 
+                    "guid": "0334c5db-8abf-4d11-8019-169ad86d5e1b"
+                }
+            }, 
+            "9": {
+                "part": {
+                    "data": {
+                        "attributes": {
+                            "name": "9"
+                        }, 
+                        "features": [], 
+                        "frame": {
+                            "point": [
+                                2000.0, 
+                                0.0, 
+                                1000.0
+                            ], 
+                            "xaxis": [
+                                1.0, 
+                                0.0, 
+                                0.0
+                            ], 
+                            "yaxis": [
+                                0.0, 
+                                1.0, 
+                                0.0
+                            ]
+                        }, 
+                        "key": 9
+                    }, 
+                    "dtype": "compas.datastructures/Part", 
+                    "guid": "65db7d4a-a9de-49dc-99b7-942f91c9dd62"
+                }
+            }
+        }
+    }
+}
