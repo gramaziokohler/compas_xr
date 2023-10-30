@@ -40,22 +40,20 @@ from Firebase.Auth.Providers import FirebaseAuthProvider
 from Firebase.Storage import FirebaseStorage
 from Firebase.Storage import FirebaseStorageTask
 
-
-
-#TODO: Update file path... this currently maps to C: drive or wherever the program is running the code... this is important.
 # Get the current file path
 CURRENT_FILE_PATH = os.path.abspath(__file__)
 # print (CURRENT_FILE_PATH)
 
 # Define the number of levels to navigate up
-LEVELS_TO_GO_UP = 4
+LEVELS_TO_GO_UP = 2
 
 #Construct File path to the correct location
 PARENT_FOLDER = os.path.abspath(os.path.join(CURRENT_FILE_PATH, "../" * LEVELS_TO_GO_UP))
 
 # Enter another folder
-TARGET_FOLDER = os.path.join(PARENT_FOLDER, "scripts")
+TARGET_FOLDER = os.path.join(PARENT_FOLDER, "data")
 DEFAULT_CONFIG_PATH = os.path.join(TARGET_FOLDER, "firebase_config.json")
+print (DEFAULT_CONFIG_PATH)
 
 def _event_trigger(event):
     print ("function is being called to trigger event and task was completed")

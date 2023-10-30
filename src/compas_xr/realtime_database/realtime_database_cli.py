@@ -2,6 +2,7 @@ import os
 import sys
 import json
 from compas.data import json_dumps,json_loads
+from compas_timber import assembly as TA
 from compas_xr.realtime_database.realtime_database_interface import RealtimeDatabaseInterface
 import clr
 import threading
@@ -30,7 +31,6 @@ if lib_dir not in sys.path:
 clr.AddReference("Firebase.Auth.dll")
 clr.AddReference("Firebase.dll")
 clr.AddReference("Firebase.Storage.dll")
-print("Are u really working realtime?")
 
 from Firebase.Database import FirebaseClient
 from Firebase.Database.Query import FirebaseQuery
@@ -40,20 +40,18 @@ from Firebase.Database.Query import FirebaseQuery
 # from Firebase.Auth.Providers import FirebaseAuthProvider
 # from Firebase.Storage import FirebaseStorage
 
-
-#TODO: Update file path... this currently maps to C: drive or wherever the program is running the code... this is important.
 # Get the current file path
 CURRENT_FILE_PATH = os.path.abspath(__file__)
 # print (CURRENT_FILE_PATH)
 
 # Define the number of levels to navigate up
-LEVELS_TO_GO_UP = 4
+LEVELS_TO_GO_UP = 2
 
 #Construct File path to the correct location
 PARENT_FOLDER = os.path.abspath(os.path.join(CURRENT_FILE_PATH, "../" * LEVELS_TO_GO_UP))
 
 # Enter another folder
-TARGET_FOLDER = os.path.join(PARENT_FOLDER, "scripts")
+TARGET_FOLDER = os.path.join(PARENT_FOLDER, "data")
 DEFAULT_CONFIG_PATH = os.path.join(TARGET_FOLDER, "firebase_config.json")
 
 class RealtimeDatabase(RealtimeDatabaseInterface):
@@ -105,6 +103,7 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
 
         return RealtimeDatabase._shared_database
 
+    #Internal Class Structure Functions
     def _start_async_call(self, fn, timeout=10):
         print ("inside of start async")
         result = {}
@@ -116,16 +115,45 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
 
         return result["data"]
     
+    #Functions for adding attributes to assemblies
+    def add_assembly_attributes(self, assembly, data_type, robot_keys=None, built_keys=None, planned_keys=None):
+        
+        data_type_list = ['0.Cylinder','1.Box','2.ObjFile','3.Mesh']
+
+        data = assembly.data
+        graph = assembly.graph.data
+        graph_node = graph["node"]
+
+        for key in graph_node:
+            graph_node[str(key)]['type_id'] = key
+            graph_node[str(key)]['type_data'] = data_type_list[data_type]
+            graph_node[str(key)]['is_built'] = False
+            graph_node[str(key)]['is_planned'] = False
+            graph_node[str(key)]['placed_by'] = "human"
+
+        for k in robot_keys:
+            graph_node[str(k)]['placed_by'] = "robot"
+
+        if built_keys:
+            for l in built_keys:
+                graph_node[str(l)]['is_built'] = True
+
+        if planned_keys:
+            for m in planned_keys:
+                graph_node[str(m)]['is_planned'] = True
+
+        assembly = Assembly.from_data(data)
+
+        return assembly
+
     def add_assembly_attributes_timbers(self, assembly, data_type, robot_keys=None, built_keys=None, planned_keys=None):
         
         data_type_list = ['0.Cylinder','1.Box','2.ObjFile','3.Mesh']
 
         data = assembly.data
         beam_keys = assembly.beam_keys
-        joint_keys = assembly.joint_keys
         graph = assembly.graph.data
         graph_node = graph["node"]
-        beam_frames = []
 
         for key in beam_keys:
             graph_node[str(key)]['type_id'] = key
@@ -148,10 +176,12 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
                     if m in beam_keys:
                         graph_node[str(m)]['is_planned'] = True
 
-        assembly = Assembly.from_data(data)
+        timber_assembly = TA.assembly.TimberAssembly.from_data(data)
 
-        return assembly
+        return timber_assembly
 
+    #Functions for uploading various types of data
+    #TODO: Function for adding children to an existing parent
     def upload_file_all(self, json_path, parentname):
         
         if RealtimeDatabase._shared_database:
@@ -179,8 +209,7 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
         #TODO: Do I need this?
         else:
             raise Exception("You need a DB reference!")
-    
-    #Function for uploading json parameters and nested json paramaters    
+
     def upload_file(self, json_path, parentname, parentparamater, parameters, nestedparams=True):
         
         if RealtimeDatabase._shared_database:
@@ -199,9 +228,11 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
                     parameters_dict = {param: values}
                     paramaters_nested.update(parameters_dict)
 
-                nested_dict = {parentparamater: paramaters_nested}
+                #TODO: QUESTION.... DO WE WANT TO GIVE THE PARENT PARAMATER NAME OR NOT
+                # nested_dict = {parentparamater: paramaters_nested}
                 # print (nested_dict)
-                parameters_list.update(nested_dict)
+                # parameters_list.update(nested_dict)
+                parameters_list.update(paramaters_nested)
 
             else: 
                 for param in parameters:
@@ -365,6 +396,8 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
         else:
             raise Exception("You need a DB reference!")
 
+    #TODO: Functions for reading from RealTimeDB
+
 
     #This function is only for first level paramaters, or would be great if we want to hard code "Graph param"    
     def upload_file_baselevel(self, json_path, parentname, parameters):
@@ -400,9 +433,6 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
         #TODO: Do I need this?
         else:
             raise Exception("You need a DB reference!")
-
-
-
 
     #TODO: This did not work, but reference code looks like we can double nest child references. This needs to be checked.
     def upload_file_all_as_child(self, json_path, parentname, childname):
