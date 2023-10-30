@@ -444,15 +444,17 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
             
             serialized_data = json_dumps(json_data)
             database_reference = RealtimeDatabase._shared_database
-            print (type(database_reference))
-            parent_reference = database_reference.Child(parentname)
-            print (type(parent_reference))
-            parent_query = FirebaseQuery(parent_reference, database_reference)
-            print (parent_reference)
+            # print (type(database_reference))
+            # parent_reference = database_reference.Child(parentname)
+            # print (type(parent_reference))
+            # parent_query = FirebaseQuery(parent_reference, database_reference)
+            # print (parent_reference)
 
             def _begin_upload(result):
                 print ("inside of begin upload")
-                uploadtask = parent_query.Child(childname).PutAsync(serialized_data)
+                uploadtask = database_reference.Child(parentname).PostAsync(serialized_data)
+                # print (random) 
+                # uploadtask = database_reference.Child(parentname).Child(childname).PutAsync(serialized_data)
                 print (uploadtask)
                 task_upload = uploadtask.GetAwaiter()
                 print (task_upload)

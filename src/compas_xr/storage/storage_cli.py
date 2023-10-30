@@ -53,7 +53,6 @@ PARENT_FOLDER = os.path.abspath(os.path.join(CURRENT_FILE_PATH, "../" * LEVELS_T
 # Enter another folder
 TARGET_FOLDER = os.path.join(PARENT_FOLDER, "data")
 DEFAULT_CONFIG_PATH = os.path.join(TARGET_FOLDER, "firebase_config.json")
-print (DEFAULT_CONFIG_PATH)
 
 def _event_trigger(event):
     print ("function is being called to trigger event and task was completed")
@@ -87,7 +86,7 @@ class Storage(StorageInterface):
     def _ensure_storage(self):
         # Initialize Firebase connection and storage only once
         if not Storage._shared_storage:
-            path = self.config_path 
+            path = self.config_path
             print ("This is your path" + path)
 
             # Load the Firebase configuration file from the JSON file if the file exists
@@ -116,7 +115,7 @@ class Storage(StorageInterface):
 
         return Storage._shared_storage
     
-    
+    #Internal Class Functions
     def _start_async_call(self, fn, timeout=10):
         result = {}
         result["event"] = threading.Event()
@@ -170,6 +169,8 @@ class Storage(StorageInterface):
             if overwrite:
                 urlretrieve(source, target)
     
+    #Functions for uploading different data types to Storage
+    #TODO: Uploading a series of .obj files
     def download_file(self, path_on_cloud, path_local):
         if Storage._shared_storage:
             # Shared storage instance with a specificatoin of file name.
