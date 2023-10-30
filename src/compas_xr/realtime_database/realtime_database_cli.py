@@ -5,6 +5,8 @@ from compas.data import json_dumps,json_loads
 from compas_xr.realtime_database.realtime_database_interface import RealtimeDatabaseInterface
 import clr
 import threading
+from compas.datastructures import Assembly
+from compas.data import json_dumps,json_loads
 from System.IO import FileStream, FileMode, MemoryStream, Stream
 from System.Text import Encoding
 from System.Threading import (
@@ -114,6 +116,42 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
 
         return result["data"]
     
+    def add_assembly_attributes_timbers(self, assembly, data_type, robot_keys=None, built_keys=None, planned_keys=None):
+        
+        data_type_list = ['0.Cylinder','1.Box','2.ObjFile','3.Mesh']
+
+        data = assembly.data
+        beam_keys = assembly.beam_keys
+        joint_keys = assembly.joint_keys
+        graph = assembly.graph.data
+        graph_node = graph["node"]
+        beam_frames = []
+
+        for key in beam_keys:
+            graph_node[str(key)]['type_id'] = key
+            graph_node[str(key)]['type_data'] = data_type_list[data_type]
+            graph_node[str(key)]['is_built'] = False
+            graph_node[str(key)]['is_planned'] = False
+            graph_node[str(key)]['placed_by'] = "human"
+
+        for k in robot_keys:
+            if k in beam_keys:
+                graph_node[str(k)]['placed_by'] = "robot"
+
+        if built_keys:
+            for l in built_keys:
+                    if l in beam_keys:
+                        graph_node[str(l)]['is_built'] = True
+
+        if planned_keys:
+            for m in planned_keys:
+                    if m in beam_keys:
+                        graph_node[str(m)]['is_planned'] = True
+
+        assembly = Assembly.from_data(data)
+
+        return assembly
+
     def upload_file_all(self, json_path, parentname):
         
         if RealtimeDatabase._shared_database:
