@@ -8,7 +8,7 @@ from compas.datastructures import Assembly
 from compas_xr.storage.storage_interface import StorageInterface
 import clr
 import threading
-from System.IO import FileStream, FileMode, MemoryStream, Stream
+from System.IO import File, FileStream, FileMode, MemoryStream, Stream
 from System.Text import Encoding
 from System.Threading import (
     ManualResetEventSlim,
@@ -328,6 +328,31 @@ class Storage(StorageInterface):
             desearialized_data = json_loads(data_serialized)
 
             return desearialized_data
+
+    def upload_obj(self, path_on_cloud, cloud_folder, path_local):
+            
+        if Storage._shared_storage:
+            # Shared storage instance with a specification of file name.
+            storage_refrence = Storage._shared_storage.Child("obj_storage").Child(cloud_folder).Child(path_on_cloud)
+
+            if os.path.exists(path_local):
+                
+                data = File.ReadAllBytes(path_local)
+                stream = MemoryStream(data)
+
+                def _begin_upload(result):
+
+                    uploadtask = storage_refrence.PutAsync(stream)
+                    task_upload = uploadtask.GetAwaiter()
+                    task_upload.OnCompleted(lambda: result["event"].set())
+
+                    result["event"].wait()
+                    result["data"] = True
+                
+                upload = self._start_async_call(_begin_upload)
+            
+            else:
+                raise Exception("OBJ file path does not exist")
 
 # # Back up PROXY option, and works but not the ideal solution.
 # from compas.rpc import Proxy
