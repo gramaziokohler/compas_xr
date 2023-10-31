@@ -31,6 +31,7 @@ if lib_dir not in sys.path:
 clr.AddReference("Firebase.Auth.dll")
 clr.AddReference("Firebase.dll")
 clr.AddReference("Firebase.Storage.dll")
+clr.AddReference("System.Reactive.dll")
 
 from Firebase.Database import FirebaseClient
 from Firebase.Database.Query import FirebaseQuery
@@ -363,6 +364,17 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
             raise Exception("You need a DB reference!")
 
     #TODO: Functions for reading from RealTimeDB
+    def stream_data(self, parentname):
+        
+        if RealtimeDatabase._shared_database:
+            database_reference = RealtimeDatabase._shared_database
+            # print (type(database_reference))
+            # parent_reference = database_reference.Child(parentname)
+            # print (type(parent_reference))
+            # parent_query = FirebaseQuery(parent_reference, database_reference)
+            # print (parent_reference)
+            downloadtask = database_reference.Child(parentname).AsObservable[dict]()
+            print (downloadtask) 
 
 
     #This function is only for first level paramaters, or would be great if we want to hard code "Graph param"    
@@ -399,7 +411,7 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
         #TODO: Do I need this?
         else:
             raise Exception("You need a DB reference!")
-
+        
     #TODO: This did not work, but reference code looks like we can double nest child references. This needs to be checked.
     def upload_file_all_as_child(self, json_path, parentname, childname):
         
@@ -415,22 +427,25 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
             # print (type(parent_reference))
             # parent_query = FirebaseQuery(parent_reference, database_reference)
             # print (parent_reference)
+            uploadtask = database_reference.Child(parentname).AsRealtimeDatabase[dict]
+            print (uploadtask) 
 
-            def _begin_upload(result):
-                print ("inside of begin upload")
-                uploadtask = database_reference.Child(parentname).PostAsync(serialized_data)
-                # print (random) 
-                # uploadtask = database_reference.Child(parentname).Child(childname).PutAsync(serialized_data)
-                print (uploadtask)
-                task_upload = uploadtask.GetAwaiter()
-                print (task_upload)
-                task_upload.OnCompleted(lambda: result["event"].set())
-                print
-                result["event"].wait()
-                result["data"] = True
+
+            # def _begin_upload(result):
+            #     print ("inside of begin upload")
+            #     uploadtask = database_reference.Child(parentname).AsRealtimeDatabase
+            #     print (uploadtask) 
+            #     # uploadtask = database_reference.Child(parentname).Child(childname).PutAsync(serialized_data)
+            #     print (uploadtask)
+            #     task_upload = uploadtask.GetAwaiter()
+            #     print (task_upload)
+            #     task_upload.OnCompleted(lambda: result["event"].set())
+            #     print
+            #     result["event"].wait()
+            #     result["data"] = True
             
-            upload = self._start_async_call(_begin_upload)
-            print (upload)
+            # upload = self._start_async_call(_begin_upload)
+            # print (upload)
 
         #TODO: Do I need this?
         else:
