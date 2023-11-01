@@ -354,6 +354,47 @@ class Storage(StorageInterface):
             else:
                 raise Exception("OBJ file path does not exist")
 
+    def upload_objs(self, folder_local, cloud_folder_name):
+            
+        if Storage._shared_storage:
+            # Shared storage instance with a specification of file name.
+            storagefolder_refrence = Storage._shared_storage.Child("obj_storage").Child(cloud_folder_name)
+
+            if os.path.exists(folder_local) and os.path.isdir(folder_local):
+                
+                file_info = []
+
+                for f in os.listdir(folder_local):
+                    file_path = os.path.join(folder_local, f)
+                    if os.path.isfile(file_path):
+                        file_info.append((file_path, f))
+
+                for path, name in file_info:
+                    
+                    print ("path:", path)
+                    print ("name:", name)
+                    
+                    storage_refrence = storagefolder_refrence.Child(name)
+                    data = File.ReadAllBytes(path)
+                    stream = MemoryStream(data)
+
+                    def _begin_upload(result):
+
+                        uploadtask = storage_refrence.PutAsync(stream)
+                        task_upload = uploadtask.GetAwaiter()
+                        task_upload.OnCompleted(lambda: result["event"].set())
+
+                        result["event"].wait()
+                        result["data"] = True
+                    
+                    upload = self._start_async_call(_begin_upload)
+            
+            else:
+                raise Exception("Folder path {} does not exist".format(folder_local))
+
+
+
+
 # # Back up PROXY option, and works but not the ideal solution.
 # from compas.rpc import Proxy
 
