@@ -31,10 +31,12 @@ if lib_dir not in sys.path:
 clr.AddReference("Firebase.Auth.dll")
 clr.AddReference("Firebase.dll")
 clr.AddReference("Firebase.Storage.dll")
+clr.AddReference("LiteDB.dll")
 clr.AddReference("System.Reactive.dll")
 
 from Firebase.Database import FirebaseClient
 from Firebase.Database.Query import FirebaseQuery
+from Firebase.Database import Streaming
 # from Firebase.Auth import FirebaseAuthConfig
 # # from Firebase.Auth import FirebaseConfig
 # from Firebase.Auth import FirebaseAuthClient
@@ -116,6 +118,49 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
 
         return result["data"]
     
+    def download_file_from_remote(self, source, target, overwrite=True):
+        """Download a file from a remote source and save it to a local destination.
+
+        Parameters
+        ----------
+        source : str
+            The url of the source file.
+        target : str
+            The path of the local destination.
+        overwrite : bool, optional
+            If True, overwrite `target` if it already exists.
+
+        Examples
+        --------
+        .. code-block:: python
+
+            import os
+            import compas
+            from compas.utilities.remote import download_file_from_remote
+
+            source = 'https://raw.githubusercontent.com/compas-dev/compas/main/data/faces.obj'
+            target = os.path.join(compas.APPDATA, 'data', 'faces.obj')
+
+            download_file_from_remote(source, target)
+
+        """
+        parent = os.path.abspath(os.path.dirname(target))
+
+        if not os.path.exists(parent):
+            os.makedirs(parent)
+
+        if not os.path.isdir(parent):
+            raise Exception("The target path is not a valid file path: {}".format(target))
+
+        if not os.access(parent, os.W_OK):
+            raise Exception("The target path is not writable: {}".format(target))
+
+        if not os.path.exists(target):
+            urlretrieve(source, target)
+        else:
+            if overwrite:
+                urlretrieve(source, target)
+
     #Functions for adding attributes to assemblies
     def add_assembly_attributes(self, assembly, data_type, robot_keys=None, built_keys=None, planned_keys=None):
         
@@ -369,19 +414,34 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
         if RealtimeDatabase._shared_database:
             database_reference = RealtimeDatabase._shared_database
 
-            downloadtask = database_reference.Child(parentname).AsObservable[dict]()
-            print (downloadtask) 
+            downloadevent = database_reference.Child(parentname).AsObservable[dict]()
+            print (type(downloadevent)) 
 
-            def _begin_download(result):
-                download_task = downloadtask.Subcribe()
-                task_download = download_task.GetAwaiter()
-                task_download.OnCompleted(lambda: result["event"].set())
+            data_dict = {}
 
-                result["event"].wait()
-                result["data"] = download_task.Object
+            # def _begin_download(result):
+            #     download_task = downloadtask.Subscribe()
+            #     task_download = download_task.GetAwaiter()
+            #     task_download.OnCompleted(lambda: result["event"].set())
+
+            #     result["event"].wait()
+            #     result["data"] = download_task.Object
             
-            data = self._start_async_call(_begin_download)
-            print (data)
+            # data = self._start_async_call(_begin_download)
+            # downloadtask.Dispose()
+            # print (data)
+
+            def _process_event(event):
+                data = event.OnCompleted()
+                print (data)
+                # data_dict[event.Key] = data
+
+            subscription = downloadevent.Subscribe(_process_event(downloadevent))
+            print (subscription)
+            subscription.Dispose()
+
+            return data_dict
+
 
 
     #Functions for deleting parents and children
@@ -441,7 +501,7 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
 
     
     #TODO: This did not work, but reference code looks like we can double nest child references. This needs to be checked.
-    def upload_file_all_as_child(self, json_path, parentname, childname):
+    def upload_file_all_as_child(self, json_path, parentname, childname, path_local):
         
         if RealtimeDatabase._shared_database:
 
@@ -450,30 +510,57 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
             
             serialized_data = json_dumps(json_data)
             database_reference = RealtimeDatabase._shared_database
-            # print (type(database_reference))
+            # query = FirebaseQuery[child](parentname,database_reference)
+            print (type(database_reference))
             # parent_reference = database_reference.Child(parentname)
             # print (type(parent_reference))
             # parent_query = FirebaseQuery(parent_reference, database_reference)
             # print (parent_reference)
-            uploadtask = database_reference.Child(parentname).AsRealtimeDatabase[dict]
-            print (uploadtask) 
-
-
-            # def _begin_upload(result):
-            #     print ("inside of begin upload")
-            #     uploadtask = database_reference.Child(parentname).AsRealtimeDatabase
-            #     print (uploadtask) 
-            #     # uploadtask = database_reference.Child(parentname).Child(childname).PutAsync(serialized_data)
-            #     print (uploadtask)
-            #     task_upload = uploadtask.GetAwaiter()
-            #     print (task_upload)
-            #     task_upload.OnCompleted(lambda: result["event"].set())
-            #     print
-            #     result["event"].wait()
-            #     result["data"] = True
             
-            # upload = self._start_async_call(_begin_upload)
-            # print (upload)
+            #This returned a task
+            # uploadtask = database_reference.Child(parentname).BuildUrlAsync()
+            # print (type(uploadtask)) 
+
+
+            def _begin_build_url(result):
+                urlbuldtask = database_reference.Child(parentname).BuildUrlAsync()
+                task_url = urlbuldtask.GetAwaiter()
+                task_url.OnCompleted(lambda: result["event"].set())
+
+                result["event"].wait()
+                result["data"] = urlbuldtask.Result
+            
+            url = self._start_async_call(_begin_build_url)
+            print (url)
+
+            download = self.download_file_from_remote(url, path_local)
+            print ("download_complete")
+
+        #TODO: Do I need this?
+        else:
+            raise Exception("You need a DB reference!")
+
+
+    def download_parent(self, parentname, path_local):
+        
+        if RealtimeDatabase._shared_database:
+
+            database_reference = RealtimeDatabase._shared_database
+            print (type(database_reference))
+
+            def _begin_build_url(result):
+                urlbuldtask = database_reference.Child(parentname).BuildUrlAsync()
+                task_url = urlbuldtask.GetAwaiter()
+                task_url.OnCompleted(lambda: result["event"].set())
+
+                result["event"].wait()
+                result["data"] = urlbuldtask.Result
+            
+            url = self._start_async_call(_begin_build_url)
+            print (url)
+
+            download = self.download_file_from_remote(url, path_local)
+            print ("download_complete")
 
         #TODO: Do I need this?
         else:
