@@ -339,6 +339,7 @@ class Storage(StorageInterface):
                 
                 data = File.ReadAllBytes(path_local)
                 stream = MemoryStream(data)
+                print (path_local)
 
                 def _begin_upload(result):
 
@@ -355,13 +356,19 @@ class Storage(StorageInterface):
                 raise Exception("OBJ file path does not exist")
 
     def upload_objs(self, folder_local, cloud_folder_name):
-            
+        
         if Storage._shared_storage:
-            # Shared storage instance with a specification of file name.
+            # TODO: Shared storage instance with a specification of file name. Does not work with the reference below, only works if I construct the reference every time.
+            """
+            Folder reference:
             storagefolder_refrence = Storage._shared_storage.Child("obj_storage").Child(cloud_folder_name)
 
+            File reference below later in code loop:
+            storage_reference = storagefolder_reference.Child(name)
+
+            """
+                        
             if os.path.exists(folder_local) and os.path.isdir(folder_local):
-                
                 file_info = []
 
                 for f in os.listdir(folder_local):
@@ -370,28 +377,30 @@ class Storage(StorageInterface):
                         file_info.append((file_path, f))
 
                 for path, name in file_info:
-                    
-                    print ("path:", path)
-                    print ("name:", name)
-                    
-                    storage_refrence = storagefolder_refrence.Child(name)
+                    print (path)
+                    print (name)
+
+                    #TODO: Question
+                    """
+                    Also works with the function call below, but not sure if this is the best idea
+                    # self.upload_obj(name, cloud_folder_name, path)
+                    """
                     data = File.ReadAllBytes(path)
                     stream = MemoryStream(data)
 
                     def _begin_upload(result):
-
+                        storage_refrence = Storage._shared_storage.Child("obj_storage").Child(cloud_folder_name).Child(name)
                         uploadtask = storage_refrence.PutAsync(stream)
                         task_upload = uploadtask.GetAwaiter()
                         task_upload.OnCompleted(lambda: result["event"].set())
 
                         result["event"].wait()
                         result["data"] = True
-                    
+
                     upload = self._start_async_call(_begin_upload)
-            
+
             else:
                 raise Exception("Folder path {} does not exist".format(folder_local))
-
 
 
 

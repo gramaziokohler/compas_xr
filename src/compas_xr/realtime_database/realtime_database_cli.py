@@ -364,17 +364,44 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
             raise Exception("You need a DB reference!")
 
     #TODO: Functions for reading from RealTimeDB
-    def stream_data(self, parentname):
+    def stream_parent(self, parentname):
         
         if RealtimeDatabase._shared_database:
             database_reference = RealtimeDatabase._shared_database
-            # print (type(database_reference))
-            # parent_reference = database_reference.Child(parentname)
-            # print (type(parent_reference))
-            # parent_query = FirebaseQuery(parent_reference, database_reference)
-            # print (parent_reference)
+
             downloadtask = database_reference.Child(parentname).AsObservable[dict]()
             print (downloadtask) 
+
+            def _begin_download(result):
+                download_task = downloadtask.Subcribe()
+                task_download = download_task.GetAwaiter()
+                task_download.OnCompleted(lambda: result["event"].set())
+
+                result["event"].wait()
+                result["data"] = download_task.Object
+            
+            data = self._start_async_call(_begin_download)
+            print (data)
+
+
+    #Functions for deleting parents and children
+    def delete_parent(self, parentname):
+        
+        if RealtimeDatabase._shared_database:
+
+            database_reference = RealtimeDatabase._shared_database 
+
+            def _begin_delete(result):
+                deletetask = database_reference.Child(parentname).DeleteAsync()
+                delete_data = deletetask.GetAwaiter()
+                delete_data.OnCompleted(lambda: result["event"].set())
+                result["event"].wait()
+                result["data"] = True
+            
+            delete = self._start_async_call(_begin_delete)
+            print (delete)
+
+
 
 
     #This function is only for first level paramaters, or would be great if we want to hard code "Graph param"    
@@ -411,7 +438,8 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
         #TODO: Do I need this?
         else:
             raise Exception("You need a DB reference!")
-        
+
+    
     #TODO: This did not work, but reference code looks like we can double nest child references. This needs to be checked.
     def upload_file_all_as_child(self, json_path, parentname, childname):
         
