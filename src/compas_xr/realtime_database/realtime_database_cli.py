@@ -500,27 +500,17 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
             raise Exception("You need a DB reference!")
 
     
-    #TODO: This did not work, but reference code looks like we can double nest child references. This needs to be checked.
-    def upload_file_all_as_child(self, json_path, parentname, childname, path_local):
+    #TODO: This needs to be reformatted to work only with paramaters and not the full thing... there really is very limited reason to upload a full json as a child
+    #TODO: THIS SHOULD BE OPTIMIZED. CONSTRUCT CHILD REFERENCE IN ITS INTERNAL OWN FUNCTION.... THAT WAY EVERY FILE WHERE YOU USE CHILD REFERENCE YOU CAN CALL THAT FUNCTION?
+    def upload_file_all_as_child(self, path_local, parentname, childname):
         
         if RealtimeDatabase._shared_database:
 
-            with open(json_path) as json_file:
+            with open(path_local) as json_file:
                 json_data = json.load(json_file)
             
             serialized_data = json_dumps(json_data)
             database_reference = RealtimeDatabase._shared_database
-            # query = FirebaseQuery[child](parentname,database_reference)
-            print (type(database_reference))
-            # parent_reference = database_reference.Child(parentname)
-            # print (type(parent_reference))
-            # parent_query = FirebaseQuery(parent_reference, database_reference)
-            # print (parent_reference)
-            
-            #This returned a task
-            # uploadtask = database_reference.Child(parentname).BuildUrlAsync()
-            # print (type(uploadtask)) 
-
 
             def _begin_build_url(result):
                 urlbuldtask = database_reference.Child(parentname).BuildUrlAsync()
@@ -533,13 +523,25 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
             url = self._start_async_call(_begin_build_url)
             print (url)
 
-            download = self.download_file_from_remote(url, path_local)
-            print ("download_complete")
+            url = url[:-6]
+            print (url)
+
+            child_client = FirebaseClient(url)
+
+            def _begin_upload(result):
+                
+                uploadtask = child_client.Child(childname).PostAsync(serialized_data)
+                task_upload = uploadtask.GetAwaiter()
+                task_upload.OnCompleted(lambda: result["event"].set())
+                result["event"].wait()
+                result["data"] = True
+            
+            upload = self._start_async_call(_begin_upload)
+            print ("HERE", upload)
 
         #TODO: Do I need this?
         else:
             raise Exception("You need a DB reference!")
-
 
     def download_parent(self, parentname, path_local):
         
