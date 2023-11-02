@@ -61,7 +61,7 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
 
     # Class attribute for the shared firebase database reference
     _shared_database = None
-    
+    _shared_database_url = None
     # def __init__(self, config_path = None):
         
     #     pass
@@ -92,8 +92,11 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
                 # auth_config.api_key = config["apiKey"]  # Set the API key separately
                 # auth_client = FirebaseAuthClient(config_file)
 
-                #Initilize Storage instance from storageBucket
-                database_client = FirebaseClient(config["databaseURL"])
+                #Initilize database instance from the database URL
+                database_url = config["databaseURL"]
+                print (database_url)
+                RealtimeDatabase._shared_database_url = database_url
+                database_client = FirebaseClient(database_url)
                 print (database_client)
                 RealtimeDatabase._shared_database = database_client
 
@@ -161,6 +164,21 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
             if overwrite:
                 urlretrieve(source, target)
 
+    def _build_child_reference(self, parentname):
+        
+        databaseurl = RealtimeDatabase._shared_database_url
+        print (databaseurl)
+        parentreference = str("/" + parentname)
+        newurl = databaseurl+parentreference
+
+        parent_client = FirebaseClient(newurl)
+
+        return parent_client
+        
+
+
+
+
     #Functions for adding attributes to assemblies
     def add_assembly_attributes(self, assembly, data_type, robot_keys=None, built_keys=None, planned_keys=None):
         
@@ -225,6 +243,7 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
         timber_assembly = TA.assembly.TimberAssembly.from_data(data)
 
         return timber_assembly
+
 
     #Functions for uploading various types of data
     #TODO: Function for adding children to an existing parent
@@ -408,6 +427,7 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
         else:
             raise Exception("You need a DB reference!")
 
+
     #TODO: Functions for reading from RealTimeDB
     def stream_parent(self, parentname):
         
@@ -441,6 +461,31 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
             subscription.Dispose()
 
             return data_dict
+
+    def download_parent(self, parentname, path_local):
+        
+        if RealtimeDatabase._shared_database:
+
+            database_reference = RealtimeDatabase._shared_database
+            print (type(database_reference))
+
+            def _begin_build_url(result):
+                urlbuldtask = database_reference.Child(parentname).BuildUrlAsync()
+                task_url = urlbuldtask.GetAwaiter()
+                task_url.OnCompleted(lambda: result["event"].set())
+
+                result["event"].wait()
+                result["data"] = urlbuldtask.Result
+            
+            url = self._start_async_call(_begin_build_url)
+            print (url)
+
+            download = self.download_file_from_remote(url, path_local)
+            print ("download_complete")
+
+        #TODO: Do I need this?
+        else:
+            raise Exception("You need a DB reference!")
 
 
 
@@ -502,7 +547,7 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
     
     #TODO: This needs to be reformatted to work only with paramaters and not the full thing... there really is very limited reason to upload a full json as a child
     #TODO: THIS SHOULD BE OPTIMIZED. CONSTRUCT CHILD REFERENCE IN ITS INTERNAL OWN FUNCTION.... THAT WAY EVERY FILE WHERE YOU USE CHILD REFERENCE YOU CAN CALL THAT FUNCTION?
-    def upload_file_all_as_child(self, path_local, parentname, childname):
+    def upload_file_all_as_child_original(self, path_local, parentname, childname):
         
         if RealtimeDatabase._shared_database:
 
@@ -537,33 +582,33 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
                 result["data"] = True
             
             upload = self._start_async_call(_begin_upload)
-            print ("HERE", upload)
 
         #TODO: Do I need this?
         else:
             raise Exception("You need a DB reference!")
-
-    def download_parent(self, parentname, path_local):
+        
+    
+    def upload_file_all_as_child(self, path_local, parentname, childname):
         
         if RealtimeDatabase._shared_database:
-
-            database_reference = RealtimeDatabase._shared_database
-            print (type(database_reference))
-
-            def _begin_build_url(result):
-                urlbuldtask = database_reference.Child(parentname).BuildUrlAsync()
-                task_url = urlbuldtask.GetAwaiter()
-                task_url.OnCompleted(lambda: result["event"].set())
-
-                result["event"].wait()
-                result["data"] = urlbuldtask.Result
             
-            url = self._start_async_call(_begin_build_url)
-            print (url)
-
-            download = self.download_file_from_remote(url, path_local)
-            print ("download_complete")
+            with open(path_local) as json_file:
+                json_data = json.load(json_file)
+            
+            serialized_data = json_dumps(json_data)
+            child_client = self._build_child_reference(parentname)
+            
+            def _begin_upload(result):
+                
+                uploadtask = child_client.Child(childname).PostAsync(serialized_data)
+                task_upload = uploadtask.GetAwaiter()
+                task_upload.OnCompleted(lambda: result["event"].set())
+                result["event"].wait()
+                result["data"] = True
+            
+            upload = self._start_async_call(_begin_upload)
 
         #TODO: Do I need this?
         else:
             raise Exception("You need a DB reference!")
+
