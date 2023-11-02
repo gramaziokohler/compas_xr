@@ -2,18 +2,20 @@ import os
 import sys
 import json
 import io
-from compas.data import Data
-from compas.data import json_loads,json_dumps
-from compas.datastructures import Assembly
+from compas.data import Data,json_loads,json_dumps
+from compas.datastructures import Assembly, Mesh
+from compas.geometry import Transformation, Point, Vector, Frame
 from compas_xr.storage.storage_interface import StorageInterface
 import clr
 import threading
+
 from System.IO import File, FileStream, FileMode, MemoryStream, Stream
 from System.Text import Encoding
 from System.Threading import (
     ManualResetEventSlim,
     CancellationTokenSource,
     CancellationToken)
+
 try:
     # from urllib.request import urlopen
     from urllib.request import urlretrieve
@@ -21,12 +23,10 @@ except ImportError:
     # from urllib2 import urlopen
     from urllib import urlretrieve
 
-
 lib_dir = os.path.join(os.path.dirname(__file__), "dependencies")
 print (lib_dir)
 if lib_dir not in sys.path:
     sys.path.append(lib_dir)
-
 
 clr.AddReference("Firebase.Auth.dll")
 clr.AddReference("Firebase.dll")
@@ -169,27 +169,8 @@ class Storage(StorageInterface):
             if overwrite:
                 urlretrieve(source, target)
     
-    #Functions for uploading different data types to Storage
-    #TODO: Uploading a series of .obj files
-    def download_file(self, path_on_cloud, path_local):
-        if Storage._shared_storage:
-            # Shared storage instance with a specificatoin of file name.
-            storage_refrence = Storage._shared_storage.Child(path_on_cloud)
-            print (storage_refrence)
+    #Upload Functions
 
-            def _begin_download(result):
-                downloadurl_task = storage_refrence.GetDownloadUrlAsync()
-                task_download = downloadurl_task.GetAwaiter()
-                task_download.OnCompleted(lambda: result["event"].set())
-
-                result["event"].wait()
-                result["data"] = downloadurl_task.Result
-            
-            url = self._start_async_call(_begin_download)
-            
-            #THIS WORKED
-            self.download_file_from_remote(url, path_local)
-            print ("download_complete")
 
     def upload_file(self, path_on_cloud, path_local):
         
@@ -246,35 +227,6 @@ class Storage(StorageInterface):
         
             print (upload)
 
-    def download_assembly(self, path_on_cloud, path_local):
-        if Storage._shared_storage:
-            # Shared storage instance with a specificatoin of file name.
-            storage_refrence = Storage._shared_storage.Child(path_on_cloud)
-            print (storage_refrence)
-
-            def _begin_download(result):
-                downloadurl_task = storage_refrence.GetDownloadUrlAsync()
-                task_download = downloadurl_task.GetAwaiter()
-                task_download.OnCompleted(lambda: result["event"].set())
-
-                result["event"].wait()
-                result["data"] = downloadurl_task.Result
-            
-            url = self._start_async_call(_begin_download)
-            
-            #THIS WORKED -- Needs to be in an async event?
-            download = self.download_file_from_remote(url, path_local)
-            print ("download_complete")
-
-            #TODO: This works, but I am not sure if there is a better way then download to a local and open the local... maybe download to MemoryStream or ByteArray?
-            with open(path_local) as json_file:
-                json_assembly = json.load(json_file)
-
-            assembly_serialized = json_dumps(json_assembly)
-            desearialized_data = json_loads(assembly_serialized)
-
-            return desearialized_data
-
     def upload_data(self, path_on_cloud, data):
         if Storage._shared_storage:
             # Shared storage instance with a specification of file name.
@@ -300,7 +252,29 @@ class Storage(StorageInterface):
         
             print (upload)
 
-    def download_data(self, path_on_cloud, path_local):
+    #Download Functions
+    def download_file(self, path_on_cloud, path_local):
+        
+        if Storage._shared_storage:
+            # Shared storage instance with a specificatoin of file name.
+            storage_refrence = Storage._shared_storage.Child(path_on_cloud)
+            print (storage_refrence)
+
+            def _begin_download(result):
+                downloadurl_task = storage_refrence.GetDownloadUrlAsync()
+                task_download = downloadurl_task.GetAwaiter()
+                task_download.OnCompleted(lambda: result["event"].set())
+
+                result["event"].wait()
+                result["data"] = downloadurl_task.Result
+            
+            url = self._start_async_call(_begin_download)
+            
+            #THIS WORKED
+            self.download_file_from_remote(url, path_local)
+            print ("download_complete")
+    
+    def download_assembly(self, path_on_cloud, path_local):
         if Storage._shared_storage:
             # Shared storage instance with a specificatoin of file name.
             storage_refrence = Storage._shared_storage.Child(path_on_cloud)
@@ -320,7 +294,35 @@ class Storage(StorageInterface):
             download = self.download_file_from_remote(url, path_local)
             print ("download_complete")
 
-            #TODO: This works, but I am not sure if there is a better way then download to a local and open the local... maybe download to MemoryStream or ByteArray?
+            with open(path_local) as json_file:
+                json_assembly = json.load(json_file)
+
+            assembly_serialized = json_dumps(json_assembly)
+            desearialized_data = json_loads(assembly_serialized)
+
+            return desearialized_data
+
+    def download_data(self, path_on_cloud, path_local):
+        
+        if Storage._shared_storage:
+            # Shared storage instance with a specificatoin of file name.
+            storage_refrence = Storage._shared_storage.Child(path_on_cloud)
+            print (storage_refrence)
+
+            def _begin_download(result):
+                downloadurl_task = storage_refrence.GetDownloadUrlAsync()
+                task_download = downloadurl_task.GetAwaiter()
+                task_download.OnCompleted(lambda: result["event"].set())
+
+                result["event"].wait()
+                result["data"] = downloadurl_task.Result
+            
+            url = self._start_async_call(_begin_download)
+            
+            #THIS WORKED -- Needs to be in an async event?
+            download = self.download_file_from_remote(url, path_local)
+            print ("download_complete")
+
             with open(path_local) as json_file:
                 json_data = json.load(json_file)
 
@@ -329,6 +331,50 @@ class Storage(StorageInterface):
 
             return desearialized_data
 
+    #Manage Objects - .obj export and upload
+    def export_timberassembly_objs(self, assembly, folder_path, new_folder_name):
+        
+        assembly_graph = assembly.graph.data
+        nodes = assembly_graph["node"]
+        assembly_beam_keys = assembly.beam_keys
+        origin_frame = Frame(Point(0,0,0), Vector.Xaxis(), Vector.Yaxis())
+
+        #Construct file path with the new folder name
+        target_folder_path = os.path.join(folder_path, new_folder_name)
+        
+        #Make a folder with the folder name if it does not exist
+        if not os.path.exists(target_folder_path):
+            os.makedirs(target_folder_path)
+        
+        #Iterate through assembly beams and perform transformation and export
+        for key in assembly_beam_keys:
+            beam = nodes[str(key)]["part"]
+            frame = beam.frame
+            
+            #Extract compas box from beam
+            beam_box = beam.shape
+            
+            #Create Transformation from beam frame to world_xy frame and maybe a copy?
+            transformation = Transformation.from_frame_to_frame(frame, origin_frame)
+            
+            #Transform box from frame to world xy
+            box_transformed = beam_box.transformed(transformation)
+            
+            #Get all information from the box and convert to mesh
+            box_vertices = box_transformed.vertices
+            box_faces = box_transformed.faces
+            box_mesh = Mesh.from_vertices_and_faces(box_vertices, box_faces)
+            
+            # Mesh to obj with file name being KEY and folder being the newly created folder
+            if os.path.exists(target_folder_path):
+                file_name = str(key)+".obj"
+                obj_file_path = os.path.join(target_folder_path, file_name)
+                box_mesh.to_obj(obj_file_path)
+            
+            else:
+                raise Exception("File path does not exist {}".format(target_folder_path))
+
+    
     def upload_obj(self, path_on_cloud, cloud_folder, path_local):
             
         if Storage._shared_storage:
