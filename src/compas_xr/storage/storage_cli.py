@@ -170,8 +170,6 @@ class Storage(StorageInterface):
                 urlretrieve(source, target)
     
     #Upload Functions
-
-
     def upload_file(self, path_on_cloud, path_local):
         
         # self._ensure_storage()
@@ -270,7 +268,6 @@ class Storage(StorageInterface):
             
             url = self._start_async_call(_begin_download)
             
-            #THIS WORKED
             self.download_file_from_remote(url, path_local)
             print ("download_complete")
     
@@ -290,7 +287,7 @@ class Storage(StorageInterface):
             
             url = self._start_async_call(_begin_download)
             
-            #THIS WORKED -- Needs to be in an async event?
+            #TODO: I think this could be optimized.... I do not know if it is worth downloading or if I should just use urlretrieve?
             download = self.download_file_from_remote(url, path_local)
             print ("download_complete")
 
@@ -319,7 +316,7 @@ class Storage(StorageInterface):
             
             url = self._start_async_call(_begin_download)
             
-            #THIS WORKED -- Needs to be in an async event?
+            #TODO: I think this could be optimized.... I do not know if it is worth downloading or if I should just use urlretrieve?
             download = self.download_file_from_remote(url, path_local)
             print ("download_complete")
 
@@ -373,7 +370,6 @@ class Storage(StorageInterface):
             
             else:
                 raise Exception("File path does not exist {}".format(target_folder_path))
-
     
     def upload_obj(self, path_on_cloud, cloud_folder, path_local):
             

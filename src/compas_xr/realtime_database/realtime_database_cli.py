@@ -75,6 +75,7 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
 
     def _ensure_database(self):
 
+        #TODO: Include catch method for calling the function after a config already exists
         # Initialize Firebase connection and databse only once
         if not RealtimeDatabase._shared_database:
             path = self.config_path
@@ -164,17 +165,27 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
             if overwrite:
                 urlretrieve(source, target)
 
-    def _build_child_reference(self, parentname):
+    def _build_parent_client(self, parentname):
         
         databaseurl = RealtimeDatabase._shared_database_url
-        print (databaseurl)
         parentreference = str("/" + parentname)
         newurl = databaseurl+parentreference
 
         parent_client = FirebaseClient(newurl)
 
         return parent_client
-        
+    
+    def _build_child_client(self, parentname, childname):
+
+        databaseurl = RealtimeDatabase._shared_database_url
+        parentreference = str("/" + parentname)
+        childrefernce = str("/" + childname)
+        newurl = databaseurl + parentreference + childrefernce
+        print (newurl)
+
+        child_client = FirebaseClient(newurl)
+
+        return child_client
 
 
 
@@ -249,6 +260,7 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
     #TODO: Function for adding children to an existing parent
     def upload_file_all(self, json_path, parentname):
         
+        #TODO: I don't remember why we included this if statement... Also should call _ensure_database()?
         if RealtimeDatabase._shared_database:
 
             with open(json_path) as json_file:
@@ -277,6 +289,7 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
 
     def upload_file(self, json_path, parentname, parentparamater, parameters):
         
+        #TODO: I don't remember why we included this if statement... Also should call _ensure_database()?
         if RealtimeDatabase._shared_database:
 
             with open(json_path) as json_file:
@@ -311,6 +324,7 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
 
     def upload_assembly_all(self, assembly, parentname):
         
+        #TODO: I don't remember why we included this if statement... Also should call _ensure_database()?
         if RealtimeDatabase._shared_database:
 
             data = assembly.data
@@ -337,6 +351,7 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
     
     def upload_assembly(self, assembly, parentname, parentparamater, parameters):
         
+        #TODO: I don't remember why we included this if statement... Also should call _ensure_database()?
         if RealtimeDatabase._shared_database:
 
             data = assembly.data
@@ -371,6 +386,7 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
 
     def upload_data_all(self, data, parentname):
         
+        #TODO: I don't remember why we included this if statement... Also should call _ensure_database()?
         if RealtimeDatabase._shared_database:
 
             serialized_data = json_dumps(data)
@@ -396,6 +412,7 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
     
     def upload_data(self, data, parentname, parentparamater, parameters, nestedparams=True):
         
+        #TODO: I don't remember why we included this if statement... Also should call _ensure_database()?
         if RealtimeDatabase._shared_database:
             
             parameters_list = {}
@@ -428,9 +445,10 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
             raise Exception("You need a DB reference!")
 
 
-    #TODO: Functions for reading from RealTimeDB
+    #TODO: Functions for streaming realtime databese.
     def stream_parent(self, parentname):
         
+        #TODO: I don't remember why we included this if statement... Also should call _ensure_database()?
         if RealtimeDatabase._shared_database:
             database_reference = RealtimeDatabase._shared_database
 
@@ -464,6 +482,7 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
 
     def download_parent(self, parentname, path_local):
         
+        #TODO: I don't remember why we included this if statement... Also should call _ensure_database()?
         if RealtimeDatabase._shared_database:
 
             database_reference = RealtimeDatabase._shared_database
@@ -492,6 +511,7 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
     #Functions for deleting parents and children
     def delete_parent(self, parentname):
         
+        #TODO: I don't remember why we included this if statement... Also should call _ensure_database()?
         if RealtimeDatabase._shared_database:
 
             database_reference = RealtimeDatabase._shared_database 
@@ -506,12 +526,48 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
             delete = self._start_async_call(_begin_delete)
             print (delete)
 
+    def delete_child(self, parentname, childname):
+        
+        #TODO: I don't remember why we included this if statement... Also should call _ensure_database()?
+        if RealtimeDatabase._shared_database:
 
+            database_reference = self._build_parent_client(parentname)
 
+            def _begin_delete(result):
+                deletetask = database_reference.Child(childname).DeleteAsync()
+                delete_data = deletetask.GetAwaiter()
+                delete_data.OnCompleted(lambda: result["event"].set())
+                result["event"].wait()
+                result["data"] = True
+            
+            delete = self._start_async_call(_begin_delete)
+            print (delete)
+
+    def delete_children(self, parentname, childname, children):
+        
+        #TODO: I don't remember why we included this if statement... Also should call _ensure_database()?
+        if RealtimeDatabase._shared_database:
+
+            database_reference = self._build_child_client(parentname, childname)
+
+            print (database_reference)
+
+            for child in children:
+
+                def _begin_delete(result):
+                    deletetask = database_reference.Child(child).DeleteAsync()
+                    delete_data = deletetask.GetAwaiter()
+                    delete_data.OnCompleted(lambda: result["event"].set())
+                    result["event"].wait()
+                    result["data"] = True
+                
+                delete = self._start_async_call(_begin_delete)
+            
 
     #This function is only for first level paramaters, or would be great if we want to hard code "Graph param"    
     def upload_file_baselevel(self, json_path, parentname, parameters):
         
+        #TODO: I don't remember why we included this if statement... Also should call _ensure_database()?
         if RealtimeDatabase._shared_database:
 
             with open(json_path) as json_file:
@@ -546,9 +602,9 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
 
     
     #TODO: This needs to be reformatted to work only with paramaters and not the full thing... there really is very limited reason to upload a full json as a child
-    #TODO: THIS SHOULD BE OPTIMIZED. CONSTRUCT CHILD REFERENCE IN ITS INTERNAL OWN FUNCTION.... THAT WAY EVERY FILE WHERE YOU USE CHILD REFERENCE YOU CAN CALL THAT FUNCTION?
     def upload_file_all_as_child_original(self, path_local, parentname, childname):
         
+        #TODO: I don't remember why we included this if statement... Also should call _ensure_database()?
         if RealtimeDatabase._shared_database:
 
             with open(path_local) as json_file:
@@ -588,16 +644,17 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
             raise Exception("You need a DB reference!")
         
     
-    def upload_file_all_as_child(self, path_local, parentname, childname):
+    def upload_file_aschild_all(self, path_local, parentname, childname):
         
+        #TODO: I don't remember why we included this if statement... Also should call _ensure_database()?
         if RealtimeDatabase._shared_database:
             
             with open(path_local) as json_file:
                 json_data = json.load(json_file)
             
             serialized_data = json_dumps(json_data)
-            child_client = self._build_child_reference(parentname)
-            
+            child_client = self._build_parent_client(parentname)
+
             def _begin_upload(result):
                 
                 uploadtask = child_client.Child(childname).PostAsync(serialized_data)
