@@ -27,21 +27,17 @@ print (lib_dir)
 if lib_dir not in sys.path:
     sys.path.append(lib_dir)
 
-
 clr.AddReference("Firebase.Auth.dll")
 clr.AddReference("Firebase.dll")
 clr.AddReference("Firebase.Storage.dll")
 clr.AddReference("LiteDB.dll")
 clr.AddReference("System.Reactive.dll")
 
+
 from Firebase.Database import FirebaseClient
 from Firebase.Database.Query import FirebaseQuery
 from Firebase.Database import Streaming
-# from Firebase.Auth import FirebaseAuthConfig
-# # from Firebase.Auth import FirebaseConfig
-# from Firebase.Auth import FirebaseAuthClient
-# from Firebase.Auth.Providers import FirebaseAuthProvider
-# from Firebase.Storage import FirebaseStorage
+
 
 # Get the current file path
 CURRENT_FILE_PATH = os.path.abspath(__file__)
@@ -56,6 +52,13 @@ PARENT_FOLDER = os.path.abspath(os.path.join(CURRENT_FILE_PATH, "../" * LEVELS_T
 # Enter another folder
 TARGET_FOLDER = os.path.join(PARENT_FOLDER, "data")
 DEFAULT_CONFIG_PATH = os.path.join(TARGET_FOLDER, "firebase_config.json")
+
+"""
+TODO: add proper exceptions. This is a function by function review.
+TODO: add proper comments.
+TODO: Review Function todo's
+TODO: REVIEW BUILD PARENT FUNCTION WITH GONZALO IF IT IS A GOOD IDEA OR NOT
+"""
 
 class RealtimeDatabase(RealtimeDatabaseInterface):
 
@@ -111,6 +114,7 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
         return RealtimeDatabase._shared_database
 
     #Internal Class Structure Functions
+    #TODO: Could Include a bool to make it usable for download also... It would just include .json in the name also
     def _start_async_call(self, fn, timeout=10):
         print ("inside of start async")
         result = {}
@@ -187,9 +191,6 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
 
         return child_client
 
-
-
-
     #Functions for adding attributes to assemblies
     def add_assembly_attributes(self, assembly, data_type, robot_keys=None, built_keys=None, planned_keys=None):
         
@@ -254,7 +255,6 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
         timber_assembly = TA.assembly.TimberAssembly.from_data(data)
 
         return timber_assembly
-
 
     #Functions for uploading various types of data
     #TODO: Function for adding children to an existing parent
@@ -444,6 +444,140 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
         else:
             raise Exception("You need a DB reference!")
 
+    #This function is only for first level paramaters ex. "Attributes" and "Graph" 
+    def upload_file_baselevel(self, json_path, parentname, parameters):
+        
+        #TODO: I don't remember why we included this if statement... Also should call _ensure_database()?
+        if RealtimeDatabase._shared_database:
+
+            with open(json_path) as json_file:
+                json_data = json.load(json_file)
+            
+            parameters_list = {}
+
+            for param in parameters:
+                values = json_data[param]
+                parameters_dict = {param: values}
+                parameters_list.update(parameters_dict)
+            
+            serialized_data = json_dumps(parameters_list)
+            database_reference = RealtimeDatabase._shared_database 
+
+            def _begin_upload(result):
+                uploadtask = database_reference.Child(parentname).PutAsync(serialized_data)
+                print (uploadtask)
+                task_upload = uploadtask.GetAwaiter()
+                print (task_upload)
+                task_upload.OnCompleted(lambda: result["event"].set())
+                print
+                result["event"].wait()
+                result["data"] = True
+            
+            upload = self._start_async_call(_begin_upload)
+            print (upload)
+
+        #TODO: Do I need this?
+        else:
+            raise Exception("You need a DB reference!")
+
+    #TODO: Original function built the databaseurl from the reference updated version is for: Confirm if it should be deleted or not 
+    def upload_file_all_as_child_original(self, path_local, parentname, childname):
+        
+        #TODO: I don't remember why we included this if statement... Also should call _ensure_database()?
+        if RealtimeDatabase._shared_database:
+
+            with open(path_local) as json_file:
+                json_data = json.load(json_file)
+            
+            serialized_data = json_dumps(json_data)
+            database_reference = RealtimeDatabase._shared_database
+
+            def _begin_build_url(result):
+                urlbuldtask = database_reference.Child(parentname).BuildUrlAsync()
+                task_url = urlbuldtask.GetAwaiter()
+                task_url.OnCompleted(lambda: result["event"].set())
+
+                result["event"].wait()
+                result["data"] = urlbuldtask.Result
+            
+            url = self._start_async_call(_begin_build_url)
+            print (url)
+
+            url = url[:-6]
+            print (url)
+
+            child_client = FirebaseClient(url)
+
+            def _begin_upload(result):
+                
+                uploadtask = child_client.Child(childname).PostAsync(serialized_data)
+                task_upload = uploadtask.GetAwaiter()
+                task_upload.OnCompleted(lambda: result["event"].set())
+                result["event"].wait()
+                result["data"] = True
+            
+            upload = self._start_async_call(_begin_upload)
+
+        #TODO: Do I need this?
+        else:
+            raise Exception("You need a DB reference!")
+         
+    def upload_file_aschild_all(self, path_local, parentname, childname, name):
+        
+        #TODO: I don't remember why we included this if statement... Also should call _ensure_database()?
+        if RealtimeDatabase._shared_database:
+            
+            with open(path_local) as json_file:
+                json_data = json.load(json_file)
+            
+            serialized_data = json_dumps(json_data)
+            child_client = self._build_child_client(parentname, childname)
+
+            def _begin_upload(result):
+                
+                uploadtask = child_client.Child(name).PutAsync(serialized_data)
+                task_upload = uploadtask.GetAwaiter()
+                task_upload.OnCompleted(lambda: result["event"].set())
+                result["event"].wait()
+                result["data"] = True
+            
+            upload = self._start_async_call(_begin_upload)
+
+        #TODO: Do I need this?
+        else:
+            raise Exception("You need a DB reference!")
+
+    def upload_file_aschild(self, path_local, parentname, childname, parentparameter, childparameter, parameters):
+        
+        #TODO: I don't remember why we included this if statement... Also should call _ensure_database()?
+        if RealtimeDatabase._shared_database:
+            
+            with open(path_local) as json_file:
+                json_data = json.load(json_file)
+            
+            child_client = self._build_child_client(parentname, childname)
+
+            for param in parameters:
+                values = json_data[parentparameter][childparameter][param]
+                # parameters_dict = {values}
+                serialized_data = json_dumps(values)
+            
+                #TODO: THIS MIGHT NEED TO BE A LOOP
+                def _begin_upload(result):
+                    
+                    #TODO: THIS IS IMPORTANT TO CHECK PUT VS. POST: Not sure if it uploads all data or replaces node reference
+                    uploadtask = child_client.Child(param).PutAsync(serialized_data)
+                    task_upload = uploadtask.GetAwaiter()
+                    task_upload.OnCompleted(lambda: result["event"].set())
+                    result["event"].wait()
+                    result["data"] = True
+                
+                upload = self._start_async_call(_begin_upload)
+
+        #TODO: Do I need this?
+        else:
+            raise Exception("You need a DB reference!")
+
 
     #TODO: Functions for streaming realtime databese.
     def stream_parent(self, parentname):
@@ -482,11 +616,11 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
 
     def download_parent(self, parentname, path_local):
         
+        #TODO: YOU CAN REPLACE THE URL BUILD WITH THE BULID PARENT FUNCTION
         #TODO: I don't remember why we included this if statement... Also should call _ensure_database()?
         if RealtimeDatabase._shared_database:
 
             database_reference = RealtimeDatabase._shared_database
-            print (type(database_reference))
 
             def _begin_build_url(result):
                 urlbuldtask = database_reference.Child(parentname).BuildUrlAsync()
@@ -506,6 +640,31 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
         else:
             raise Exception("You need a DB reference!")
 
+    def download_child(self, parentname, childname, path_local):
+        
+        #TODO: YOU CAN REPLACE THE URL BUILD WITH THE BULID PARENT FUNCTION, but it needs to include .json
+        #TODO: I don't remember why we included this if statement... Also should call _ensure_database()?
+        if RealtimeDatabase._shared_database:
+
+            database_reference = self._build_parent_client(parentname)
+
+            def _begin_build_url(result):
+                urlbuldtask = database_reference.Child(childname).BuildUrlAsync()
+                task_url = urlbuldtask.GetAwaiter()
+                task_url.OnCompleted(lambda: result["event"].set())
+
+                result["event"].wait()
+                result["data"] = urlbuldtask.Result
+            
+            url = self._start_async_call(_begin_build_url)
+            print ("this is you url", url)
+
+            download = self.download_file_from_remote(url, path_local)
+            print ("download_complete")
+
+        #TODO: Do I need this?
+        else:
+            raise Exception("You need a DB reference!")
 
 
     #Functions for deleting parents and children
@@ -563,109 +722,3 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
                 
                 delete = self._start_async_call(_begin_delete)
             
-
-    #This function is only for first level paramaters, or would be great if we want to hard code "Graph param"    
-    def upload_file_baselevel(self, json_path, parentname, parameters):
-        
-        #TODO: I don't remember why we included this if statement... Also should call _ensure_database()?
-        if RealtimeDatabase._shared_database:
-
-            with open(json_path) as json_file:
-                json_data = json.load(json_file)
-            
-            parameters_list = {}
-
-            for param in parameters:
-                values = json_data[param]
-                parameters_dict = {param: values}
-                parameters_list.update(parameters_dict)
-            
-            serialized_data = json_dumps(parameters_list)
-            database_reference = RealtimeDatabase._shared_database 
-
-            def _begin_upload(result):
-                uploadtask = database_reference.Child(parentname).PutAsync(serialized_data)
-                print (uploadtask)
-                task_upload = uploadtask.GetAwaiter()
-                print (task_upload)
-                task_upload.OnCompleted(lambda: result["event"].set())
-                print
-                result["event"].wait()
-                result["data"] = True
-            
-            upload = self._start_async_call(_begin_upload)
-            print (upload)
-
-        #TODO: Do I need this?
-        else:
-            raise Exception("You need a DB reference!")
-
-    
-    #TODO: This needs to be reformatted to work only with paramaters and not the full thing... there really is very limited reason to upload a full json as a child
-    def upload_file_all_as_child_original(self, path_local, parentname, childname):
-        
-        #TODO: I don't remember why we included this if statement... Also should call _ensure_database()?
-        if RealtimeDatabase._shared_database:
-
-            with open(path_local) as json_file:
-                json_data = json.load(json_file)
-            
-            serialized_data = json_dumps(json_data)
-            database_reference = RealtimeDatabase._shared_database
-
-            def _begin_build_url(result):
-                urlbuldtask = database_reference.Child(parentname).BuildUrlAsync()
-                task_url = urlbuldtask.GetAwaiter()
-                task_url.OnCompleted(lambda: result["event"].set())
-
-                result["event"].wait()
-                result["data"] = urlbuldtask.Result
-            
-            url = self._start_async_call(_begin_build_url)
-            print (url)
-
-            url = url[:-6]
-            print (url)
-
-            child_client = FirebaseClient(url)
-
-            def _begin_upload(result):
-                
-                uploadtask = child_client.Child(childname).PostAsync(serialized_data)
-                task_upload = uploadtask.GetAwaiter()
-                task_upload.OnCompleted(lambda: result["event"].set())
-                result["event"].wait()
-                result["data"] = True
-            
-            upload = self._start_async_call(_begin_upload)
-
-        #TODO: Do I need this?
-        else:
-            raise Exception("You need a DB reference!")
-        
-    
-    def upload_file_aschild_all(self, path_local, parentname, childname):
-        
-        #TODO: I don't remember why we included this if statement... Also should call _ensure_database()?
-        if RealtimeDatabase._shared_database:
-            
-            with open(path_local) as json_file:
-                json_data = json.load(json_file)
-            
-            serialized_data = json_dumps(json_data)
-            child_client = self._build_parent_client(parentname)
-
-            def _begin_upload(result):
-                
-                uploadtask = child_client.Child(childname).PostAsync(serialized_data)
-                task_upload = uploadtask.GetAwaiter()
-                task_upload.OnCompleted(lambda: result["event"].set())
-                result["event"].wait()
-                result["data"] = True
-            
-            upload = self._start_async_call(_begin_upload)
-
-        #TODO: Do I need this?
-        else:
-            raise Exception("You need a DB reference!")
-
