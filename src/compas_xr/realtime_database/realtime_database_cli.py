@@ -15,11 +15,9 @@ from System.Threading import (
     CancellationTokenSource,
     CancellationToken)
 try:
-    # from urllib.request import urlopen
-    from urllib.request import urlretrieve
+    from urllib.request import urlopen    
 except ImportError:
-    # from urllib2 import urlopen
-    from urllib import urlretrieve
+    from urllib import urlopen
 
 
 lib_dir = os.path.join(os.path.dirname(__file__), "dependencies")
@@ -32,7 +30,6 @@ clr.AddReference("Firebase.dll")
 clr.AddReference("Firebase.Storage.dll")
 clr.AddReference("LiteDB.dll")
 clr.AddReference("System.Reactive.dll")
-
 
 from Firebase.Database import FirebaseClient
 from Firebase.Database.Query import FirebaseQuery, QueryExtensions
@@ -56,8 +53,6 @@ DEFAULT_CONFIG_PATH = os.path.join(TARGET_FOLDER, "firebase_config.json")
 """
 TODO: add proper exceptions. This is a function by function review.
 TODO: add proper comments.
-TODO: Review Function todo's
-TODO: Get RID of CHECKS FOR DATABASE INSIDE OF METHODS
 """
 
 class RealtimeDatabase(RealtimeDatabaseInterface):
@@ -112,49 +107,21 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
         async_thread.join(timeout=timeout)
 
         return result["data"]
-    #TODO: GET RID OF AND USE URL OPEN INSTEAD
-    def download_file_from_remote(self, source, target, overwrite=True):
-        """Download a file from a remote source and save it to a local destination.
 
-        Parameters
-        ----------
-        source : str
-            The url of the source file.
-        target : str
-            The path of the local destination.
-        overwrite : bool, optional
-            If True, overwrite `target` if it already exists.
-
-        Examples
-        --------
-        .. code-block:: python
-
-            import os
-            import compas
-            from compas.utilities.remote import download_file_from_remote
-
-            source = 'https://raw.githubusercontent.com/compas-dev/compas/main/data/faces.obj'
-            target = os.path.join(compas.APPDATA, 'data', 'faces.obj')
-
-            download_file_from_remote(source, target)
-
+    def _get_file_from_remote(self, url):
+        
         """
-        parent = os.path.abspath(os.path.dirname(target))
+        This function is used to get the information form the source url and returns a string
+        """
 
-        if not os.path.exists(parent):
-            os.makedirs(parent)
+        try:
+            get = urlopen(url).read()
 
-        if not os.path.isdir(parent):
-            raise Exception("The target path is not a valid file path: {}".format(target))
-
-        if not os.access(parent, os.W_OK):
-            raise Exception("The target path is not writable: {}".format(target))
-
-        if not os.path.exists(target):
-            urlretrieve(source, target)
-        else:
-            if overwrite:
-                urlretrieve(source, target)
+        except:
+            raise Exception("unable to get file from url {}".format(url))
+        
+        return get
+    
     #Functions for building Child References: Happens in 3 types of methods: Upload, Download, and Delete
     def _construct_childreference(self, parentname, childname):
       
@@ -177,7 +144,7 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
 
     #Functions for adding attributes to assemblies
     #TODO: NEEDS TO BE MOVED
-    def add_assembly_attributes(self, assembly, data_type, robot_keys=None, built_keys=None, planned_keys=None):
+    def add_assembly_attributes(self, assembly, data_type, robot_keys=None, built_keys=None, planned_keys=None): #DONE
         
         data_type_list = ['0.Cylinder','1.Box','2.ObjFile','3.Mesh']
 
@@ -207,7 +174,7 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
 
         return assembly
     #TODO: NEEDS TO BE MOVED
-    def add_assembly_attributes_timbers(self, assembly, data_type, robot_keys=None, built_keys=None, planned_keys=None):
+    def add_assembly_attributes_timbers(self, assembly, data_type, robot_keys=None, built_keys=None, planned_keys=None):#DONE
         
         data_type_list = ['0.Cylinder','1.Box','2.ObjFile','3.Mesh']
 
@@ -241,9 +208,11 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
 
         return timber_assembly
 
-
     #Functions for uploading various types of data
-    def upload_file_all(self, json_path, parentname):
+    def upload_file_all(self, json_path, parentname): #DONE
+
+        #Ensure Database Connection
+        self._ensure_database()
 
         with open(json_path) as json_file:
             json_data = json.load(json_file)
@@ -265,7 +234,10 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
         upload = self._start_async_call(_begin_upload)
         print (upload)
 
-    def upload_file(self, json_path, parentname, parentparamater, parameters):
+    def upload_file(self, json_path, parentname, parentparamater, parameters): #DONE
+
+        #Ensure Database Connection
+        self._ensure_database()
 
         with open(json_path) as json_file:
             json_data = json.load(json_file)
@@ -274,7 +246,6 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
     
         paramaters_nested = {}
         for param in parameters:
-            print (param)
             values = json_data[parentparamater][param]
             parameters_dict = {param: values}
             paramaters_nested.update(parameters_dict)
@@ -294,9 +265,11 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
         upload = self._start_async_call(_begin_upload)
         print (upload)
 
-
     #TODO: NEEDS TO BE MOVED
-    def upload_assembly_all(self, assembly, parentname):
+    def upload_assembly_all(self, assembly, parentname): #DONE
+
+        #Ensure Database Connection
+        self._ensure_database()
 
         data = assembly.data
         serialized_data = json_dumps(data)
@@ -317,175 +290,178 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
         print (upload)
 
     #TODO: NEEDS TO BE MOVED
-    def upload_assembly(self, assembly, parentname, parentparamater, parameters):
+    def upload_assembly(self, assembly, parentname, parentparamater, parameters):#DONE
         
-        #TODO: I don't remember why we included this if statement... Also should call _ensure_database()?
-        if RealtimeDatabase._shared_database:
+        #Ensure Database Connection
+        self._ensure_database()
 
-            data = assembly.data
-            
-            parameters_list = {}
-
-            paramaters_nested = {}
-            
-            for param in parameters:
-                print (param)
-                values = data[parentparamater][param]
-                parameters_dict = {param: values}
-                paramaters_nested.update(parameters_dict)
-            parameters_list.update(paramaters_nested)
-
-            serialized_data = json_dumps(parameters_list)
-            database_reference = RealtimeDatabase._shared_database 
-
-            def _begin_upload(result):
-                uploadtask = database_reference.Child(parentname).PutAsync(serialized_data)
-                task_upload = uploadtask.GetAwaiter()
-                task_upload.OnCompleted(lambda: result["event"].set())
-                result["event"].wait()
-                result["data"] = True
-            
-            upload = self._start_async_call(_begin_upload)
-            print (upload)
-
-        #TODO: Do I need this?
-        else:
-            raise Exception("You need a DB reference!")
-
-    def upload_data_all(self, data, parentname):
+        data = assembly.data
         
-        #TODO: I don't remember why we included this if statement... Also should call _ensure_database()?
-        if RealtimeDatabase._shared_database:
+        parameters_list = {}
 
-            serialized_data = json_dumps(data)
-            database_reference = RealtimeDatabase._shared_database 
+        paramaters_nested = {}
+        
+        for param in parameters:
+            print (param)
+            values = data[parentparamater][param]
+            parameters_dict = {param: values}
+            paramaters_nested.update(parameters_dict)
+        parameters_list.update(paramaters_nested)
 
-            def _begin_upload(result):
-                print ("inside of begin upload")
-                uploadtask = database_reference.Child(parentname).PutAsync(serialized_data)
-                print (uploadtask)
-                task_upload = uploadtask.GetAwaiter()
-                print (task_upload)
-                task_upload.OnCompleted(lambda: result["event"].set())
-                print
-                result["event"].wait()
-                result["data"] = True
-            
-            upload = self._start_async_call(_begin_upload)
-            print (upload)
+        serialized_data = json_dumps(parameters_list)
+        database_reference = RealtimeDatabase._shared_database 
 
-        #TODO: Do I need this?
-        else:
-            raise Exception("You need a DB reference!")
+        def _begin_upload(result):
+            uploadtask = database_reference.Child(parentname).PutAsync(serialized_data)
+            task_upload = uploadtask.GetAwaiter()
+            task_upload.OnCompleted(lambda: result["event"].set())
+            result["event"].wait()
+            result["data"] = True
+        
+        upload = self._start_async_call(_begin_upload)
+        print (upload)
+
+    def upload_data_all(self, data, parentname): #DONE
+
+        #Ensure Database Connection
+        self._ensure_database()
+
+        serialized_data = json_dumps(data)
+        database_reference = RealtimeDatabase._shared_database 
+
+        def _begin_upload(result):
+            print ("inside of begin upload")
+            uploadtask = database_reference.Child(parentname).PutAsync(serialized_data)
+            print (uploadtask)
+            task_upload = uploadtask.GetAwaiter()
+            print (task_upload)
+            task_upload.OnCompleted(lambda: result["event"].set())
+            print
+            result["event"].wait()
+            result["data"] = True
+        
+        upload = self._start_async_call(_begin_upload)
+        print (upload)
     
-    def upload_data(self, data, parentname, parentparamater, parameters, nestedparams=True):
+    def upload_data(self, data, parentname, parentparamater, parameters, nestedparams=True): #REVIEW
+            
+        #Ensure Database Connection
+        self._ensure_database()
+
+        parameters_list = {}
+
+        #Upload Nested Data or not.
+        paramaters_nested = {}
         
-        #TODO: I don't remember why we included this if statement... Also should call _ensure_database()?
-        if RealtimeDatabase._shared_database:
-            
-            parameters_list = {}
+        for param in parameters:
+            print (param)
+            values = data[parentparamater][param]
+            parameters_dict = {param: values}
+            paramaters_nested.update(parameters_dict)
+        parameters_list.update(paramaters_nested)
 
-            #Upload Nested Data or not.
-            paramaters_nested = {}
-            
-            for param in parameters:
-                print (param)
-                values = data[parentparamater][param]
-                parameters_dict = {param: values}
-                paramaters_nested.update(parameters_dict)
-            parameters_list.update(paramaters_nested)
+        serialized_data = json_dumps(parameters_list)
+        database_reference = RealtimeDatabase._shared_database 
 
-            serialized_data = json_dumps(parameters_list)
-            database_reference = RealtimeDatabase._shared_database 
-
-            def _begin_upload(result):
-                uploadtask = database_reference.Child(parentname).PutAsync(serialized_data)
-                task_upload = uploadtask.GetAwaiter()
-                task_upload.OnCompleted(lambda: result["event"].set())
-                result["event"].wait()
-                result["data"] = True
-            
-            upload = self._start_async_call(_begin_upload)
-            print (upload)
-
-        #TODO: Do I need this?
-        else:
-            raise Exception("You need a DB reference!")
+        def _begin_upload(result):
+            uploadtask = database_reference.Child(parentname).PutAsync(serialized_data)
+            task_upload = uploadtask.GetAwaiter()
+            task_upload.OnCompleted(lambda: result["event"].set())
+            result["event"].wait()
+            result["data"] = True
+        
+        upload = self._start_async_call(_begin_upload)
+        print (upload)
 
     #This function is only for first level paramaters ex. "Attributes" and "Graph" 
-    def upload_file_baselevel(self, json_path, parentname, parameters):
+    def upload_file_baselevel(self, json_path, parentname, parameters): #DONE
+
+        #Ensure Database Connection
+        self._ensure_database()
+
+        with open(json_path) as json_file:
+            json_data = json.load(json_file)
         
-        #TODO: I don't remember why we included this if statement... Also should call _ensure_database()?
-        if RealtimeDatabase._shared_database:
+        parameters_list = {}
 
-            with open(json_path) as json_file:
-                json_data = json.load(json_file)
-            
-            parameters_list = {}
+        for param in parameters:
+            values = json_data[param]
+            parameters_dict = {param: values}
+            parameters_list.update(parameters_dict)
+        
+        serialized_data = json_dumps(parameters_list)
+        database_reference = RealtimeDatabase._shared_database 
 
-            for param in parameters:
-                values = json_data[param]
-                parameters_dict = {param: values}
-                parameters_list.update(parameters_dict)
-            
-            serialized_data = json_dumps(parameters_list)
-            database_reference = RealtimeDatabase._shared_database 
-
-            def _begin_upload(result):
-                uploadtask = database_reference.Child(parentname).PutAsync(serialized_data)
-                print (uploadtask)
-                task_upload = uploadtask.GetAwaiter()
-                print (task_upload)
-                task_upload.OnCompleted(lambda: result["event"].set())
-                print
-                result["event"].wait()
-                result["data"] = True
-            
-            upload = self._start_async_call(_begin_upload)
-            print (upload)
-
-        #TODO: Do I need this?
-        else:
-            raise Exception("You need a DB reference!")
+        def _begin_upload(result):
+            uploadtask = database_reference.Child(parentname).PutAsync(serialized_data)
+            print (uploadtask)
+            task_upload = uploadtask.GetAwaiter()
+            print (task_upload)
+            task_upload.OnCompleted(lambda: result["event"].set())
+            print
+            result["event"].wait()
+            result["data"] = True
+        
+        upload = self._start_async_call(_begin_upload)
+        print (upload)
 
     #TODO: CREATE MATCHING METHODS FOR DATA?     
     def upload_file_aschild_all(self, path_local, parentname, childname, name): #DONE
-        
-        #TODO: I don't remember why we included this if statement... Also should call _ensure_database()?
-        if RealtimeDatabase._shared_database:
-            
-            with open(path_local) as json_file:
-                json_data = json.load(json_file)
-            
-            serialized_data = json_dumps(json_data)
-                    
-            def _begin_upload(result):
-                new_childreference = self._construct_childrenreference(parentname,childname,name)
-                uploadtask = new_childreference.PutAsync(serialized_data)
-                task_upload = uploadtask.GetAwaiter()
-                task_upload.OnCompleted(lambda: result["event"].set())
-                result["event"].wait()
-                result["data"] = True
-            
-            upload = self._start_async_call(_begin_upload)
 
-        #TODO: Do I need this?
-        else:
-            raise Exception("You need a DB reference!")
+        #Ensure Database Connection
+        self._ensure_database()
+
+        with open(path_local) as json_file:
+            json_data = json.load(json_file)
+        
+        serialized_data = json_dumps(json_data)
+                
+        def _begin_upload(result):
+            new_childreference = self._construct_childrenreference(parentname,childname,name)
+            uploadtask = new_childreference.PutAsync(serialized_data)
+            task_upload = uploadtask.GetAwaiter()
+            task_upload.OnCompleted(lambda: result["event"].set())
+            result["event"].wait()
+            result["data"] = True
+        
+        upload = self._start_async_call(_begin_upload)
 
     def upload_file_aschild(self, path_local, parentname, childname, parentparameter, childparameter): #DONE
-        
-        #TODO: I don't remember why we included this if statement... Also should call _ensure_database()?
-        if RealtimeDatabase._shared_database:
-            
-            with open(path_local) as json_file:
-                json_data = json.load(json_file)
+           
+        #Ensure Database Connection
+        self._ensure_database()
+ 
+        with open(path_local) as json_file:
+            json_data = json.load(json_file)
 
-            values = json_data[parentparameter][childparameter]
+        values = json_data[parentparameter][childparameter]
+        serialized_data = json_dumps(values)
+
+        def _begin_upload(result):
+            new_childreference = self._construct_childreference(parentname, childname)
+            uploadtask = new_childreference.PutAsync(serialized_data)
+            task_upload = uploadtask.GetAwaiter()
+            task_upload.OnCompleted(lambda: result["event"].set())
+            result["event"].wait()
+            result["data"] = True
+        
+        upload = self._start_async_call(_begin_upload)
+
+    def upload_file_aschildren(self, path_local, parentname, childname, parentparameter, childparameter, parameters): #DONE
+            
+        #Ensure Database Connection
+        self._ensure_database()
+
+        with open(path_local) as json_file:
+            json_data = json.load(json_file)
+
+        for param in parameters:
+            
+            values = json_data[parentparameter][childparameter][param]
             serialized_data = json_dumps(values)
 
             def _begin_upload(result):
-                new_childreference = self._construct_childreference(parentname, childname)
+                new_childreference = self._construct_childrenreference(parentname,childname,param)
                 uploadtask = new_childreference.PutAsync(serialized_data)
                 task_upload = uploadtask.GetAwaiter()
                 task_upload.OnCompleted(lambda: result["event"].set())
@@ -494,147 +470,109 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
             
             upload = self._start_async_call(_begin_upload)
 
-        #TODO: Do I need this?
-        else:
-            raise Exception("You need a DB reference!")
-    
-    def upload_file_aschildren(self, path_local, parentname, childname, parentparameter, childparameter, parameters): #DONE
-        
-        #TODO: I don't remember why we included this if statement... Also should call _ensure_database()?
-        if RealtimeDatabase._shared_database:
-            
-            with open(path_local) as json_file:
-                json_data = json.load(json_file)
-
-            for param in parameters:
-                
-                values = json_data[parentparameter][childparameter][param]
-                serialized_data = json_dumps(values)
-
-                def _begin_upload(result):
-                    new_childreference = self._construct_childrenreference(parentname,childname,param)
-                    uploadtask = new_childreference.PutAsync(serialized_data)
-                    task_upload = uploadtask.GetAwaiter()
-                    task_upload.OnCompleted(lambda: result["event"].set())
-                    result["event"].wait()
-                    result["data"] = True
-                
-                upload = self._start_async_call(_begin_upload)
-
-        #TODO: Do I need this?
-        else:
-            raise Exception("You need a DB reference!")
-
-
     #TODO: Functions for streaming realtime databese. SUBSCRIBE TO PARENT... takes a path or a parent name
     def stream_parent(self, callback, parentname): #NEEDS TO BE FIXED
+
+        #Ensure Database Connection
+        self._ensure_database()
+
+        database_reference = RealtimeDatabase._shared_database
+
+        downloadevent = database_reference.Child(parentname).AsObservable[object]()
+        print (downloadevent)
+
+        subscription = downloadevent.Subscribe(callback)
+
+    def download_parent(self, parentname): #DONE
+       
+        #Ensure Database Connection
+        self._ensure_database()
+ 
+        database_reference = RealtimeDatabase._shared_database
+
+        def _begin_build_url(result):
+            urlbuldtask = database_reference.Child(parentname).BuildUrlAsync()
+            task_url = urlbuldtask.GetAwaiter()
+            task_url.OnCompleted(lambda: result["event"].set())
+
+            result["event"].wait()
+            result["data"] = urlbuldtask.Result
         
-        #TODO: I don't remember why we included this if statement... Also should call _ensure_database()?
-        if RealtimeDatabase._shared_database:
-            database_reference = RealtimeDatabase._shared_database
+        url = self._start_async_call(_begin_build_url)
+        print (url)
 
-            downloadevent = database_reference.Child(parentname).AsObservable[object]()
-            print (downloadevent)
+        data = self._get_file_from_remote(url)
+        dictionary = json_loads(data)
 
-            subscription = downloadevent.Subscribe(callback)
+        return dictionary
 
-    def download_parent(self, parentname, path_local): #DONE: Needs to fix download
+    def download_child(self, parentname, childname): #DONE
         
-        #TODO: YOU CAN REPLACE THE URL BUILD WITH THE BULID PARENT FUNCTION
-        #TODO: I don't remember why we included this if statement... Also should call _ensure_database()?
-        if RealtimeDatabase._shared_database:
+        #Ensure Database Connection
+        self._ensure_database()
 
-            database_reference = RealtimeDatabase._shared_database
+        def _begin_build_url(result):
+            database_reference = self._construct_childreference(parentname, childname)
+            urlbuldtask = database_reference.BuildUrlAsync()
+            task_url = urlbuldtask.GetAwaiter()
+            task_url.OnCompleted(lambda: result["event"].set())
 
-            def _begin_build_url(result):
-                urlbuldtask = database_reference.Child(parentname).BuildUrlAsync()
-                task_url = urlbuldtask.GetAwaiter()
-                task_url.OnCompleted(lambda: result["event"].set())
-
-                result["event"].wait()
-                result["data"] = urlbuldtask.Result
-            
-            url = self._start_async_call(_begin_build_url)
-            print (url)
-
-            download = self.download_file_from_remote(url, path_local)
-            print ("download_complete")
-
-        #TODO: Do I need this?
-        else:
-            raise Exception("You need a DB reference!")
-
-    def download_child(self, parentname, childname, path_local): #DONE: Needs to fix download
+            result["event"].wait()
+            result["data"] = urlbuldtask.Result
         
-        #TODO: I don't remember why we included this if statement... Also should call _ensure_database()?
-        if RealtimeDatabase._shared_database:
+        url = self._start_async_call(_begin_build_url)
 
-            def _begin_build_url(result):
-                database_reference = self._construct_childreference(parentname, childname)
-                urlbuldtask = database_reference.BuildUrlAsync()
-                task_url = urlbuldtask.GetAwaiter()
-                task_url.OnCompleted(lambda: result["event"].set())
+        data = self._get_file_from_remote(url)
+        dictionary = json_loads(data)
 
-                result["event"].wait()
-                result["data"] = urlbuldtask.Result
-            
-            url = self._start_async_call(_begin_build_url)
-
-            download = self.download_file_from_remote(url, path_local)
-
-        #TODO: Do I need this?
-        else:
-            raise Exception("You need a DB reference!")
-
+        return dictionary
 
     #Functions for deleting parents and children
     def delete_parent(self, parentname): #DONE
+
+        #Ensure Database Connection
+        self._ensure_database()
+
+        database_reference = RealtimeDatabase._shared_database 
+
+        def _begin_delete(result):
+            deletetask = database_reference.Child(parentname).DeleteAsync()
+            delete_data = deletetask.GetAwaiter()
+            delete_data.OnCompleted(lambda: result["event"].set())
+            result["event"].wait()
+            result["data"] = True
         
-        #TODO: I don't remember why we included this if statement... Also should call _ensure_database()?
-        if RealtimeDatabase._shared_database:
+        delete = self._start_async_call(_begin_delete)
 
-            database_reference = RealtimeDatabase._shared_database 
+    def delete_child(self, parentname, childname): #DONE
 
-            def _begin_delete(result):
-                deletetask = database_reference.Child(parentname).DeleteAsync()
-                delete_data = deletetask.GetAwaiter()
-                delete_data.OnCompleted(lambda: result["event"].set())
-                result["event"].wait()
-                result["data"] = True
-            
-            delete = self._start_async_call(_begin_delete)
-            print (delete)
+        #Ensure Database Connection
+        self._ensure_database()
 
-    def delete_child(self, parentname, childname):
+        def _begin_delete(result):
+            delete_reference = self._construct_childreference( parentname, childname)
+            deletetask = delete_reference.DeleteAsync()
+            delete_data = deletetask.GetAwaiter()
+            delete_data.OnCompleted(lambda: result["event"].set())
+            result["event"].wait()
+            result["data"] = True
         
-        #TODO: I don't remember why we included this if statement... Also should call _ensure_database()?
-        if RealtimeDatabase._shared_database:
-
-            def _begin_delete(result):
-                delete_reference = self._construct_childreference( parentname, childname)
-                deletetask = delete_reference.DeleteAsync()
-                delete_data = deletetask.GetAwaiter()
-                delete_data.OnCompleted(lambda: result["event"].set())
-                result["event"].wait()
-                result["data"] = True
-            
-            delete = self._start_async_call(_begin_delete)
-            print (delete)
+        delete = self._start_async_call(_begin_delete)
 
     def delete_children(self, parentname, childname, children): #DONE
-        
-        #TODO: I don't remember why we included this if statement... Also should call _ensure_database()?
-        if RealtimeDatabase._shared_database:
 
-            for child in children:
-                def _begin_delete(result):
-                    
-                    delete_child_reference = self._construct_childrenreference(parentname, childname, child)
-                    deletetask = delete_child_reference.DeleteAsync()
-                    delete_data = deletetask.GetAwaiter()
-                    delete_data.OnCompleted(lambda: result["event"].set())
-                    result["event"].wait()
-                    result["data"] = True
+        #Ensure Database Connection
+        self._ensure_database()
+
+        for child in children:
+            def _begin_delete(result):
                 
-                delete = self._start_async_call(_begin_delete)
+                delete_child_reference = self._construct_childrenreference(parentname, childname, child)
+                deletetask = delete_child_reference.DeleteAsync()
+                delete_data = deletetask.GetAwaiter()
+                delete_data.OnCompleted(lambda: result["event"].set())
+                result["event"].wait()
+                result["data"] = True
             
+            delete = self._start_async_call(_begin_delete)
+        

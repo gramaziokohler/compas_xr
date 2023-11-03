@@ -2,7 +2,7 @@ import os
 import sys
 import json
 import io
-from compas.data import Data,json_loads,json_dumps
+from compas.data import Data,json_loads,json_dumps, json_dump
 from compas.datastructures import Assembly, Mesh
 from compas.geometry import Transformation, Point, Vector, Frame
 from compas_xr.storage.storage_interface import StorageInterface
@@ -18,10 +18,9 @@ from System.Threading import (
 
 try:
     # from urllib.request import urlopen
-    from urllib.request import urlretrieve
+    from urllib.request import urlopen
 except ImportError:
-    # from urllib2 import urlopen
-    from urllib import urlretrieve
+    from urllib import urlopen
 
 lib_dir = os.path.join(os.path.dirname(__file__), "dependencies")
 print (lib_dir)
@@ -106,210 +105,169 @@ class Storage(StorageInterface):
 
         return result["data"]
     
-    #TODO: GET RID OF AND USE URL OPEN INSTEAD
-    def download_file_from_remote(self, source, target, overwrite=True):
-        """Download a file from a remote source and save it to a local destination.
-
-        Parameters
-        ----------
-        source : str
-            The url of the source file.
-        target : str
-            The path of the local destination.
-        overwrite : bool, optional
-            If True, overwrite `target` if it already exists.
-
-        Examples
-        --------
-        .. code-block:: python
-
-            import os
-            import compas
-            from compas.utilities.remote import download_file_from_remote
-
-            source = 'https://raw.githubusercontent.com/compas-dev/compas/main/data/faces.obj'
-            target = os.path.join(compas.APPDATA, 'data', 'faces.obj')
-
-            download_file_from_remote(source, target)
-
+    def _get_file_from_remote(self, url):
+        
         """
-        parent = os.path.abspath(os.path.dirname(target))
+        This function is used to get the information form the source url and returns a string
+        """
 
-        if not os.path.exists(parent):
-            os.makedirs(parent)
+        try:
+            get = urlopen(url).read()
 
-        if not os.path.isdir(parent):
-            raise Exception("The target path is not a valid file path: {}".format(target))
-
-        if not os.access(parent, os.W_OK):
-            raise Exception("The target path is not writable: {}".format(target))
-
-        if not os.path.exists(target):
-            urlretrieve(source, target)
-        else:
-            if overwrite:
-                urlretrieve(source, target)
+        except:
+            raise Exception("unable to get file from url {}".format(url))
+        
+        return get
     
     #Upload Functions
     def upload_file(self, path_on_cloud, path_local):
         
-        # self._ensure_storage()
+        self._ensure_storage()
         
-        #TODO: Do I need this?
-        if Storage._shared_storage:
-            # Shared storage instance with a specification of file name.
-            storage_refrence = Storage._shared_storage.Child(path_on_cloud)
-            print (storage_refrence)
+        # Shared storage instance with a specification of file name.
+        storage_refrence = Storage._shared_storage.Child(path_on_cloud)
+        print (storage_refrence)
 
+        with FileStream(path_local, FileMode.Open) as file_stream:
             
-            with FileStream(path_local, FileMode.Open) as file_stream:
-                
-                print (type(file_stream))
+            print (type(file_stream))
 
-                def _begin_upload(result):
+            def _begin_upload(result):
 
-                    uploadtask = storage_refrence.PutAsync(file_stream)
-                    task_upload = uploadtask.GetAwaiter()
-                    task_upload.OnCompleted(lambda: result["event"].set())
+                uploadtask = storage_refrence.PutAsync(file_stream)
+                task_upload = uploadtask.GetAwaiter()
+                task_upload.OnCompleted(lambda: result["event"].set())
 
-                    result["event"].wait()
-                    result["data"] = True
-                
-                upload = self._start_async_call(_begin_upload)
-           
-                print (upload)
+                result["event"].wait()
+                result["data"] = True
+            
+            upload = self._start_async_call(_begin_upload)
+        
+            print (upload)
 
-        #TODO: Do I need this?
-        else:
-            raise Exception("You need a storage reference!")
-
+    #TODO: NEEDS TO BE MOVED
     def upload_assembly(self, path_on_cloud, assembly):
-        if Storage._shared_storage:
-            # Shared storage instance with a specification of file name.
-            storage_refrence = Storage._shared_storage.Child(path_on_cloud)
-                
-            data = json_dumps(assembly, pretty=True)
-
-            byte_data = Encoding.UTF8.GetBytes(data)
-            stream = MemoryStream(byte_data)
-
-            def _begin_upload(result):
-
-                uploadtask = storage_refrence.PutAsync(stream)
-                task_upload = uploadtask.GetAwaiter()
-                task_upload.OnCompleted(lambda: result["event"].set())
-
-                result["event"].wait()
-                result["data"] = True
-            
-            upload = self._start_async_call(_begin_upload)
         
-            print (upload)
+        self._ensure_storage()
+        
+        # Shared storage instance with a specification of file name.
+        storage_refrence = Storage._shared_storage.Child(path_on_cloud)
+            
+        data = json_dumps(assembly, pretty=True)
 
+        byte_data = Encoding.UTF8.GetBytes(data)
+        stream = MemoryStream(byte_data)
+
+        def _begin_upload(result):
+
+            uploadtask = storage_refrence.PutAsync(stream)
+            task_upload = uploadtask.GetAwaiter()
+            task_upload.OnCompleted(lambda: result["event"].set())
+
+            result["event"].wait()
+            result["data"] = True
+        
+        upload = self._start_async_call(_begin_upload)
+ 
     def upload_data(self, path_on_cloud, data):
-        if Storage._shared_storage:
-            # Shared storage instance with a specification of file name.
-            storage_refrence = Storage._shared_storage.Child(path_on_cloud)
-           
-            #Serialize data
-            serialized_data = json_dumps(data)
-            print (serialized_data)
-
-            byte_data = Encoding.UTF8.GetBytes(serialized_data)
-            stream = MemoryStream(byte_data)
-
-            def _begin_upload(result):
-
-                uploadtask = storage_refrence.PutAsync(stream)
-                task_upload = uploadtask.GetAwaiter()
-                task_upload.OnCompleted(lambda: result["event"].set())
-
-                result["event"].wait()
-                result["data"] = True
-            
-            upload = self._start_async_call(_begin_upload)
         
-            print (upload)
+        self._ensure_storage()
+        
+        # Shared storage instance with a specification of file name.
+        storage_refrence = Storage._shared_storage.Child(path_on_cloud)
+        
+        #Serialize data
+        serialized_data = json_dumps(data)
+        print (serialized_data)
+
+        byte_data = Encoding.UTF8.GetBytes(serialized_data)
+        stream = MemoryStream(byte_data)
+
+        def _begin_upload(result):
+
+            uploadtask = storage_refrence.PutAsync(stream)
+            task_upload = uploadtask.GetAwaiter()
+            task_upload.OnCompleted(lambda: result["event"].set())
+
+            result["event"].wait()
+            result["data"] = True
+        
+        upload = self._start_async_call(_begin_upload)
 
     #Download Functions
     def download_file(self, path_on_cloud, path_local):
         
-        if Storage._shared_storage:
-            # Shared storage instance with a specificatoin of file name.
-            storage_refrence = Storage._shared_storage.Child(path_on_cloud)
-            print (storage_refrence)
-
-            def _begin_download(result):
-                downloadurl_task = storage_refrence.GetDownloadUrlAsync()
-                task_download = downloadurl_task.GetAwaiter()
-                task_download.OnCompleted(lambda: result["event"].set())
-
-                result["event"].wait()
-                result["data"] = downloadurl_task.Result
-            
-            url = self._start_async_call(_begin_download)
-            
-            self.download_file_from_remote(url, path_local)
-            print ("download_complete")
-    
-    def download_assembly(self, path_on_cloud, path_local):
-        if Storage._shared_storage:
-            # Shared storage instance with a specificatoin of file name.
-            storage_refrence = Storage._shared_storage.Child(path_on_cloud)
-            print (storage_refrence)
-
-            def _begin_download(result):
-                downloadurl_task = storage_refrence.GetDownloadUrlAsync()
-                task_download = downloadurl_task.GetAwaiter()
-                task_download.OnCompleted(lambda: result["event"].set())
-
-                result["event"].wait()
-                result["data"] = downloadurl_task.Result
-            
-            url = self._start_async_call(_begin_download)
-            print ("THIS:", url)
-            #TODO: I think this could be optimized.... I do not know if it is worth downloading or if I should just use urlretrieve?
-            download = self.download_file_from_remote(url, path_local)
-            print ("download_complete")
-
-            with open(path_local) as json_file:
-                json_assembly = json.load(json_file)
-
-            assembly_serialized = json_dumps(json_assembly)
-            desearialized_data = json_loads(assembly_serialized)
-
-            return desearialized_data
-
-    def download_data(self, path_on_cloud, path_local):
+        self._ensure_storage()
         
-        if Storage._shared_storage:
-            # Shared storage instance with a specificatoin of file name.
-            storage_refrence = Storage._shared_storage.Child(path_on_cloud)
-            print (storage_refrence)
+        storage_refrence = Storage._shared_storage.Child(path_on_cloud)
 
-            def _begin_download(result):
-                downloadurl_task = storage_refrence.GetDownloadUrlAsync()
-                task_download = downloadurl_task.GetAwaiter()
-                task_download.OnCompleted(lambda: result["event"].set())
+        def _begin_download(result):
+            downloadurl_task = storage_refrence.GetDownloadUrlAsync()
+            task_download = downloadurl_task.GetAwaiter()
+            task_download.OnCompleted(lambda: result["event"].set())
 
-                result["event"].wait()
-                result["data"] = downloadurl_task.Result
-            
-            url = self._start_async_call(_begin_download)
-            
-            #TODO: I think this could be optimized.... I do not know if it is worth downloading or if I should just use urlretrieve?
-            download = self.download_file_from_remote(url, path_local)
-            print ("download_complete")
+            result["event"].wait()
+            result["data"] = downloadurl_task.Result
+        
+        url = self._start_async_call(_begin_download)
+        
+        data = self._get_file_from_remote(url)
 
-            with open(path_local) as json_file:
-                json_data = json.load(json_file)
+        json_dump(data, path_local, True)
 
-            data_serialized = json_dumps(json_data)
-            desearialized_data = json_loads(data_serialized)
+    #TODO: NEEDS TO BE MOVED
+    def download_assembly(self, path_on_cloud):
+        
+        self._ensure_storage()
+        
+        # Shared storage instance with a specificatoin of file name.
+        storage_refrence = Storage._shared_storage.Child(path_on_cloud)
+        print (storage_refrence)
 
-            return desearialized_data
+        def _begin_download(result):
+            downloadurl_task = storage_refrence.GetDownloadUrlAsync()
+            task_download = downloadurl_task.GetAwaiter()
+            task_download.OnCompleted(lambda: result["event"].set())
+
+            result["event"].wait()
+            result["data"] = downloadurl_task.Result
+        
+        url = self._start_async_call(_begin_download)
+
+        data = self._get_file_from_remote(url)
+
+        desearialized_data = json_loads(data)
+
+        return desearialized_data
+
+    def download_data(self, path_on_cloud):
+        
+        self._ensure_storage()
+        
+        # Shared storage instance with a specificatoin of file name.
+        storage_refrence = Storage._shared_storage.Child(path_on_cloud)
+        print (storage_refrence)
+
+        def _begin_download(result):
+            downloadurl_task = storage_refrence.GetDownloadUrlAsync()
+            task_download = downloadurl_task.GetAwaiter()
+            task_download.OnCompleted(lambda: result["event"].set())
+
+            result["event"].wait()
+            result["data"] = downloadurl_task.Result
+        
+        url = self._start_async_call(_begin_download)
+        
+        data = self._get_file_from_remote(url)
+
+        # data_serialized = json_dumps(json_data)
+        desearialized_data = json_loads(data)
+        print (type(desearialized_data))
+
+        return desearialized_data
 
     #Manage Objects - .obj export and upload
+    #TODO: NEEDS TO BE MOVED
     def export_timberassembly_objs(self, assembly, folder_path, new_folder_name):
         
         assembly_graph = assembly.graph.data
@@ -353,75 +311,71 @@ class Storage(StorageInterface):
                 raise Exception("File path does not exist {}".format(target_folder_path))
     
     def upload_obj(self, path_on_cloud, cloud_folder, path_local):
-            
-        if Storage._shared_storage:
-            # Shared storage instance with a specification of file name.
-            storage_refrence = Storage._shared_storage.Child("obj_storage").Child(cloud_folder).Child(path_on_cloud)
+        
+        self._ensure_storage()
+        
+        storage_refrence = Storage._shared_storage.Child("obj_storage").Child(cloud_folder).Child(path_on_cloud)
 
-            if os.path.exists(path_local):
-                
-                data = File.ReadAllBytes(path_local)
+        if os.path.exists(path_local):
+            
+            data = File.ReadAllBytes(path_local)
+            stream = MemoryStream(data)
+            print (path_local)
+
+            def _begin_upload(result):
+
+                uploadtask = storage_refrence.PutAsync(stream)
+                task_upload = uploadtask.GetAwaiter()
+                task_upload.OnCompleted(lambda: result["event"].set())
+
+                result["event"].wait()
+                result["data"] = True
+            
+            upload = self._start_async_call(_begin_upload)
+
+    def upload_objs(self, folder_local, cloud_folder_name):
+        
+        
+        self._ensure_storage()
+    
+        # TODO: Shared storage instance with a specification of file name. Does not work with the reference below, only works if I construct the reference every time.
+        """
+        Folder reference:
+        storagefolder_refrence = Storage._shared_storage.Child("obj_storage").Child(cloud_folder_name)
+
+        File reference below later in code loop:
+        storage_reference = storagefolder_reference.Child(name)
+
+        """
+                    
+        if os.path.exists(folder_local) and os.path.isdir(folder_local):
+            file_info = []
+
+            for f in os.listdir(folder_local):
+                file_path = os.path.join(folder_local, f)
+                if os.path.isfile(file_path):
+                    file_info.append((file_path, f))
+
+            for path, name in file_info:
+                print (path)
+                print (name)
+
+                #TODO: Question
+                """
+                Also works with the function call below, but not sure if this is the best idea
+                # self.upload_obj(name, cloud_folder_name, path)
+                """
+                data = File.ReadAllBytes(path)
                 stream = MemoryStream(data)
-                print (path_local)
 
                 def _begin_upload(result):
-
+                    storage_refrence = Storage._shared_storage.Child("obj_storage").Child(cloud_folder_name).Child(name)
                     uploadtask = storage_refrence.PutAsync(stream)
                     task_upload = uploadtask.GetAwaiter()
                     task_upload.OnCompleted(lambda: result["event"].set())
 
                     result["event"].wait()
                     result["data"] = True
-                
+
                 upload = self._start_async_call(_begin_upload)
-            
-            else:
-                raise Exception("OBJ file path does not exist")
-
-    def upload_objs(self, folder_local, cloud_folder_name):
-        
-        if Storage._shared_storage:
-            # TODO: Shared storage instance with a specification of file name. Does not work with the reference below, only works if I construct the reference every time.
-            """
-            Folder reference:
-            storagefolder_refrence = Storage._shared_storage.Child("obj_storage").Child(cloud_folder_name)
-
-            File reference below later in code loop:
-            storage_reference = storagefolder_reference.Child(name)
-
-            """
-                        
-            if os.path.exists(folder_local) and os.path.isdir(folder_local):
-                file_info = []
-
-                for f in os.listdir(folder_local):
-                    file_path = os.path.join(folder_local, f)
-                    if os.path.isfile(file_path):
-                        file_info.append((file_path, f))
-
-                for path, name in file_info:
-                    print (path)
-                    print (name)
-
-                    #TODO: Question
-                    """
-                    Also works with the function call below, but not sure if this is the best idea
-                    # self.upload_obj(name, cloud_folder_name, path)
-                    """
-                    data = File.ReadAllBytes(path)
-                    stream = MemoryStream(data)
-
-                    def _begin_upload(result):
-                        storage_refrence = Storage._shared_storage.Child("obj_storage").Child(cloud_folder_name).Child(name)
-                        uploadtask = storage_refrence.PutAsync(stream)
-                        task_upload = uploadtask.GetAwaiter()
-                        task_upload.OnCompleted(lambda: result["event"].set())
-
-                        result["event"].wait()
-                        result["data"] = True
-
-                    upload = self._start_async_call(_begin_upload)
-
-            else:
-                raise Exception("Folder path {} does not exist".format(folder_local))
 
