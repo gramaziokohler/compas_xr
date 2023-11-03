@@ -54,23 +54,11 @@ PARENT_FOLDER = os.path.abspath(os.path.join(CURRENT_FILE_PATH, "../" * LEVELS_T
 TARGET_FOLDER = os.path.join(PARENT_FOLDER, "data")
 DEFAULT_CONFIG_PATH = os.path.join(TARGET_FOLDER, "firebase_config.json")
 
-def _event_trigger(event):
-    print ("function is being called to trigger event and task was completed")
-    event.set()
-
-
-def _mre_event_trigger(task, mre):
-    print ("entered mre function")
-
-    if task.IsFaulted:
-        print ("here")
-    else:
-        print ("This is a normal task")
-        #TODO: THIS IS THE PROBLEM LINE
-        # result = task.Result.Content
-        mre.Set()
-    
-    # return result
+"""
+TODO: add proper exceptions. This is a function by function review.
+TODO: add proper comments.
+TODO: Review Function todo's
+"""
 
 class Storage(StorageInterface):
     
@@ -94,20 +82,12 @@ class Storage(StorageInterface):
                 with open(path) as config_file:
                     config = json.load(config_file)
 
-                # Initialize Firebase authentication and storage
-                # api_key = config["apiKey"]
-                # auth_config_test = FirebaseAuthConfig()
-                # auth_config = FirebaseAuthProvider(FirebaseConfig(api_key))
-                # auth_config.api_key = config["apiKey"]  # Set the API key separately
-                # auth_client = FirebaseAuthClient(config_file)
+                #TODO: Authorization for storage security (Works for now for us because our Storage is public)
 
-                #Initilize Storage instance from storageBucket
+                #Initialize Storage from storage bucket
                 storage_client = FirebaseStorage(config["storageBucket"])
                 print (storage_client)
                 Storage._shared_storage = storage_client
-
-        else:
-            raise Exception("Path Does Not Exist: {}".format(path))
 
         # Still no storage? Fail, we can't do anything
         if not Storage._shared_storage:
@@ -126,6 +106,7 @@ class Storage(StorageInterface):
 
         return result["data"]
     
+    #TODO: GET RID OF AND USE URL OPEN INSTEAD
     def download_file_from_remote(self, source, target, overwrite=True):
         """Download a file from a remote source and save it to a local destination.
 
@@ -286,7 +267,7 @@ class Storage(StorageInterface):
                 result["data"] = downloadurl_task.Result
             
             url = self._start_async_call(_begin_download)
-            
+            print ("THIS:", url)
             #TODO: I think this could be optimized.... I do not know if it is worth downloading or if I should just use urlretrieve?
             download = self.download_file_from_remote(url, path_local)
             print ("download_complete")
@@ -444,19 +425,3 @@ class Storage(StorageInterface):
             else:
                 raise Exception("Folder path {} does not exist".format(folder_local))
 
-
-
-# # Back up PROXY option, and works but not the ideal solution.
-# from compas.rpc import Proxy
-
-# class Storage(StorageInterface):
-#     def __init__(self, config_file):
-#         self.config_file = config_file
-
-#     def download_file(self, path_on_cloud, path_local):
-#         st = Proxy('compas_xr.storage.storage_proxy_api')
-#         st.download_file(path_on_cloud, path_local, self.config_file)
-
-#     def upload_file(self, path_on_cloud, path_local):
-#         st = Proxy('compas_xr.storage.storage_proxy_api')
-#         st.upload_file(path_on_cloud, path_local, self.config_file)
