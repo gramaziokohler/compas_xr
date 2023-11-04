@@ -31,30 +31,14 @@ clr.AddReference("Firebase.dll")
 clr.AddReference("Firebase.Storage.dll")
 
 from Firebase.Auth import FirebaseAuthConfig
-# from Firebase.Auth import FirebaseConfig
 from Firebase.Auth import FirebaseAuthClient
-from Firebase.Auth.Providers import FirebaseAuthProvider
 from Firebase.Storage import FirebaseStorage
-from Firebase.Storage import FirebaseStorageTask
-
-# # Get the current file path
-# CURRENT_FILE_PATH = os.path.abspath(__file__)
-# # print (CURRENT_FILE_PATH)
-
-# # Define the number of levels to navigate up
-# LEVELS_TO_GO_UP = 2
-
-# #Construct File path to the correct location
-# PARENT_FOLDER = os.path.abspath(os.path.join(CURRENT_FILE_PATH, "../" * LEVELS_TO_GO_UP))
-
-# # Enter another folder
-# TARGET_FOLDER = os.path.join(PARENT_FOLDER, "data")
-# DEFAULT_CONFIG_PATH = os.path.join(TARGET_FOLDER, "firebase_config.json")
 
 """
-TODO: add proper exceptions. This is a function by function review.
 TODO: add proper comments.
 TODO: Review Function todo's
+TODO: Authorization for Storage.
+TODO: Move Assembly Stuff to Assembly Manager
 """
 
 class Storage(StorageInterface):
