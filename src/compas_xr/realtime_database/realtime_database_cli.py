@@ -7,7 +7,7 @@ from compas_xr.realtime_database.realtime_database_interface import RealtimeData
 import clr
 import threading
 from compas.datastructures import Assembly
-from compas.data import json_dumps,json_loads
+from compas.data import json_dumps,json_loads, json_load
 from System.IO import FileStream, FileMode, MemoryStream, Stream
 from System.Text import Encoding
 from System.Threading import (
@@ -21,7 +21,6 @@ except ImportError:
 
 
 lib_dir = os.path.join(os.path.dirname(__file__), "dependencies")
-print (lib_dir)
 if lib_dir not in sys.path:
     sys.path.append(lib_dir)
 
@@ -35,20 +34,20 @@ from Firebase.Database import FirebaseClient
 from Firebase.Database.Query import FirebaseQuery, QueryExtensions
 from Firebase.Database import Streaming
 
-#TODO: GET RID OF DEFAULT CONFIG PATH ALWAYS PASS CONFIG PATH.
-# Get the current file path
-CURRENT_FILE_PATH = os.path.abspath(__file__)
-# print (CURRENT_FILE_PATH)
+# #TODO: GET RID OF DEFAULT CONFIG PATH ALWAYS PASS CONFIG PATH.
+# # Get the current file path
+# CURRENT_FILE_PATH = os.path.abspath(__file__)
+# # print (CURRENT_FILE_PATH)
 
-# Define the number of levels to navigate up
-LEVELS_TO_GO_UP = 2
+# # Define the number of levels to navigate up
+# LEVELS_TO_GO_UP = 2
 
-#Construct File path to the correct location
-PARENT_FOLDER = os.path.abspath(os.path.join(CURRENT_FILE_PATH, "../" * LEVELS_TO_GO_UP))
+# #Construct File path to the correct location
+# PARENT_FOLDER = os.path.abspath(os.path.join(CURRENT_FILE_PATH, "../" * LEVELS_TO_GO_UP))
 
-# Enter another folder
-TARGET_FOLDER = os.path.join(PARENT_FOLDER, "data")
-DEFAULT_CONFIG_PATH = os.path.join(TARGET_FOLDER, "firebase_config.json")
+# # Enter another folder
+# TARGET_FOLDER = os.path.join(PARENT_FOLDER, "data")
+# DEFAULT_CONFIG_PATH = os.path.join(TARGET_FOLDER, "firebase_config.json")
 
 """
 TODO: add proper exceptions. This is a function by function review.
@@ -66,9 +65,7 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
     
     def __init__(self, config_path = None):
         
-        self.config_path = config_path or DEFAULT_CONFIG_PATH
-        # self.auth_client = None
-        # self.storage_client = None
+        self.config_path = config_path #or DEFAULT_CONFIG_PATH
         self.database = self._ensure_database()
 
     def _ensure_database(self):
@@ -76,7 +73,6 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
         # Initialize Firebase connection and databse only once
         if not RealtimeDatabase._shared_database:
             path = self.config_path
-            print ("This is your path" + path)
 
             # Load the Firebase configuration file from the JSON file if the file exists
             if os.path.exists(path):
@@ -89,8 +85,9 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
                 database_url = config["databaseURL"]
                 database_client = FirebaseClient(database_url)
                 RealtimeDatabase._shared_database = database_client
-
-        # Still no storage? Fail, we can't do anything
+                print ("Shared Database Client Set")
+        
+        # Still no Database? Fail, we can't do anything
         if not RealtimeDatabase._shared_database:
             raise Exception("Could not initialize Database!")
 
@@ -112,15 +109,22 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
         
         """
         This function is used to get the information form the source url and returns a string
+        It also checks if the data is None or == null (firebase return if no data)
         """
 
         try:
             get = urlopen(url).read()
+            print (get)
 
         except:
             raise Exception("unable to get file from url {}".format(url))
         
-        return get
+        if get is not None and get != "null":
+            return get    
+        
+        else:
+            raise Exception("unable to get file from url {}".format(url))
+        
     
     #Functions for building Child References: Happens in 3 types of methods: Upload, Download, and Delete
     def _construct_childreference(self, parentname, childname):
@@ -208,39 +212,46 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
 
         return timber_assembly
 
+
     #Functions for uploading various types of data
-    def upload_file_all(self, json_path, parentname): #DONE
+    def upload_file_all(self, path_local, parentname): #DONE
 
         #Ensure Database Connection
         self._ensure_database()
 
-        with open(json_path) as json_file:
-            json_data = json.load(json_file)
+        if os.path.exists(path_local):
+
+            with open(path_local) as json_file:
+                json_data = json.load(json_file)
         
+        else:
+            raise Exception("path does not exist {}".format(path_local))
+
         serialized_data = json_dumps(json_data)
         database_reference = RealtimeDatabase._shared_database 
 
         def _begin_upload(result):
-            print ("inside of begin upload")
             uploadtask = database_reference.Child(parentname).PutAsync(serialized_data)
-            print (uploadtask)
             task_upload = uploadtask.GetAwaiter()
-            print (task_upload)
             task_upload.OnCompleted(lambda: result["event"].set())
-            print
             result["event"].wait()
             result["data"] = True
         
         upload = self._start_async_call(_begin_upload)
-        print (upload)
+        print ("upload complete")
 
-    def upload_file(self, json_path, parentname, parentparamater, parameters): #DONE
+    def upload_file(self, path_local, parentname, parentparamater, parameters): #DONE
 
         #Ensure Database Connection
         self._ensure_database()
 
-        with open(json_path) as json_file:
-            json_data = json.load(json_file)
+        if os.path.exists(path_local):
+
+            with open(path_local) as json_file:
+                json_data = json.load(json_file)
+            
+        else:
+            raise Exception("path does not exist {}".format(path_local))
         
         parameters_list = {}
     
@@ -263,7 +274,41 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
             result["data"] = True
         
         upload = self._start_async_call(_begin_upload)
-        print (upload)
+        print ("upload complete")
+
+    #This function is only for first level paramaters ex. "Attributes" and "Graph" 
+    def upload_file_baselevel(self, path_local, parentname, parameters): #DONE
+
+        #Ensure Database Connection
+        self._ensure_database()
+
+        if os.path.exists(path_local):
+            with open(path_local) as json_file:
+                json_data = json.load(json_file)
+            
+        else:
+            raise Exception("path does not exist {}".format(path_local))
+        
+        parameters_list = {}
+
+        for param in parameters:
+            values = json_data[param]
+            parameters_dict = {param: values}
+            parameters_list.update(parameters_dict)
+        
+        serialized_data = json_dumps(parameters_list)
+        database_reference = RealtimeDatabase._shared_database 
+
+        def _begin_upload(result):
+            uploadtask = database_reference.Child(parentname).PutAsync(serialized_data)
+            task_upload = uploadtask.GetAwaiter()
+            task_upload.OnCompleted(lambda: result["event"].set())
+            result["event"].wait()
+            result["data"] = True
+        
+        upload = self._start_async_call(_begin_upload)
+        print ("upload complete")
+
 
     #TODO: NEEDS TO BE MOVED
     def upload_assembly_all(self, assembly, parentname): #DONE
@@ -330,20 +375,17 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
         database_reference = RealtimeDatabase._shared_database 
 
         def _begin_upload(result):
-            print ("inside of begin upload")
             uploadtask = database_reference.Child(parentname).PutAsync(serialized_data)
-            print (uploadtask)
             task_upload = uploadtask.GetAwaiter()
             print (task_upload)
             task_upload.OnCompleted(lambda: result["event"].set())
-            print
             result["event"].wait()
             result["data"] = True
         
         upload = self._start_async_call(_begin_upload)
-        print (upload)
+        print ("upload complete")
     
-    def upload_data(self, data, parentname, parentparamater, parameters, nestedparams=True): #REVIEW
+    def upload_data(self, data, parentname, parentparamater, parameters): #DONE
             
         #Ensure Database Connection
         self._ensure_database()
@@ -373,51 +415,24 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
         upload = self._start_async_call(_begin_upload)
         print (upload)
 
-    #This function is only for first level paramaters ex. "Attributes" and "Graph" 
-    def upload_file_baselevel(self, json_path, parentname, parameters): #DONE
-
-        #Ensure Database Connection
-        self._ensure_database()
-
-        with open(json_path) as json_file:
-            json_data = json.load(json_file)
-        
-        parameters_list = {}
-
-        for param in parameters:
-            values = json_data[param]
-            parameters_dict = {param: values}
-            parameters_list.update(parameters_dict)
-        
-        serialized_data = json_dumps(parameters_list)
-        database_reference = RealtimeDatabase._shared_database 
-
-        def _begin_upload(result):
-            uploadtask = database_reference.Child(parentname).PutAsync(serialized_data)
-            print (uploadtask)
-            task_upload = uploadtask.GetAwaiter()
-            print (task_upload)
-            task_upload.OnCompleted(lambda: result["event"].set())
-            print
-            result["event"].wait()
-            result["data"] = True
-        
-        upload = self._start_async_call(_begin_upload)
-        print (upload)
 
     #TODO: CREATE MATCHING METHODS FOR DATA?     
-    def upload_file_aschild_all(self, path_local, parentname, childname, name): #DONE
+    def upload_file_aschild_all(self, path_local, parentname, childname): #DONE
 
         #Ensure Database Connection
         self._ensure_database()
 
-        with open(path_local) as json_file:
-            json_data = json.load(json_file)
-        
+        if os.path.exists(path_local):
+            with open(path_local) as json_file:
+                json_data = json.load(json_file)
+
+        else:
+            raise Exception("path does not exist {}".format(path_local))
+
         serialized_data = json_dumps(json_data)
                 
         def _begin_upload(result):
-            new_childreference = self._construct_childrenreference(parentname,childname,name)
+            new_childreference = self._construct_childreference(parentname,childname)
             uploadtask = new_childreference.PutAsync(serialized_data)
             task_upload = uploadtask.GetAwaiter()
             task_upload.OnCompleted(lambda: result["event"].set())
@@ -431,9 +446,13 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
         #Ensure Database Connection
         self._ensure_database()
  
-        with open(path_local) as json_file:
-            json_data = json.load(json_file)
+        if os.path.exists(path_local):
+            with open(path_local) as json_file:
+                json_data = json.load(json_file)
 
+        else:
+            raise Exception("path does not exist {}".format(path_local))
+        
         values = json_data[parentparameter][childparameter]
         serialized_data = json_dumps(values)
 
@@ -452,8 +471,12 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
         #Ensure Database Connection
         self._ensure_database()
 
-        with open(path_local) as json_file:
-            json_data = json.load(json_file)
+        if os.path.exists(path_local):
+            with open(path_local) as json_file:
+                json_data = json.load(json_file)
+
+        else:
+            raise Exception("path does not exist {}".format(path_local))
 
         for param in parameters:
             
@@ -470,7 +493,7 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
             
             upload = self._start_async_call(_begin_upload)
 
-    #TODO: Functions for streaming realtime databese. SUBSCRIBE TO PARENT... takes a path or a parent name
+    #TODO: SUBSCRIBE TO PARENT... parentname function Needs to be fixed.
     def stream_parent(self, callback, parentname): #NEEDS TO BE FIXED
 
         #Ensure Database Connection
@@ -494,16 +517,15 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
             urlbuldtask = database_reference.Child(parentname).BuildUrlAsync()
             task_url = urlbuldtask.GetAwaiter()
             task_url.OnCompleted(lambda: result["event"].set())
-
             result["event"].wait()
             result["data"] = urlbuldtask.Result
         
         url = self._start_async_call(_begin_build_url)
-        print (url)
 
         data = self._get_file_from_remote(url)
-        dictionary = json_loads(data)
-
+        #TODO: CHECK json.load vs json_loads with Danela or Gonzalo
+        dictionary = json.loads(data)
+  
         return dictionary
 
     def download_child(self, parentname, childname): #DONE
@@ -523,7 +545,7 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
         url = self._start_async_call(_begin_build_url)
 
         data = self._get_file_from_remote(url)
-        dictionary = json_loads(data)
+        dictionary = json.loads(data)
 
         return dictionary
 

@@ -23,14 +23,12 @@ except ImportError:
     from urllib import urlopen
 
 lib_dir = os.path.join(os.path.dirname(__file__), "dependencies")
-print (lib_dir)
 if lib_dir not in sys.path:
     sys.path.append(lib_dir)
 
 clr.AddReference("Firebase.Auth.dll")
 clr.AddReference("Firebase.dll")
 clr.AddReference("Firebase.Storage.dll")
-print("Are u really working?")
 
 from Firebase.Auth import FirebaseAuthConfig
 # from Firebase.Auth import FirebaseConfig
@@ -72,7 +70,6 @@ class Storage(StorageInterface):
         # Initialize Firebase connection and storage only once
         if not Storage._shared_storage:
             path = self.config_path
-            print ("This is your path" + path)
 
             # Load the Firebase configuration file from the JSON file if the file exists
             if os.path.exists(path):
@@ -83,8 +80,8 @@ class Storage(StorageInterface):
 
                 #Initialize Storage from storage bucket
                 storage_client = FirebaseStorage(config["storageBucket"])
-                print (storage_client)
                 Storage._shared_storage = storage_client
+                print ("Shared Storage Client Set")
 
         # Still no storage? Fail, we can't do anything
         if not Storage._shared_storage:
@@ -107,18 +104,25 @@ class Storage(StorageInterface):
         
         """
         This function is used to get the information form the source url and returns a string
+        It also checks if the data is None or == null (firebase return if no data)
         """
 
         try:
             get = urlopen(url).read()
+            print (get)
 
         except:
             raise Exception("unable to get file from url {}".format(url))
         
-        return get
+        if get is not None and get != "null":
+            return get    
+        
+        else:
+            raise Exception("unable to get file from url {}".format(url))
+
     
     #Upload Functions
-    def upload_file(self, path_on_cloud, path_local): #DONE
+    def upload_file(self, path_on_cloud, path_local):
         
         self._ensure_storage()
         
@@ -249,7 +253,6 @@ class Storage(StorageInterface):
         
         # Shared storage instance with a specificatoin of file name.
         storage_refrence = Storage._shared_storage.Child(path_on_cloud)
-        print (storage_refrence)
 
         def _begin_download(result):
             downloadurl_task = storage_refrence.GetDownloadUrlAsync()
@@ -263,9 +266,7 @@ class Storage(StorageInterface):
         
         data = self._get_file_from_remote(url)
 
-        # data_serialized = json_dumps(json_data)
         desearialized_data = json_loads(data)
-        print (type(desearialized_data))
 
         return desearialized_data
 
