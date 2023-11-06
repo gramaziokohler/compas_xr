@@ -1,20 +1,14 @@
 import os
 import sys
 import json
-import io
-from compas.data import Data,json_loads,json_dumps, json_dump
-from compas.datastructures import Assembly, Mesh
-from compas.geometry import Transformation, Point, Vector, Frame
+
+from compas.data import json_loads,json_dumps, json_dump
 from compas_xr.storage.storage_interface import StorageInterface
 import clr
 import threading
 
-from System.IO import File, FileStream, FileMode, MemoryStream, Stream
+from System.IO import File, FileStream, FileMode, MemoryStream
 from System.Text import Encoding
-from System.Threading import (
-    ManualResetEventSlim,
-    CancellationTokenSource,
-    CancellationToken)
 
 try:
     # from urllib.request import urlopen
@@ -38,7 +32,6 @@ from Firebase.Storage import FirebaseStorage
 TODO: add proper comments.
 TODO: Review Function todo's
 TODO: Authorization for Storage.
-TODO: Move Assembly Stuff to Assembly Manager
 """
 
 class Storage(StorageInterface):
@@ -50,6 +43,7 @@ class Storage(StorageInterface):
         self.config_path = config_path #or DEFAULT_CONFIG_PATH
         self.storage = self._ensure_storage()
 
+    #Internal Class Functions
     def _ensure_storage(self):
         # Initialize Firebase connection and storage only once
         if not Storage._shared_storage:
@@ -73,7 +67,6 @@ class Storage(StorageInterface):
 
         return Storage._shared_storage
     
-    #Internal Class Functions
     def _start_async_call(self, fn, timeout=10):
         result = {}
         result["event"] = threading.Event()
@@ -104,8 +97,7 @@ class Storage(StorageInterface):
         else:
             raise Exception("unable to get file from url {}".format(url))
 
-    
-    #Upload Functions
+    #Functions for uploading .json and data
     def upload_file(self, path_on_cloud, path_local):
         
         self._ensure_storage()
@@ -130,30 +122,6 @@ class Storage(StorageInterface):
             
         else:
             raise Exception("path does not exist {}".format(path_local))
-
-    #TODO: NEEDS TO BE MOVED
-    def upload_assembly(self, path_on_cloud, assembly):
-        
-        self._ensure_storage()
-        
-        # Shared storage instance with a specification of file name.
-        storage_refrence = Storage._shared_storage.Child(path_on_cloud)
-            
-        data = json_dumps(assembly, pretty=True)
-
-        byte_data = Encoding.UTF8.GetBytes(data)
-        stream = MemoryStream(byte_data)
-
-        def _begin_upload(result):
-
-            uploadtask = storage_refrence.PutAsync(stream)
-            task_upload = uploadtask.GetAwaiter()
-            task_upload.OnCompleted(lambda: result["event"].set())
-
-            result["event"].wait()
-            result["data"] = True
-        
-        upload = self._start_async_call(_begin_upload)
  
     def upload_data(self, path_on_cloud, data):
         
@@ -206,32 +174,7 @@ class Storage(StorageInterface):
         else:
             raise Exception("path does not exist {}".format(path_local))
 
-    #TODO: NEEDS TO BE MOVED
-    def download_assembly(self, path_on_cloud):
-        
-        self._ensure_storage()
-        
-        # Shared storage instance with a specificatoin of file name.
-        storage_refrence = Storage._shared_storage.Child(path_on_cloud)
-        print (storage_refrence)
-
-        def _begin_download(result):
-            downloadurl_task = storage_refrence.GetDownloadUrlAsync()
-            task_download = downloadurl_task.GetAwaiter()
-            task_download.OnCompleted(lambda: result["event"].set())
-
-            result["event"].wait()
-            result["data"] = downloadurl_task.Result
-        
-        url = self._start_async_call(_begin_download)
-
-        data = self._get_file_from_remote(url)
-
-        desearialized_data = json_loads(data)
-
-        return desearialized_data
-
-    def download_data(self, path_on_cloud):
+    def get_data(self, path_on_cloud):
         
         self._ensure_storage()
         
@@ -254,50 +197,7 @@ class Storage(StorageInterface):
 
         return desearialized_data
 
-    #Manage Objects - .obj export and upload
-    #TODO: NEEDS TO BE MOVED
-    def export_timberassembly_objs(self, assembly, folder_path, new_folder_name):
-        
-        assembly_graph = assembly.graph.data
-        nodes = assembly_graph["node"]
-        assembly_beam_keys = assembly.beam_keys
-        origin_frame = Frame(Point(0,0,0), Vector.Xaxis(), Vector.Yaxis())
-
-        #Construct file path with the new folder name
-        target_folder_path = os.path.join(folder_path, new_folder_name)
-        
-        #Make a folder with the folder name if it does not exist
-        if not os.path.exists(target_folder_path):
-            os.makedirs(target_folder_path)
-        
-        #Iterate through assembly beams and perform transformation and export
-        for key in assembly_beam_keys:
-            beam = nodes[str(key)]["part"]
-            frame = beam.frame
-            
-            #Extract compas box from beam
-            beam_box = beam.shape
-            
-            #Create Transformation from beam frame to world_xy frame and maybe a copy?
-            transformation = Transformation.from_frame_to_frame(frame, origin_frame)
-            
-            #Transform box from frame to world xy
-            box_transformed = beam_box.transformed(transformation)
-            
-            #Get all information from the box and convert to mesh
-            box_vertices = box_transformed.vertices
-            box_faces = box_transformed.faces
-            box_mesh = Mesh.from_vertices_and_faces(box_vertices, box_faces)
-            
-            # Mesh to obj with file name being KEY and folder being the newly created folder
-            if os.path.exists(target_folder_path):
-                file_name = str(key)+".obj"
-                obj_file_path = os.path.join(target_folder_path, file_name)
-                box_mesh.to_obj(obj_file_path)
-            
-            else:
-                raise Exception("File path does not exist {}".format(target_folder_path))
-    
+    #Manage Objects - .obj upload options   
     def upload_obj(self, path_on_cloud, cloud_folder, path_local):
         
         self._ensure_storage()
@@ -308,7 +208,6 @@ class Storage(StorageInterface):
             
             data = File.ReadAllBytes(path_local)
             stream = MemoryStream(data)
-            print (path_local)
 
             def _begin_upload(result):
 
@@ -326,18 +225,7 @@ class Storage(StorageInterface):
 
     def upload_objs(self, folder_local, cloud_folder_name):
         
-        
         self._ensure_storage()
-    
-        # TODO: Shared storage instance with a specification of file name. Does not work with the reference below, only works if I construct the reference every time.
-        """
-        Folder reference:
-        storagefolder_refrence = Storage._shared_storage.Child("obj_storage").Child(cloud_folder_name)
-
-        File reference below later in code loop:
-        storage_reference = storagefolder_reference.Child(name)
-
-        """
                     
         if os.path.exists(folder_local) and os.path.isdir(folder_local):
             

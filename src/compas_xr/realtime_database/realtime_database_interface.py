@@ -1,48 +1,43 @@
 class RealtimeDatabaseInterface(object):
     
-    def download_file(self, path_on_cloud, path_local):
+    def upload_file_all(self, path_local, parentname):
         raise NotImplementedError("Implemented on child classes")
-     
-    def set_json_data(self, json_f, parentname):
+
+    def upload_file(self, path_local, parentname, parentparameter, parameters): 
+        raise NotImplementedError("Implemented on child classes")
+
+    def upload_file_baselevel(self, path_local, parentname, parameters): 
+        raise NotImplementedError("Implemented on child classes")
+
+    def upload_data_all(self, data, parentname): 
         raise NotImplementedError("Implemented on child classes")
     
-    def set_json_data_keys(self, json_f, parentname, keys):
+    def upload_file_aschild(self, path_local, parentname, childname, parentparameter, childparameter):
         raise NotImplementedError("Implemented on child classes")
 
-    def set_data(self, parentname, data):
+    def upload_file_aschildren(self, path_local, parentname, childname, parentparameter, childparameter, parameters):
         raise NotImplementedError("Implemented on child classes")
 
-    def set_data_keys(self, parentname, data, keys):
+    def upload_data_aschild(self, data, parentname, childname, parentparameter, childparameter):
         raise NotImplementedError("Implemented on child classes")
 
-    def set_assembly(self, parentname, assembly):
-        raise NotImplementedError("Implemented on child classes")
-
-    def set_assembly_keys(self, parentname, assembly, keys):
-        raise NotImplementedError("Implemented on child classes")
-
-    def set_assembly_keys_timbers(self, parentname, assembly, keys):
-        raise NotImplementedError("Implemented on child classes")
-
-    def add_assembly_attributes(assembly, data_type, robot_keys=None, built_keys=None, planned_keys=None):
-        raise NotImplementedError("Implemented on child classes")
-        
-    def add_assembly_attributes_timbers(assembly, data_type, robot_keys=None, built_keys=None, planned_keys=None):
-        raise NotImplementedError("Implemented on child classes")
-
-    def remove_parent(self, parentname):
-        raise NotImplementedError("Implemented on child classes")
-
-    def remove_child(self, parentname, childname):
+    def upload_data_aschildren(self, data, parentname, childname, parentparameter, childparameter, parameters):
         raise NotImplementedError("Implemented on child classes")
     
-    def remove_children(self, parentname, children):
+    def stream_parent(self, callback, parentname):
         raise NotImplementedError("Implemented on child classes")
 
-    def get_json_data_child(self, parentname, childname):
-        raise NotImplementedError("Implemented on child classes")
-    
-    def get_json_data_parent(self, parentname):
+    def download_parent(self, parentname): 
         raise NotImplementedError("Implemented on child classes")
 
+    def download_child(self, parentname, childname): 
+        raise NotImplementedError("Implemented on child classes")
 
+    def delete_parent(self, parentname):
+        raise NotImplementedError("Implemented on child classes")
+
+    def delete_child(self, parentname, childname):
+        raise NotImplementedError("Implemented on child classes")
+
+    def delete_children(self, parentname, childname, children):
+        raise NotImplementedError("Implemented on child classes")

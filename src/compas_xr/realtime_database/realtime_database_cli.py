@@ -1,19 +1,13 @@
 import os
 import sys
 import json
-from compas.data import json_dumps,json_loads
-from compas_timber import assembly as TA
+
+
 from compas_xr.realtime_database.realtime_database_interface import RealtimeDatabaseInterface
 import clr
 import threading
-from compas.datastructures import Assembly
-from compas.data import json_dumps,json_loads, json_load
-from System.IO import FileStream, FileMode, MemoryStream, Stream
-from System.Text import Encoding
-from System.Threading import (
-    ManualResetEventSlim,
-    CancellationTokenSource,
-    CancellationToken)
+from compas.data import json_dumps,json_loads
+
 try:
     from urllib.request import urlopen    
 except ImportError:
@@ -33,13 +27,12 @@ clr.AddReference("System.Reactive.dll")
 from Firebase.Auth import FirebaseAuthConfig
 from Firebase.Auth import FirebaseAuthClient
 from Firebase.Database import FirebaseClient
-from Firebase.Database.Query import FirebaseQuery, QueryExtensions
+from Firebase.Database.Query import QueryExtensions
 
 """
 TODO: add proper comments.
 TODO: Review Function todo's
 TODO: Authorization for the Database
-TODO: Move Assembly Stuff to Assembly Manager
 """
 
 class RealtimeDatabase(RealtimeDatabaseInterface):
@@ -52,6 +45,7 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
         self.config_path = config_path #or DEFAULT_CONFIG_PATH
         self.database = self._ensure_database()
 
+    #Internal Class Structure Functions
     def _ensure_database(self):
 
         # Initialize Firebase connection and databse only once
@@ -77,7 +71,6 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
 
         return RealtimeDatabase._shared_database
 
-    #Internal Class Structure Functions
     def _start_async_call(self, fn, timeout=10):
         print ("inside of start async")
         result = {}
@@ -109,8 +102,6 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
         else:
             raise Exception("unable to get file from url {}".format(url))
         
-    
-    #Functions for building Child References: Happens in 3 types of methods: Upload, Download, and Delete
     def _construct_childreference(self, parentname, childname):
       
         database_reference = RealtimeDatabase._shared_database
@@ -129,82 +120,13 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
 
         return childrenreference
 
-
-    #Functions for adding attributes to assemblies
-    #TODO: NEEDS TO BE MOVED
-    def add_assembly_attributes(self, assembly, data_type, robot_keys=None, built_keys=None, planned_keys=None): #DONE
-        
-        data_type_list = ['0.Cylinder','1.Box','2.ObjFile','3.Mesh']
-
-        data = assembly.data
-        graph = assembly.graph.data
-        graph_node = graph["node"]
-
-        for key in graph_node:
-            graph_node[str(key)]['type_id'] = key
-            graph_node[str(key)]['type_data'] = data_type_list[data_type]
-            graph_node[str(key)]['is_built'] = False
-            graph_node[str(key)]['is_planned'] = False
-            graph_node[str(key)]['placed_by'] = "human"
-
-        for k in robot_keys:
-            graph_node[str(k)]['placed_by'] = "robot"
-
-        if built_keys:
-            for l in built_keys:
-                graph_node[str(l)]['is_built'] = True
-
-        if planned_keys:
-            for m in planned_keys:
-                graph_node[str(m)]['is_planned'] = True
-
-        assembly = Assembly.from_data(data)
-
-        return assembly
-    #TODO: NEEDS TO BE MOVED
-    def add_assembly_attributes_timbers(self, assembly, data_type, robot_keys=None, built_keys=None, planned_keys=None):#DONE
-        
-        data_type_list = ['0.Cylinder','1.Box','2.ObjFile','3.Mesh']
-
-        data = assembly.data
-        beam_keys = assembly.beam_keys
-        graph = assembly.graph.data
-        graph_node = graph["node"]
-
-        for key in beam_keys:
-            graph_node[str(key)]['type_id'] = key
-            graph_node[str(key)]['type_data'] = data_type_list[data_type]
-            graph_node[str(key)]['is_built'] = False
-            graph_node[str(key)]['is_planned'] = False
-            graph_node[str(key)]['placed_by'] = "human"
-
-        for k in robot_keys:
-            if k in beam_keys:
-                graph_node[str(k)]['placed_by'] = "robot"
-
-        if built_keys:
-            for l in built_keys:
-                    if l in beam_keys:
-                        graph_node[str(l)]['is_built'] = True
-
-        if planned_keys:
-            for m in planned_keys:
-                    if m in beam_keys:
-                        graph_node[str(m)]['is_planned'] = True
-
-        timber_assembly = TA.assembly.TimberAssembly.from_data(data)
-
-        return timber_assembly
-
-
-    #Functions for uploading various types of data
-    def upload_file_all(self, path_local, parentname): #DONE
+    #Functions for uploading .json files specifically
+    def upload_file_all(self, path_local, parentname):
 
         #Ensure Database Connection
         self._ensure_database()
 
         if os.path.exists(path_local):
-
             with open(path_local) as json_file:
                 json_data = json.load(json_file)
         
@@ -224,7 +146,7 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
         upload = self._start_async_call(_begin_upload)
         print ("upload complete")
 
-    def upload_file(self, path_local, parentname, parentparamater, parameters): #DONE
+    def upload_file(self, path_local, parentname, parentparameter, parameters):
 
         #Ensure Database Connection
         self._ensure_database()
@@ -241,7 +163,7 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
     
         paramaters_nested = {}
         for param in parameters:
-            values = json_data[parentparamater][param]
+            values = json_data[parentparameter][param]
             parameters_dict = {param: values}
             paramaters_nested.update(parameters_dict)
 
@@ -261,7 +183,7 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
         print ("upload complete")
 
     #This function is only for first level paramaters ex. "Attributes" and "Graph" 
-    def upload_file_baselevel(self, path_local, parentname, parameters): #DONE
+    def upload_file_baselevel(self, path_local, parentname, parameters):
 
         #Ensure Database Connection
         self._ensure_database()
@@ -293,64 +215,8 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
         upload = self._start_async_call(_begin_upload)
         print ("upload complete")
 
-
-    #TODO: NEEDS TO BE MOVED
-    def upload_assembly_all(self, assembly, parentname): #DONE
-
-        #Ensure Database Connection
-        self._ensure_database()
-
-        data = assembly.data
-        serialized_data = json_dumps(data)
-        database_reference = RealtimeDatabase._shared_database 
-
-        def _begin_upload(result):
-            print ("inside of begin upload")
-            uploadtask = database_reference.Child(parentname).PutAsync(serialized_data)
-            print (uploadtask)
-            task_upload = uploadtask.GetAwaiter()
-            print (task_upload)
-            task_upload.OnCompleted(lambda: result["event"].set())
-            print
-            result["event"].wait()
-            result["data"] = True
-        
-        upload = self._start_async_call(_begin_upload)
-        print (upload)
-
-    #TODO: NEEDS TO BE MOVED
-    def upload_assembly(self, assembly, parentname, parentparamater, parameters):#DONE
-        
-        #Ensure Database Connection
-        self._ensure_database()
-
-        data = assembly.data
-        
-        parameters_list = {}
-
-        paramaters_nested = {}
-        
-        for param in parameters:
-            print (param)
-            values = data[parentparamater][param]
-            parameters_dict = {param: values}
-            paramaters_nested.update(parameters_dict)
-        parameters_list.update(paramaters_nested)
-
-        serialized_data = json_dumps(parameters_list)
-        database_reference = RealtimeDatabase._shared_database 
-
-        def _begin_upload(result):
-            uploadtask = database_reference.Child(parentname).PutAsync(serialized_data)
-            task_upload = uploadtask.GetAwaiter()
-            task_upload.OnCompleted(lambda: result["event"].set())
-            result["event"].wait()
-            result["data"] = True
-        
-        upload = self._start_async_call(_begin_upload)
-        print (upload)
-
-    def upload_data_all(self, data, parentname): #DONE
+    #Functions for uploading Data
+    def upload_data_all(self, data, parentname):
 
         #Ensure Database Connection
         self._ensure_database()
@@ -369,7 +235,7 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
         upload = self._start_async_call(_begin_upload)
         print ("upload complete")
     
-    def upload_data(self, data, parentname, parentparamater, parameters): #DONE
+    def upload_data(self, data, parentname, parentparamater, parameters):
             
         #Ensure Database Connection
         self._ensure_database()
@@ -380,7 +246,6 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
         paramaters_nested = {}
         
         for param in parameters:
-            print (param)
             values = data[parentparamater][param]
             parameters_dict = {param: values}
             paramaters_nested.update(parameters_dict)
@@ -399,32 +264,8 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
         upload = self._start_async_call(_begin_upload)
         print (upload)
 
-    #TODO: CREATE MATCHING METHODS FOR DATA? (I think yes)   
-    def upload_file_aschild_all(self, path_local, parentname, childname): #DONE
-
-        #Ensure Database Connection
-        self._ensure_database()
-
-        if os.path.exists(path_local):
-            with open(path_local) as json_file:
-                json_data = json.load(json_file)
-
-        else:
-            raise Exception("path does not exist {}".format(path_local))
-
-        serialized_data = json_dumps(json_data)
-                
-        def _begin_upload(result):
-            new_childreference = self._construct_childreference(parentname,childname)
-            uploadtask = new_childreference.PutAsync(serialized_data)
-            task_upload = uploadtask.GetAwaiter()
-            task_upload.OnCompleted(lambda: result["event"].set())
-            result["event"].wait()
-            result["data"] = True
-        
-        upload = self._start_async_call(_begin_upload)
-
-    def upload_file_aschild(self, path_local, parentname, childname, parentparameter, childparameter): #DONE
+    #Functions for uploading and nesting in the database   
+    def upload_file_aschild(self, path_local, parentname, childname, parentparameter, childparameter):
            
         #Ensure Database Connection
         self._ensure_database()
@@ -449,7 +290,7 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
         
         upload = self._start_async_call(_begin_upload)
 
-    def upload_file_aschildren(self, path_local, parentname, childname, parentparameter, childparameter, parameters): #DONE
+    def upload_file_aschildren(self, path_local, parentname, childname, parentparameter, childparameter, parameters):
             
         #Ensure Database Connection
         self._ensure_database()
@@ -476,9 +317,48 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
             
             upload = self._start_async_call(_begin_upload)
 
-    #TODO: SUBSCRIBE TO PARENT... parentname function Needs to be fixed.
-    def stream_parent(self, callback, parentname): #NEEDS TO BE FIXED
+    def upload_data_aschild(self, data, parentname, childname, parentparameter, childparameter):
+           
+        #Ensure Database Connection
+        self._ensure_database()
+        
+        values = data[parentparameter][childparameter]
+        serialized_data = json_dumps(values)
 
+        def _begin_upload(result):
+            new_childreference = self._construct_childreference(parentname, childname)
+            uploadtask = new_childreference.PutAsync(serialized_data)
+            task_upload = uploadtask.GetAwaiter()
+            task_upload.OnCompleted(lambda: result["event"].set())
+            result["event"].wait()
+            result["data"] = True
+        
+        upload = self._start_async_call(_begin_upload)
+
+    def upload_data_aschildren(self, data, parentname, childname, parentparameter, childparameter, parameters):
+            
+        #Ensure Database Connection
+        self._ensure_database()
+
+        for param in parameters:
+            
+            values = data[parentparameter][childparameter][param]
+            serialized_data = json_dumps(values)
+
+            def _begin_upload(result):
+                new_childreference = self._construct_childrenreference(parentname,childname,param)
+                uploadtask = new_childreference.PutAsync(serialized_data)
+                task_upload = uploadtask.GetAwaiter()
+                task_upload.OnCompleted(lambda: result["event"].set())
+                result["event"].wait()
+                result["data"] = True
+            
+            upload = self._start_async_call(_begin_upload)
+
+    #Functions for retreiving infomation from the database Streaming and Downloading
+    def stream_parent(self, callback, parentname): #TODO: NEEDS TO BE FIXED
+        raise NotImplementedError("Function Under Developement")
+    
         #Ensure Database Connection
         self._ensure_database()
 
@@ -489,7 +369,7 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
 
         subscription = downloadevent.Subscribe(callback)
 
-    def download_parent(self, parentname): #DONE
+    def get_parent(self, parentname):
        
         #Ensure Database Connection
         self._ensure_database()
@@ -511,7 +391,7 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
   
         return dictionary
 
-    def download_child(self, parentname, childname): #DONE
+    def get_child(self, parentname, childname):
         
         #Ensure Database Connection
         self._ensure_database()
@@ -533,7 +413,7 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
         return dictionary
 
     #Functions for deleting parents and children
-    def delete_parent(self, parentname): #DONE
+    def delete_parent(self, parentname):
 
         #Ensure Database Connection
         self._ensure_database()
@@ -548,8 +428,9 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
             result["data"] = True
         
         delete = self._start_async_call(_begin_delete)
+        print("parent deleted")
 
-    def delete_child(self, parentname, childname): #DONE
+    def delete_child(self, parentname, childname):
 
         #Ensure Database Connection
         self._ensure_database()
@@ -563,8 +444,9 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
             result["data"] = True
         
         delete = self._start_async_call(_begin_delete)
+        print("child deleted")
 
-    def delete_children(self, parentname, childname, children): #DONE
+    def delete_children(self, parentname, childname, children):
 
         #Ensure Database Connection
         self._ensure_database()
@@ -580,4 +462,5 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
                 result["data"] = True
             
             delete = self._start_async_call(_begin_delete)
+        print("children deleted")
         

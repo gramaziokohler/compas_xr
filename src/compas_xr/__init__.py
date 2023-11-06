@@ -34,23 +34,5 @@ DOCS = os.path.abspath(os.path.join(HOME, "docs"))
 TEMP = os.path.abspath(os.path.join(HOME, "temp"))
 SCRIPT = os.path.abspath(os.path.join(HOME, "scripts"))
 
-# def storage_instance(default_file_path, config_path):
-
-#     storage = Storage(default_file_path, config_path)
-
-#     return storage
-
-# def realtime_database_instance(default_file_path, config_path):
-
-#     realtime_database = RealtimeDatabase(default_file_path, config_path)
-
-#     return realtime_database
-
-# def print_instance():
-
-#     print = Print()
-
-#     return print
-
 __all_plugins__ = ["compas_xr.rhino.install"]
 __all__ = ["HOME", "DATA", "DOCS", "TEMP"]
