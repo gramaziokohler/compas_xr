@@ -159,17 +159,15 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
         else:
             raise Exception("path does not exist {}".format(path_local))
         
-        parameters_list = {}
-    
+        
         paramaters_nested = {}
+
         for param in parameters:
             values = json_data[parentparameter][param]
             parameters_dict = {param: values}
             paramaters_nested.update(parameters_dict)
 
-        parameters_list.update(paramaters_nested)
-
-        serialized_data = json_dumps(parameters_list)
+        serialized_data = json_dumps(paramaters_nested)
         database_reference = RealtimeDatabase._shared_database 
 
         def _begin_upload(result):
@@ -240,8 +238,6 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
         #Ensure Database Connection
         self._ensure_database()
 
-        parameters_list = {}
-
         #Upload Nested Data or not.
         paramaters_nested = {}
         
@@ -249,9 +245,8 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
             values = data[parentparamater][param]
             parameters_dict = {param: values}
             paramaters_nested.update(parameters_dict)
-        parameters_list.update(paramaters_nested)
-
-        serialized_data = json_dumps(parameters_list)
+       
+        serialized_data = json_dumps(paramaters_nested)
         database_reference = RealtimeDatabase._shared_database 
 
         def _begin_upload(result):
@@ -316,14 +311,13 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
                 result["data"] = True
             
             upload = self._start_async_call(_begin_upload)
-
-    def upload_data_aschild(self, data, parentname, childname, parentparameter, childparameter):
+    #TODO: CHANGE NAME
+    def upload_data_aschild(self, data, parentname, childname):
            
         #Ensure Database Connection
         self._ensure_database()
         
-        values = data[parentparameter][childparameter]
-        serialized_data = json_dumps(values)
+        serialized_data = json_dumps(data)
 
         def _begin_upload(result):
             new_childreference = self._construct_childreference(parentname, childname)
@@ -334,26 +328,23 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
             result["data"] = True
         
         upload = self._start_async_call(_begin_upload)
-
-    def upload_data_aschildren(self, data, parentname, childname, parentparameter, childparameter, parameters):
+    #TODO: CHANGE NAME
+    def upload_data_aschildren(self, data, parentname, childname, name):
             
         #Ensure Database Connection
         self._ensure_database()
 
-        for param in parameters:
-            
-            values = data[parentparameter][childparameter][param]
-            serialized_data = json_dumps(values)
+        serialized_data = json_dumps(data)
 
-            def _begin_upload(result):
-                new_childreference = self._construct_childrenreference(parentname,childname,param)
-                uploadtask = new_childreference.PutAsync(serialized_data)
-                task_upload = uploadtask.GetAwaiter()
-                task_upload.OnCompleted(lambda: result["event"].set())
-                result["event"].wait()
-                result["data"] = True
-            
-            upload = self._start_async_call(_begin_upload)
+        def _begin_upload(result):
+            new_childreference = self._construct_childrenreference(parentname,childname,name)
+            uploadtask = new_childreference.PutAsync(serialized_data)
+            task_upload = uploadtask.GetAwaiter()
+            task_upload.OnCompleted(lambda: result["event"].set())
+            result["event"].wait()
+            result["data"] = True
+        
+        upload = self._start_async_call(_begin_upload)
 
     #Functions for retreiving infomation from the database Streaming and Downloading
     def stream_parent(self, callback, parentname): #TODO: NEEDS TO BE FIXED

@@ -157,29 +157,24 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
         for child, param in zip(children, parameters):
             RealtimeDatabase._shared_database.child(parentname).child(childname).child(param).set(child)
         print ("upload complete")
-
-    def upload_data_aschild(self, data, parentname, childname, parentparameter, childparameter):
+    #TODO: CHANGE NAME
+    def upload_data_aschild(self, data, parentname, childname):
            
         #Ensure Database Connection
         self._ensure_database()
         
-        values = data[parentparameter][childparameter]
+        serialized_data = json_dumps(data)
         
-        RealtimeDatabase._shared_database.child(parentname).child(childname).set(values)
-
-    def upload_data_aschildren(self, data, parentname, childname, parentparameter, childparameter, parameters):
+        RealtimeDatabase._shared_database.child(parentname).child(childname).set(serialized_data)
+    #TODO: CHANGE NAME
+    def upload_data_aschildren(self, data, parentname, childname, name):
             
         #Ensure Database Connection
         self._ensure_database()
 
-        children = []
-        
-        for param in parameters:
-            values = data[parentparameter][childparameter][param]
-            children.append(values)
+        serialized_data = json_dumps(data)
 
-        for child, param in zip(children, parameters):
-            RealtimeDatabase._shared_database.child(parentname).child(childname).child(param).set(child)
+        RealtimeDatabase._shared_database.child(parentname).child(childname).child(name).set(serialized_data)
         print ("upload complete")
 
     #Functions for retreiving infomation from the database Streaming and Downloading

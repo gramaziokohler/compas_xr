@@ -86,7 +86,6 @@ class Storage(StorageInterface):
 
         try:
             get = urlopen(url).read()
-            print (get)
 
         except:
             raise Exception("unable to get file from url {}".format(url))

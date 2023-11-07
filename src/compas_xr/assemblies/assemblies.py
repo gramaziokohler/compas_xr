@@ -1,28 +1,53 @@
 
+import os
 from compas.datastructures import Assembly, Mesh
 from compas.geometry import Transformation, Point, Vector, Frame
 from compas_timber import assembly as TA
+from compas.data import json_dumps,json_loads
+from compas_xr.storage import Storage
+from compas_xr.realtime_database import RealtimeDatabase
 
-class AssemblyDirector(object):
+class AssemblyAssistant(object):
 
     # Class attribute for storage class instance? and RealtimeDatabase
-    _shared_database = None
-    _shared_storage = None
+    _shared_databaseinstance = None
+    _shared_storageinstance = None
 
-    def __init__(self):
-        pass
-        # self.config_path = config_path
-        # self._guid = None
-        # self._ensure_database()
+    def __init__(self, config=None):
+
+        if config is not None:
+            self._ensure_database(config)
+            self._ensure_storage(config)
     
+    #Internal Class functions for setting instance of database and storage_classes
     def _ensure_database(self, config):
-        pass
-
+        
+        #Create shared instance of Database Class
+        if not AssemblyAssistant._shared_databaseinstance: 
+            database = RealtimeDatabase(config)
+            AssemblyAssistant._shared_databaseinstance = database
+                
+        # Still no Database? Fail, we can't do anything
+        if not AssemblyAssistant._shared_databaseinstance:
+            raise Exception("Could not create instance of Database with path {}!".format(config))
+        
+        return AssemblyAssistant._shared_databaseinstance
+    
     def _ensure_storage(self, config):
-        pass
+        
+        #Create shared instance of Storage class        
+        if not AssemblyAssistant._shared_storageinstance:    
+            storage = Storage(config)
+            AssemblyAssistant._shared_storageinstance = storage
+        
+        # Still no Storage? Fail, we can't do anything
+        if not AssemblyAssistant._shared_storageinstance:
+            raise Exception("Could not create instance of Storage with path {}!".format(config))
+        
+        return AssemblyAssistant._shared_storageinstance
 
-    #Functions for adding attributes to assemblies
-    def add_assembly_attributes(self, assembly, data_type, robot_keys=None, built_keys=None, planned_keys=None): 
+    #Functions for adding and editing attributes to assemblies
+    def add_assembly_attributes(self, assembly, data_type, robot_keys=None, built_keys=None, planned_keys=None):
         
         data_type_list = ['0.Cylinder','1.Box','2.ObjFile','3.Mesh']
 
@@ -49,7 +74,7 @@ class AssemblyDirector(object):
                 graph_node[str(m)]['is_planned'] = True
 
         assembly = Assembly.from_data(data)
-
+        print ("ASSEMBLY ATTRIBUTES ADDED")
         return assembly
 
     def add_assembly_attributes_timbers(self, assembly, data_type, robot_keys=None, built_keys=None, planned_keys=None):
@@ -83,113 +108,126 @@ class AssemblyDirector(object):
                         graph_node[str(m)]['is_planned'] = True
 
         timber_assembly = TA.assembly.TimberAssembly.from_data(data)
-
+        print ("TIMBERS ASSEMBLY ATTRIBUTES ADDED")
         return timber_assembly
-    
-        #TODO: NEEDS TO BE MOVED
-    
-    def upload_assembly_all_database(self, assembly, parentname):
 
-        #Ensure Database Connection
-        self._ensure_database()
-
-        data = assembly.data
-        serialized_data = json_dumps(data)
-        database_reference = RealtimeDatabase._shared_database 
-
-        def _begin_upload(result):
-            print ("inside of begin upload")
-            uploadtask = database_reference.Child(parentname).PutAsync(serialized_data)
-            print (uploadtask)
-            task_upload = uploadtask.GetAwaiter()
-            print (task_upload)
-            task_upload.OnCompleted(lambda: result["event"].set())
-            print
-            result["event"].wait()
-            result["data"] = True
+    def adjust_item_attributes(self, assembly, key, data_type, built_status, planning_status, placed_by):
         
-        upload = self._start_async_call(_begin_upload)
-        print (upload)
+        data_type_list = ['0.Cylinder','1.Box','2.ObjFile','3.Mesh']
+        graph = assembly.graph.data
+        graph_node = graph["node"]
+        
+        graph_node[key]['type_data'] = data_type_list[data_type]
+        graph_node[key]['is_built'] = built_status
+        graph_node[key]['is_planned'] = planning_status
+        graph_node[key]['placed_by'] = placed_by
 
-    def upload_assembly_database(self, assembly, parentname, parentparamater, parameters):
+        data = graph_node[key]
+
+        return assembly, data
+
+    #Functions for uploading Assemblies to the Database and Storage    
+    def upload_assembly_all_database(self, config, assembly, parentname): 
+
+        #Ensure Database Instance
+        self._ensure_database(config)
+
+        #Get data from the assembly
+        data = assembly.data
+        
+        #Database Reference
+        database = AssemblyAssistant._shared_databaseinstance
+
+        # Upload data using shared instance of the Database Class
+        database.upload_data_all(data, parentname)
+        print ("I think it worked")
+
+    def upload_assembly_database(self, config, assembly, parentname, parentparamater, parameters):
         
         #Ensure Database Connection
-        self._ensure_database()
-
+        self._ensure_database(config)
+        
+        #Get data from the assembly
         data = assembly.data
+        
+        #Database Reference
+        database = AssemblyAssistant._shared_databaseinstance
         
         parameters_list = {}
 
         paramaters_nested = {}
         
         for param in parameters:
-            print (param)
             values = data[parentparamater][param]
             parameters_dict = {param: values}
             paramaters_nested.update(parameters_dict)
         parameters_list.update(paramaters_nested)
 
-        serialized_data = json_dumps(parameters_list)
-        database_reference = RealtimeDatabase._shared_database 
+        #Upload
+        database.upload_data_all(paramaters_nested, parentname)
+        print("upload completed")
 
-        def _begin_upload(result):
-            uploadtask = database_reference.Child(parentname).PutAsync(serialized_data)
-            task_upload = uploadtask.GetAwaiter()
-            task_upload.OnCompleted(lambda: result["event"].set())
-            result["event"].wait()
-            result["data"] = True
+    def upload_assembly_aschild_database(self, config, assembly, parentname, childname, parentparameter, childparameter): 
         
-        upload = self._start_async_call(_begin_upload)
-        print (upload)
+        #Ensure Database Instance
+        self._ensure_database(config)
 
-    def upload_assembly_storage(self, path_on_cloud, assembly):
+        #Get data from the assembly
+        data = assembly.data
+
+        #Database Reference
+        database = AssemblyAssistant._shared_databaseinstance
+
+        #Get Assembly Information from Database
+        assembly_info = data[parentparameter][childparameter]
+
+        upload = database.upload_data_aschild(assembly_info, parentname, childname)
+
+    def upload_assembly_aschildren_database(self, config, assembly, parentname, childname, parentparameter, childparameter, parameters):
+
+        #Ensure Database Instance
+        self._ensure_database(config)
+
+        #Get data from the assembly
+        data = assembly.data
+
+        #Database Reference
+        database = AssemblyAssistant._shared_databaseinstance
+
+        for param in parameters:
+            values = data[parentparameter][childparameter][param]
+            database.upload_data_aschildren(values, parentname, childname, param)
         
-        self._ensure_storage()
+    def upload_assembly_storage(self, config, path_on_cloud, assembly): 
+        
+        self._ensure_storage(config)
         
         # Shared storage instance with a specification of file name.
-        storage_refrence = Storage._shared_storage.Child(path_on_cloud)
-            
+        storage = AssemblyAssistant._shared_storageinstance
+        
+        #Turn Assembly to data
         data = json_dumps(assembly, pretty=True)
+        print ("uplode", type(data))
 
-        byte_data = Encoding.UTF8.GetBytes(data)
-        stream = MemoryStream(byte_data)
+        #upload data to storage from the storage class method
+        storage.upload_data(path_on_cloud, data)
 
-        def _begin_upload(result):
-
-            uploadtask = storage_refrence.PutAsync(stream)
-            task_upload = uploadtask.GetAwaiter()
-            task_upload.OnCompleted(lambda: result["event"].set())
-
-            result["event"].wait()
-            result["data"] = True
+    #Function for getting assemblies from Storage
+    def get_assembly_storage(self, config, path_on_cloud):
         
-        upload = self._start_async_call(_begin_upload)
-
-    #TODO: Can simply just call get data function from storage... not sure if it needs to be duplicated as get assembly or just use get_data
-    def get_assembly_storage(self, path_on_cloud):
+        self._ensure_storage(config)
         
-        self._ensure_storage()
+        # Shared storage instance with a specification of file name.
+        storage = AssemblyAssistant._shared_storageinstance
+
+        data = storage.get_data(path_on_cloud)
         
-        # Shared storage instance with a specificatoin of file name.
-        storage_refrence = Storage._shared_storage.Child(path_on_cloud)
-        print (storage_refrence)
+        #TODO: I am not sure why, but when I use the get data, this needs to happen twice for it to return an assembly
+        assembly = json_loads(data)
 
-        def _begin_download(result):
-            downloadurl_task = storage_refrence.GetDownloadUrlAsync()
-            task_download = downloadurl_task.GetAwaiter()
-            task_download.OnCompleted(lambda: result["event"].set())
+        return assembly    
 
-            result["event"].wait()
-            result["data"] = downloadurl_task.Result
-        
-        url = self._start_async_call(_begin_download)
-
-        data = self._get_file_from_remote(url)
-
-        desearialized_data = json_loads(data)
-
-        return desearialized_data    
-
+    #Function for Managing Assembly exports
     def export_timberassembly_objs(self, assembly, folder_path, new_folder_name):
         
         assembly_graph = assembly.graph.data
