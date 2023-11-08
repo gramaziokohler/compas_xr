@@ -72,7 +72,7 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
         return RealtimeDatabase._shared_database
 
     def _start_async_call(self, fn, timeout=10):
-        print ("inside of start async")
+        
         result = {}
         result["event"] = threading.Event()
         
@@ -91,7 +91,6 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
 
         try:
             get = urlopen(url).read()
-            print (get)
 
         except:
             raise Exception("unable to get file from url {}".format(url))
@@ -225,7 +224,6 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
         def _begin_upload(result):
             uploadtask = database_reference.Child(parentname).PutAsync(serialized_data)
             task_upload = uploadtask.GetAwaiter()
-            print (task_upload)
             task_upload.OnCompleted(lambda: result["event"].set())
             result["event"].wait()
             result["data"] = True
@@ -257,7 +255,7 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
             result["data"] = True
         
         upload = self._start_async_call(_begin_upload)
-        print (upload)
+        print ("upload complete")
 
     #Functions for uploading and nesting in the database   
     def upload_file_aschild(self, path_local, parentname, childname, parentparameter, childparameter):

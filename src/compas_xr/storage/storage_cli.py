@@ -145,7 +145,7 @@ class Storage(StorageInterface):
             result["data"] = True
         
         upload = self._start_async_call(_begin_upload)
-        print ("data uploaded")
+        print ("upload complete")
 
     #Download Functions
     def download_file(self, path_on_cloud, path_local):
@@ -172,6 +172,7 @@ class Storage(StorageInterface):
         
         else:
             raise Exception("path does not exist {}".format(path_local))
+        print ("file downloaded")
 
     def get_data(self, path_on_cloud):
         
@@ -193,6 +194,8 @@ class Storage(StorageInterface):
         data = self._get_file_from_remote(url)
 
         desearialized_data = json_loads(data)
+
+        print ("got data")
 
         return desearialized_data
 
@@ -218,6 +221,7 @@ class Storage(StorageInterface):
                 result["data"] = True
             
             upload = self._start_async_call(_begin_upload)
+            print ("obj uploaded")
         
         else:
             raise Exception("path does not exist {}".format(path_local))
@@ -260,6 +264,7 @@ class Storage(StorageInterface):
                 else:
                     raise Exception("path does not exist {}".format(path))
 
+            print ("obj's uploaded")
 
         else:
             raise Exception("path does not exist {}".format(folder_local))

@@ -91,6 +91,7 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
 
         for child, param in zip(children, parameters):
             RealtimeDatabase._shared_database.child(parentname).child(param).set(child)
+        print ("file uploaded")
 
     #Functions for uploading Data
     def upload_data_all(self, data, parentname): 
@@ -101,6 +102,7 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
         serialized_data = json_dumps(data)
         
         RealtimeDatabase._shared_database.child(parentname).set(serialized_data)
+        print ("data uploaded")
 
     def upload_data(self, data, parentname,  parentparamater, parameters): 
         #Check Database Reference            
@@ -157,6 +159,7 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
         for child, param in zip(children, parameters):
             RealtimeDatabase._shared_database.child(parentname).child(childname).child(param).set(child)
         print ("upload complete")
+    
     #TODO: CHANGE NAME
     def upload_data_aschild(self, data, parentname, childname):
            
@@ -166,6 +169,8 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
         serialized_data = json_dumps(data)
         
         RealtimeDatabase._shared_database.child(parentname).child(childname).set(serialized_data)
+        print("upload complete")
+
     #TODO: CHANGE NAME
     def upload_data_aschildren(self, data, parentname, childname, name):
             
@@ -189,10 +194,12 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
         if database_reference.each():
             for d in database_reference.each():
                 dictionary[d.key()] = d.val()
+            print ("got parent")
             return dictionary
         
         else:
             raise Exception("Parent not Found in database")
+        
 
     def get_child(self, parentname, childname): 
         self._ensure_database()
@@ -203,6 +210,7 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
         if database_reference.each():
             for d in database_reference.each():
                 dictionary[d.key()] = d.val()
+            print ("got child")
             return dictionary
         
         else:
