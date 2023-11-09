@@ -120,7 +120,7 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
         return childrenreference
 
     #Functions for uploading .json files specifically
-    def upload_file_all(self, path_local, parentname):
+    def upload_file_all(self, path_local, parentname): #Keep: but should be called
 
         #Ensure Database Connection
         self._ensure_database()
@@ -145,7 +145,7 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
         upload = self._start_async_call(_begin_upload)
         print ("upload complete")
 
-    def upload_file(self, path_local, parentname, parentparameter, parameters):
+    def upload_file(self, path_local, parentname, parentparameter, parameters): #Maybe: (move) upload_file_graph_paramaters(file_path, paramaters[edge, dna, node]) (If we keep it)
 
         #Ensure Database Connection
         self._ensure_database()
@@ -180,7 +180,7 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
         print ("upload complete")
 
     #This function is only for first level paramaters ex. "Attributes" and "Graph" 
-    def upload_file_baselevel(self, path_local, parentname, parameters):
+    def upload_file_baselevel(self, path_local, parentname, parameters): #DON'T NEED
 
         #Ensure Database Connection
         self._ensure_database()
@@ -213,7 +213,7 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
         print ("upload complete")
 
     #Functions for uploading Data
-    def upload_data_all(self, data, parentname):
+    def upload_data_all(self, data, parentname): #Keep: Should be called upload data
 
         #Ensure Database Connection
         self._ensure_database()
@@ -231,7 +231,7 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
         upload = self._start_async_call(_begin_upload)
         print ("upload complete")
     
-    def upload_data(self, data, parentname, parentparamater, parameters):
+    def upload_data(self, data, parentname, parentparamater, parameters): #DON'T NEED
             
         #Ensure Database Connection
         self._ensure_database()
@@ -258,7 +258,7 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
         print ("upload complete")
 
     #Functions for uploading and nesting in the database   
-    def upload_file_aschild(self, path_local, parentname, childname, parentparameter, childparameter):
+    def upload_file_aschild(self, path_local, parentname, childname, parentparameter, childparameter): #Don't Need - Instead will be upload_file_graph_paramaters() 
            
         #Ensure Database Connection
         self._ensure_database()
@@ -283,7 +283,7 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
         
         upload = self._start_async_call(_begin_upload)
 
-    def upload_file_aschildren(self, path_local, parentname, childname, parentparameter, childparameter, parameters):
+    def upload_file_aschildren(self, path_local, parentname, childname, parentparameter, childparameter, parameters): # Maybe - (move) Uploading specific Nodes from a file but I dont think you need this functionality would use data 
             
         #Ensure Database Connection
         self._ensure_database()
@@ -310,7 +310,7 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
             
             upload = self._start_async_call(_begin_upload)
     #TODO: CHANGE NAME
-    def upload_data_aschild(self, data, parentname, childname):
+    def upload_data_aschild(self, data, parentname, childname): #Keep: Name = upload_data_to_child_directory()
            
         #Ensure Database Connection
         self._ensure_database()
@@ -327,7 +327,7 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
         
         upload = self._start_async_call(_begin_upload)
     #TODO: CHANGE NAME
-    def upload_data_aschildren(self, data, parentname, childname, name):
+    def upload_data_aschildren(self, data, parentname, childname, name): #Keep: upload_data_as_single_entry(data, directoryname, childdirectoryname, entryname)
             
         #Ensure Database Connection
         self._ensure_database()
@@ -345,7 +345,7 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
         upload = self._start_async_call(_begin_upload)
 
     #Functions for retreiving infomation from the database Streaming and Downloading
-    def stream_parent(self, callback, parentname): #TODO: NEEDS TO BE FIXED
+    def stream_parent(self, callback, parentname): #TODO: NEEDS TO BE FIXED #Keep
         raise NotImplementedError("Function Under Developement")
     
         #Ensure Database Connection
@@ -358,7 +358,7 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
 
         subscription = downloadevent.Subscribe(callback)
 
-    def get_parent(self, parentname):
+    def get_parent(self, parentname): #Keep: get_data_main_directory(self, directoryname):
        
         #Ensure Database Connection
         self._ensure_database()
@@ -380,7 +380,7 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
   
         return dictionary
 
-    def get_child(self, parentname, childname):
+    def get_child(self, parentname, childname): #Keep: get_data_child_directory(self, directoryname, childdirectoryname)
         
         #Ensure Database Connection
         self._ensure_database()
@@ -402,7 +402,7 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
         return dictionary
 
     #Functions for deleting parents and children
-    def delete_parent(self, parentname):
+    def delete_parent(self, parentname): #Keep: delete_data_main_directory(self, directoryname)
 
         #Ensure Database Connection
         self._ensure_database()
@@ -419,7 +419,7 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
         delete = self._start_async_call(_begin_delete)
         print("parent deleted")
 
-    def delete_child(self, parentname, childname):
+    def delete_child(self, parentname, childname): #Keep: delete_data_child_directory(self, directoryname, childdirectoryname)
 
         #Ensure Database Connection
         self._ensure_database()
@@ -435,7 +435,7 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
         delete = self._start_async_call(_begin_delete)
         print("child deleted")
 
-    def delete_children(self, parentname, childname, children):
+    def delete_children(self, parentname, childname, children): #Keep: #Keep: delete_data_entries(self, directoryname, childdirectoryname, entries)
 
         #Ensure Database Connection
         self._ensure_database()

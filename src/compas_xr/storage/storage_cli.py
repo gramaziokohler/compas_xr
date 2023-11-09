@@ -226,7 +226,7 @@ class Storage(StorageInterface):
         else:
             raise Exception("path does not exist {}".format(path_local))
 
-    def upload_objs(self, folder_local, cloud_folder_name):
+    def upload_objs(self, cloud_folder_name, folder_local):
         
         self._ensure_storage()
                     
