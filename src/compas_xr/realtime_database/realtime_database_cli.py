@@ -358,7 +358,7 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
 
         subscription = downloadevent.Subscribe(callback)
 
-    def get_parent(self, parentname): #Keep: get_data_main_directory(self, directoryname):
+    def get_parent(self, parentname): #Keep: #TODO: It does not return keys of dictionary, just values get_data_main_directory(self, directoryname):
        
         #Ensure Database Connection
         self._ensure_database()

@@ -1,4 +1,4 @@
-
+import os
 from compas.datastructures import Assembly, Mesh
 from compas.geometry import Transformation, Point, Vector, Frame
 from compas_timber import assembly as TA
