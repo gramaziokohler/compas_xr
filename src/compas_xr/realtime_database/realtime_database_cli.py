@@ -143,7 +143,6 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
             result["data"] = True
         
         upload = self._start_async_call(_begin_upload)
-        print ("upload complete")
 
     def upload_file(self, path_local, parentname, parentparameter, parameters): #Maybe: (move) upload_file_graph_paramaters(file_path, paramaters[edge, dna, node]) (If we keep it)
 
