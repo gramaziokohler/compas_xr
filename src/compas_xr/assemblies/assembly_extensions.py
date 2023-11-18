@@ -134,7 +134,7 @@ class AssemblyExtensions(object):
         
         assembly_graph = assembly.graph.data
         nodes = assembly_graph["node"]
-        origin_frame = Frame(Point(0,0,0), Vector.Xaxis(), Vector.Yaxis())
+        ztoy_mapped_frame = Frame(Point(0,0,0), Vector.Xaxis(), Vector.Zaxis())
 
         #Construct file path with the new folder name
         target_folder_path = os.path.join(folder_path, new_folder_name)
@@ -152,7 +152,7 @@ class AssemblyExtensions(object):
             frame = part.frame
             
             #Create Transformation from beam frame to world_xy frame and maybe a copy?
-            transformation = Transformation.from_frame_to_frame(frame, origin_frame)
+            transformation = Transformation.from_frame_to_frame(frame, ztoy_mapped_frame)
             
             #Transform box from frame to world xy
             part_transformed = part.transformed(transformation)
