@@ -197,7 +197,7 @@
         "max_node": 75, 
         "node": {
             "0": {
-                "is_built": false, 
+                "is_built": true, 
                 "is_planned": false, 
                 "part": {
                     "data": {
@@ -230,10 +230,10 @@
                 "placed_by": "human", 
                 "type": "part_beam", 
                 "type_data": "2.ObjFile", 
-                "type_id": 0
+                "type_id": "0"
             }, 
             "1": {
-                "is_built": false, 
+                "is_built": true, 
                 "is_planned": false, 
                 "part": {
                     "data": {
@@ -266,7 +266,7 @@
                 "placed_by": "human", 
                 "type": "part_beam", 
                 "type_data": "2.ObjFile", 
-                "type_id": 1
+                "type_id": "1"
             }, 
             "10": {
                 "is_built": false, 
@@ -302,7 +302,7 @@
                 "placed_by": "human", 
                 "type": "part_beam", 
                 "type_data": "2.ObjFile", 
-                "type_id": 10
+                "type_id": "10"
             }, 
             "11": {
                 "is_built": false, 
@@ -338,7 +338,7 @@
                 "placed_by": "human", 
                 "type": "part_beam", 
                 "type_data": "2.ObjFile", 
-                "type_id": 11
+                "type_id": "11"
             }, 
             "12": {
                 "is_built": true, 
@@ -371,13 +371,13 @@
                     "dtype": "compas_timber.parts/Beam", 
                     "guid": "a53c9e13-25a2-4b30-a55d-4670e1d8fd1c"
                 }, 
-                "placed_by": "human", 
+                "placed_by": "robot", 
                 "type": "part_beam", 
                 "type_data": "2.ObjFile", 
-                "type_id": 12
+                "type_id": "12"
             }, 
             "13": {
-                "is_built": false, 
+                "is_built": true, 
                 "is_planned": false, 
                 "part": {
                     "data": {
@@ -407,10 +407,10 @@
                     "dtype": "compas_timber.parts/Beam", 
                     "guid": "ab857872-95c5-4109-b3df-4f7775f84e70"
                 }, 
-                "placed_by": "human", 
+                "placed_by": "robot", 
                 "type": "part_beam", 
                 "type_data": "2.ObjFile", 
-                "type_id": 13
+                "type_id": "13"
             }, 
             "14": {
                 "is_built": false, 
@@ -446,7 +446,7 @@
                 "placed_by": "human", 
                 "type": "part_beam", 
                 "type_data": "2.ObjFile", 
-                "type_id": 14
+                "type_id": "14"
             }, 
             "15": {
                 "is_built": false, 
@@ -482,10 +482,10 @@
                 "placed_by": "human", 
                 "type": "part_beam", 
                 "type_data": "2.ObjFile", 
-                "type_id": 15
+                "type_id": "15"
             }, 
             "16": {
-                "is_built": false, 
+                "is_built": true, 
                 "is_planned": false, 
                 "part": {
                     "data": {
@@ -518,7 +518,7 @@
                 "placed_by": "human", 
                 "type": "part_beam", 
                 "type_data": "2.ObjFile", 
-                "type_id": 16
+                "type_id": "16"
             }, 
             "17": {
                 "is_built": false, 
@@ -554,10 +554,10 @@
                 "placed_by": "human", 
                 "type": "part_beam", 
                 "type_data": "2.ObjFile", 
-                "type_id": 17
+                "type_id": "17"
             }, 
             "18": {
-                "is_built": false, 
+                "is_built": true, 
                 "is_planned": false, 
                 "part": {
                     "data": {
@@ -587,10 +587,10 @@
                     "dtype": "compas_timber.parts/Beam", 
                     "guid": "9b508e04-c1d0-46dd-ba67-9a41e4871ffc"
                 }, 
-                "placed_by": "human", 
+                "placed_by": "robot", 
                 "type": "part_beam", 
                 "type_data": "2.ObjFile", 
-                "type_id": 18
+                "type_id": "18"
             }, 
             "19": {
                 "is_built": false, 
@@ -626,7 +626,7 @@
                 "placed_by": "human", 
                 "type": "part_beam", 
                 "type_data": "2.ObjFile", 
-                "type_id": 19
+                "type_id": "19"
             }, 
             "2": {
                 "is_built": false, 
@@ -662,7 +662,7 @@
                 "placed_by": "human", 
                 "type": "part_beam", 
                 "type_data": "2.ObjFile", 
-                "type_id": 2
+                "type_id": "2"
             }, 
             "20": {
                 "is_built": false, 
@@ -698,10 +698,10 @@
                 "placed_by": "human", 
                 "type": "part_beam", 
                 "type_data": "2.ObjFile", 
-                "type_id": 20
+                "type_id": "20"
             }, 
             "21": {
-                "is_built": false, 
+                "is_built": true, 
                 "is_planned": false, 
                 "part": {
                     "data": {
@@ -731,10 +731,10 @@
                     "dtype": "compas_timber.parts/Beam", 
                     "guid": "6f0bead7-5cc0-471f-96aa-c6a1a13e9366"
                 }, 
-                "placed_by": "human", 
+                "placed_by": "robot", 
                 "type": "part_beam", 
                 "type_data": "2.ObjFile", 
-                "type_id": 21
+                "type_id": "21"
             }, 
             "22": {
                 "is_built": false, 
@@ -770,10 +770,10 @@
                 "placed_by": "human", 
                 "type": "part_beam", 
                 "type_data": "2.ObjFile", 
-                "type_id": 22
+                "type_id": "22"
             }, 
             "23": {
-                "is_built": false, 
+                "is_built": true, 
                 "is_planned": false, 
                 "part": {
                     "data": {
@@ -806,10 +806,10 @@
                 "placed_by": "human", 
                 "type": "part_beam", 
                 "type_data": "2.ObjFile", 
-                "type_id": 23
+                "type_id": "23"
             }, 
             "24": {
-                "is_built": false, 
+                "is_built": true, 
                 "is_planned": false, 
                 "part": {
                     "data": {
@@ -839,10 +839,10 @@
                     "dtype": "compas_timber.parts/Beam", 
                     "guid": "cab77ccb-9a74-4d36-869b-598526bba082"
                 }, 
-                "placed_by": "human", 
+                "placed_by": "robot", 
                 "type": "part_beam", 
                 "type_data": "2.ObjFile", 
-                "type_id": 24
+                "type_id": "24"
             }, 
             "25": {
                 "is_built": false, 
@@ -878,7 +878,7 @@
                 "placed_by": "human", 
                 "type": "part_beam", 
                 "type_data": "2.ObjFile", 
-                "type_id": 25
+                "type_id": "25"
             }, 
             "26": {
                 "is_built": false, 
@@ -914,7 +914,7 @@
                 "placed_by": "human", 
                 "type": "part_beam", 
                 "type_data": "2.ObjFile", 
-                "type_id": 26
+                "type_id": "26"
             }, 
             "27": {
                 "is_built": false, 
@@ -950,10 +950,10 @@
                 "placed_by": "human", 
                 "type": "part_beam", 
                 "type_data": "2.ObjFile", 
-                "type_id": 27
+                "type_id": "27"
             }, 
             "28": {
-                "is_built": false, 
+                "is_built": true, 
                 "is_planned": false, 
                 "part": {
                     "data": {
@@ -983,13 +983,13 @@
                     "dtype": "compas_timber.parts/Beam", 
                     "guid": "714c9198-b6fc-4b14-8d20-3e5c7dcffce4"
                 }, 
-                "placed_by": "human", 
+                "placed_by": "robot", 
                 "type": "part_beam", 
                 "type_data": "2.ObjFile", 
-                "type_id": 28
+                "type_id": "28"
             }, 
             "29": {
-                "is_built": false, 
+                "is_built": true, 
                 "is_planned": false, 
                 "part": {
                     "data": {
@@ -1022,10 +1022,10 @@
                 "placed_by": "human", 
                 "type": "part_beam", 
                 "type_data": "2.ObjFile", 
-                "type_id": 29
+                "type_id": "29"
             }, 
             "3": {
-                "is_built": false, 
+                "is_built": true, 
                 "is_planned": false, 
                 "part": {
                     "data": {
@@ -1058,7 +1058,7 @@
                 "placed_by": "human", 
                 "type": "part_beam", 
                 "type_data": "2.ObjFile", 
-                "type_id": 3
+                "type_id": "3"
             }, 
             "30": {
                 "is_built": false, 
@@ -1091,10 +1091,10 @@
                     "dtype": "compas_timber.parts/Beam", 
                     "guid": "dfedfcf8-a331-4479-a848-dee9cb3a2841"
                 }, 
-                "placed_by": "human", 
+                "placed_by": "robot", 
                 "type": "part_beam", 
                 "type_data": "2.ObjFile", 
-                "type_id": 30
+                "type_id": "30"
             }, 
             "31": {
                 "is_built": false, 
@@ -1130,7 +1130,7 @@
                 "placed_by": "human", 
                 "type": "part_beam", 
                 "type_data": "2.ObjFile", 
-                "type_id": 31
+                "type_id": "31"
             }, 
             "32": {
                 "is_built": false, 
@@ -1163,10 +1163,10 @@
                     "dtype": "compas_timber.parts/Beam", 
                     "guid": "73ea6d81-8e9f-45e4-b7ad-255a922581d5"
                 }, 
-                "placed_by": "human", 
+                "placed_by": "robot", 
                 "type": "part_beam", 
                 "type_data": "2.ObjFile", 
-                "type_id": 32
+                "type_id": "32"
             }, 
             "33": {
                 "is_built": false, 
@@ -1202,10 +1202,10 @@
                 "placed_by": "human", 
                 "type": "part_beam", 
                 "type_data": "2.ObjFile", 
-                "type_id": 33
+                "type_id": "33"
             }, 
             "34": {
-                "is_built": false, 
+                "is_built": true, 
                 "is_planned": false, 
                 "part": {
                     "data": {
@@ -1238,7 +1238,7 @@
                 "placed_by": "human", 
                 "type": "part_beam", 
                 "type_data": "2.ObjFile", 
-                "type_id": 34
+                "type_id": "34"
             }, 
             "35": {
                 "is_built": false, 
@@ -1274,7 +1274,7 @@
                 "placed_by": "human", 
                 "type": "part_beam", 
                 "type_data": "2.ObjFile", 
-                "type_id": 35
+                "type_id": "35"
             }, 
             "36": {
                 "part": {
@@ -1430,7 +1430,7 @@
                 "placed_by": "human", 
                 "type": "part_beam", 
                 "type_data": "2.ObjFile", 
-                "type_id": 4
+                "type_id": "4"
             }, 
             "40": {
                 "part": {
@@ -1733,7 +1733,7 @@
                 "type": "joint"
             }, 
             "5": {
-                "is_built": false, 
+                "is_built": true, 
                 "is_planned": false, 
                 "part": {
                     "data": {
@@ -1766,7 +1766,7 @@
                 "placed_by": "human", 
                 "type": "part_beam", 
                 "type_data": "2.ObjFile", 
-                "type_id": 5
+                "type_id": "5"
             }, 
             "50": {
                 "part": {
@@ -2102,7 +2102,7 @@
                 "placed_by": "human", 
                 "type": "part_beam", 
                 "type_data": "2.ObjFile", 
-                "type_id": 6
+                "type_id": "6"
             }, 
             "60": {
                 "part": {
@@ -2438,7 +2438,7 @@
                 "placed_by": "human", 
                 "type": "part_beam", 
                 "type_data": "2.ObjFile", 
-                "type_id": 7
+                "type_id": "7"
             }, 
             "70": {
                 "part": {
@@ -2654,7 +2654,7 @@
                 "placed_by": "human", 
                 "type": "part_beam", 
                 "type_data": "2.ObjFile", 
-                "type_id": 8
+                "type_id": "8"
             }, 
             "9": {
                 "is_built": true, 
@@ -2690,7 +2690,7 @@
                 "placed_by": "human", 
                 "type": "part_beam", 
                 "type_data": "2.ObjFile", 
-                "type_id": 9
+                "type_id": "9"
             }
         }
     }
