@@ -12,7 +12,7 @@ class AssemblyAssistant(object):
             self.storage = Storage(config_path)
             self.database = RealtimeDatabase(config_path)
 
-        # Still no Database? Fail, we can't do anything
+        # Raise Exception that it could not be founda at that path.
         else:
             raise Exception("Could not create Storage or Database with path {}!".format(config_path))
   
@@ -25,7 +25,8 @@ class AssemblyAssistant(object):
         # Upload data using Database Class
         self.database.upload_data_all(data, parentname)
 
-    def upload_assembly_to_database(self, assembly, parentname, parentparamater, parameters):
+    #TODO: Integrated in toggle for removing joint keys.
+    def upload_assembly_to_database(self, assembly, parentname, parentparamater, parameters, joints):
         
         #Get data from the assembly
         data = assembly.data
@@ -37,6 +38,19 @@ class AssemblyAssistant(object):
             values = data[parentparamater][param]
             parameters_dict = {param: values}
             paramaters_nested.update(parameters_dict)
+
+        if (joints == False):
+            
+            joint_keys = []
+            elements = paramaters_nested[param]
+
+            for item in elements:
+                values = elements[item]
+                if values["type"] == "joint":
+                    joint_keys.append(item)
+
+            for key in joint_keys:
+                elements.pop(key)
 
         #Upload
         self.database.upload_data_all(paramaters_nested, parentname)

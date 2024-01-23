@@ -17,6 +17,3 @@ class StorageInterface(object):
 
     def upload_objs(self, folder_local, cloud_folder_name):
         raise NotImplementedError("Implemented on child classes")
-
-    # def upload_graph(self, graph):
-    #     upload_data(graph.attributes[]

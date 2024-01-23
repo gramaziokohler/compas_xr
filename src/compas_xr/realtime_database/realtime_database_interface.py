@@ -42,8 +42,8 @@ class RealtimeDatabaseInterface(object):
     def delete_children(self, parentname, childname, children):
         raise NotImplementedError("Implemented on child classes")
     
-    def settings_writer(self, databaseparentname, databasechildname, storagefolder="None"):
+    def application_settings_writer(self, databaseparentname, storagefolder="None", objorientation=True):
         
-        data = {"parentname": databaseparentname, "childname": databasechildname, "storagename": storagefolder}
+        data = {"parentname": databaseparentname, "storagename": storagefolder, "objorientation": objorientation}
 
         self.upload_data_all(data, "ApplicationSettings")

@@ -144,7 +144,8 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
         
         upload = self._start_async_call(_begin_upload)
 
-    def upload_file(self, path_local, parentname, parentparameter, parameters): #Maybe: (move) upload_file_graph_paramaters(file_path, paramaters[edge, dna, node]) (If we keep it)
+    #TODO: Added joints toggle for uploading timber assembly... joints
+    def upload_file(self, path_local, parentname, parentparameter, parameters, joints): #Maybe: (move) upload_file_graph_paramaters(file_path, paramaters[edge, dna, node]) (If we keep it)
 
         #Ensure Database Connection
         self._ensure_database()
@@ -161,9 +162,23 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
         paramaters_nested = {}
 
         for param in parameters:
-            values = json_data[parentparameter][param]
+            #TODO: Added Assembly just to be able to access the new timber assembly
+            values = json_data["assembly"][parentparameter][param]
             parameters_dict = {param: values}
             paramaters_nested.update(parameters_dict)
+
+        if (joints == False):
+            joint_keys = []
+            elements = paramaters_nested[param]
+
+            for item in elements:
+                values = elements[item]
+                if values["type"] == "joint":
+                    joint_keys.append(item)
+
+            for key in joint_keys:
+                elements.pop(key)
+        
 
         serialized_data = json_dumps(paramaters_nested)
         database_reference = RealtimeDatabase._shared_database 
