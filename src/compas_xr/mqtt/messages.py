@@ -1,6 +1,6 @@
 import threading
 import uuid
-import time
+from datetime import datetime
 
 # Python 2/3 compatibility import list
 try:
@@ -37,7 +37,7 @@ class ResponseID(object):
         self._lock = threading.Lock()
         self._value = start
 
-    def _increment(self, num=1):
+    def increment(self, num=1):
         """Atomically increment the counter by ``num`` and
         return the new value.
         """
@@ -59,14 +59,16 @@ class ResponseID(object):
                 self._value = value
             return self._value
     
-class Header(object):
+class Header(UserDict):
     """Message header object used for publishing and subscribing to/from topics for compas_XR.
 
     A message header is fundamentally a dictionary and behaves as one."""
     _shared_sequence_counter = None
     _shared_response_id_counter = None
+    _last_response_id = None
 
     def __init__(self):
+        # super(Header, self).__init__()
         self.sequence_id = self._ensure_sequence_id()    
         self.response_id = self._ensure_response_id()
         self.device_id = self._get_device_id() #TODO: I THINK THIS CAN BE SIMPLIFIED.
@@ -75,9 +77,8 @@ class Header(object):
     def __str__(self):
         return str(self.data)
 
-    #I think this should be updated, and for the Message it can be Header.data
     def __getattr__(self, name):
-        return self.__dict__["data"][name]
+        return self.data.get(name, None)
 
     @classmethod
     def parse(cls, value):
@@ -90,13 +91,13 @@ class Header(object):
         return self.device_id
 
     def _get_time_stamp(self):
-        self.time_stamp = time.time()
+        self.time_stamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")
         return self.time_stamp
     
     def _ensure_sequence_id(self):
         if not Header._shared_sequence_counter:
             Header._shared_sequence_counter = SequenceCounter()
-            self.sequence_id = Header._shared_sequence_counter._value()
+            self.sequence_id = Header._shared_sequence_counter._value
         else:
             self.sequence_id = Header._shared_sequence_counter.increment()
         return self.sequence_id
@@ -105,9 +106,16 @@ class Header(object):
     def _ensure_response_id(self):
         if not Header._shared_response_id_counter:
             Header._shared_response_id_counter = ResponseID()
-            self.response_id = Header._shared_response_id_counter._value()
+            self.response_id = Header._shared_response_id_counter._value
+            Header._last_response_id = self.response_id
         else:
-            Header._shared_response_id_counter.update(self.response_id)
+            if Header._last_response_id != Header._shared_response_id_counter._value:
+                Header._shared_response_id_counter._value = self.response_id
+                self.response_id = Header._shared_response_id_counter._value
+                Header._last_response_id = self.response_id
+            else:
+                self.response_id = Header._shared_response_id_counter.increment()
+                Header._last_response_id = self.response_id
         return self.response_id
     
     @property
@@ -125,7 +133,7 @@ class GetTrajectoryRequest(UserDict):
     A message is fundamentally a dictionary and behaves as one."""
 
     def __init__(self, element_id):
-        super(GetTrajectoryRequest, self).__init__()
+        # super(GetTrajectoryRequest, self).__init__()
         self.header = Header()
         self.element_id = element_id
         self.trajectory_id = "trajectory_id_" + str(element_id)
@@ -134,7 +142,7 @@ class GetTrajectoryRequest(UserDict):
         return str(self.data)
 
     def __getattr__(self, name):
-        return self.__dict__["data"][name]
+        return self.data.get(name, None)
 
     @classmethod
     def parse(cls, value):
@@ -146,7 +154,7 @@ class GetTrajectoryRequest(UserDict):
     @property
     def data(self):
         return {
-            "header": self.header,
+            "header": self.header.data,
             "element_id": self.element_id,
             "trajectory_id": self.trajectory_id,
         }
@@ -157,7 +165,7 @@ class GetTrajectoryResult(UserDict):
     A message is fundamentally a dictionary and behaves as one."""
 
     def __init__(self, element_id, trajectory):
-        super(GetTrajectoryResult, self).__init__()
+        # super(GetTrajectoryResult, self).__init__()
         self.header = Header()
         self.element_id = element_id
         self.trajectory_id = "trajectory_id_" + str(element_id)
@@ -167,7 +175,7 @@ class GetTrajectoryResult(UserDict):
         return str(self.data)
 
     def __getattr__(self, name):
-        return self.__dict__["data"][name]
+        return self.data.get(name, None)
 
     @classmethod
     def parse(cls, value):
@@ -192,7 +200,7 @@ class ApproveTrajectory(UserDict):
     A message is fundamentally a dictionary and behaves as one."""
 
     def __init__(self, element_id, trajectory, approval_status):
-        super(ApproveTrajectory, self).__init__()
+        # super(ApproveTrajectory, self).__init__()
         self.header = Header()
         self.element_id = element_id
         self.trajectory_id = "trajectory_id_" + str(element_id)
@@ -203,7 +211,7 @@ class ApproveTrajectory(UserDict):
         return str(self.data)
 
     def __getattr__(self, name):
-        return self.__dict__["data"][name]
+        return self.data.get(name, None)
 
     @classmethod
     def parse(cls, value):
@@ -215,7 +223,6 @@ class ApproveTrajectory(UserDict):
     @property
     def data(self):
         return {
-            #TODO: Should this be header.data or just header?
             "header": self.header.data,
             "element_id": self.element_id,
             "trajectory_id": self.trajectory_id,
@@ -229,7 +236,7 @@ class SendTrajectory(UserDict):
     A message is fundamentally a dictionary and behaves as one."""
 
     def __init__(self, element_id, trajectory):
-        super(SendTrajectory, self).__init__()
+        # super(SendTrajectory, self).__init__()
         self.header = Header()
         self.element_id = element_id
         self.trajectory_id = "trajectory_id_" + str(element_id)
@@ -239,7 +246,7 @@ class SendTrajectory(UserDict):
         return str(self.data)
 
     def __getattr__(self, name):
-        return self.__dict__["data"][name]
+        return self.data.get(name, None)
 
     @classmethod
     def parse(cls, value):
