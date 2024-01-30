@@ -187,7 +187,6 @@ class GetTrajectoryResult(UserDict):
     @property
     def data(self):
         return {
-            #TODO: Should this be header.data or just header?
             "header": self.header.data,
             "element_id": self.element_id,
             "trajectory_id": self.trajectory_id,
@@ -258,7 +257,6 @@ class SendTrajectory(UserDict):
     @property
     def data(self):
         return {
-            #TODO: Should this be header.data or just header?
             "header": self.header.data,
             "element_id": self.element_id,
             "trajectory_id": self.trajectory_id,
