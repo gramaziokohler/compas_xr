@@ -228,6 +228,70 @@ class ApproveTrajectory(UserDict):
             "trajectory": self.trajectory,
             "approval_status": self.approval_status,
         }
+
+class ApprovalCounterRequest(UserDict):
+    """Message objects used for publishing and subscribing to/from topics.
+
+    A message is fundamentally a dictionary and behaves as one."""
+
+    def __init__(self, element_id):
+        # super(ApproveTrajectory, self).__init__()
+        self.header = Header()
+        self.element_id = element_id
+        self.trajectory_id = "trajectory_id_" + str(element_id)
+
+    def __str__(self):
+        return str(self.data)
+
+    def __getattr__(self, name):
+        return self.data.get(name, None)
+
+    @classmethod
+    def parse(cls, value):
+        #TODO: Should this throw an exception if the items are not there is not in the value or will this produce the error?
+        instance = cls(value.get("element_id", None))
+        instance.update(value)
+        return instance
+    
+    @property
+    def data(self):
+        return {
+            "header": self.header.data,
+            "element_id": self.element_id,
+            "trajectory_id": self.trajectory_id,
+        }
+
+class ApprovalCounterResult(UserDict):
+    """Message objects used for publishing and subscribing to/from topics.
+
+    A message is fundamentally a dictionary and behaves as one."""
+
+    def __init__(self, element_id):
+        # super(ApproveTrajectory, self).__init__()
+        self.header = Header()
+        self.element_id = element_id
+        self.trajectory_id = "trajectory_id_" + str(element_id)
+
+    def __str__(self):
+        return str(self.data)
+
+    def __getattr__(self, name):
+        return self.data.get(name, None)
+
+    @classmethod
+    def parse(cls, value):
+        #TODO: Should this throw an exception if the items are not there is not in the value or will this produce the error?
+        instance = cls(value.get("element_id", None))
+        instance.update(value)
+        return instance
+    
+    @property
+    def data(self):
+        return {
+            "header": self.header.data,
+            "element_id": self.element_id,
+            "trajectory_id": self.trajectory_id,
+        }
     
 class SendTrajectory(UserDict):
     """Message objects used for publishing and subscribing to/from topics.
