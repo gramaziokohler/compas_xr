@@ -235,7 +235,7 @@ class ApprovalCounterRequest(UserDict):
     A message is fundamentally a dictionary and behaves as one."""
 
     def __init__(self, element_id):
-        # super(ApproveTrajectory, self).__init__()
+        # super(ApprovalCounterRequest, self).__init__()
         self.header = Header()
         self.element_id = element_id
         self.trajectory_id = "trajectory_id_" + str(element_id)
@@ -267,7 +267,7 @@ class ApprovalCounterResult(UserDict):
     A message is fundamentally a dictionary and behaves as one."""
 
     def __init__(self, element_id):
-        # super(ApproveTrajectory, self).__init__()
+        # super(ApprovalCounterResult, self).__init__()
         self.header = Header()
         self.element_id = element_id
         self.trajectory_id = "trajectory_id_" + str(element_id)
