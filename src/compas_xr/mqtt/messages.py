@@ -66,8 +66,10 @@ class Header(UserDict):
     """Message header object used for publishing and subscribing to/from topics for compas_XR.
 
     A message header is fundamentally a dictionary and behaves as one."""
+
     _shared_sequence_counter = None
     _shared_response_id_counter = None
+    _device_id = None
 
     def __init__(self, increment_response_ID=False, sequence_id=None, response_id=None, device_id=None, time_stamp=None):
         # super(Header, self).__init__()
@@ -91,7 +93,7 @@ class Header(UserDict):
 
         #If any of the required fields are missing raise an error.
         if sequence_id is None or response_id is None or device_id is None or time_stamp is None:
-            raise ValueError("One or more required fields are missing.")
+            raise ValueError("One or more required fields for Header parsing are missing: sequence_id, response_id, device_id, or time_stamp.")
         instance = cls(increment_response_ID=False, sequence_id=sequence_id, response_id=response_id, device_id=device_id, time_stamp=time_stamp)
 
         #Update the sequence counter and response id from the message received.
@@ -100,8 +102,13 @@ class Header(UserDict):
         
         return instance
     
+    #TODO: THIS GENERATES A UNIQUE ID FOR THE DEVICE... BUT IT WILL BE REGENERATED EVERY TIME THE MODULE IS UNLOADED AND RELOADED... I COULD ALSO HARD CODE A UNIQUE ID FOR THE MODULE, BUT EVERYONE USING IT WOULD HAVE THE SAME.
     def _get_device_id(self):
-        self.device_id = str(uuid.uuid4())
+        if not Header._device_id:
+            Header._device_id = str(uuid.uuid4())
+            self.device_id = Header._device_id
+        else:
+            self.device_id = Header._device_id
         return self.device_id
 
     def _get_time_stamp(self):
@@ -157,7 +164,7 @@ class GetTrajectoryRequest(UserDict):
 
     A message is fundamentally a dictionary and behaves as one."""
 
-    def __init__(self, element_id, header=None): #TODO: I GET A NONE TYPE ERROR IN THIS METHOD, AND I AM NOT SURE WHY
+    def __init__(self, element_id, header=None):
         # super(GetTrajectoryRequest, self).__init__()
         if header is not None:
             self.header=header
@@ -173,7 +180,7 @@ class GetTrajectoryRequest(UserDict):
         return self.data.get(name, None)
 
     @classmethod
-    def parse(cls, value): #TODO: I GET A NONE TYPE ERROR IN THIS METHOD, AND I AM NOT SURE WHY
+    def parse(cls, value):
         # Parse the header separately
         header_info = value.get("header", None)
         if header_info is None:
@@ -183,7 +190,7 @@ class GetTrajectoryRequest(UserDict):
         # Retrieve other required values from the input value
         element_id = value.get("element_id", None)
         if element_id is None:
-            raise ValueError("element_id information is missing.")
+            raise ValueError("required information for GetTrajectoryRequest parsing is missing: element_id.")
         # Create an instance of the class with the retrieved values and the provided header
         instance = cls(element_id=element_id, header=header)
 
@@ -202,9 +209,12 @@ class GetTrajectoryResult(UserDict):
 
     A message is fundamentally a dictionary and behaves as one."""
 
-    def __init__(self, element_id, trajectory):
+    def __init__(self, element_id, trajectory, header=None):
         # super(GetTrajectoryResult, self).__init__()
-        self.header = Header()
+        if header is not None:
+            self.header=header
+        else:
+            self.header = Header()
         self.element_id = element_id
         self.trajectory_id = "trajectory_id_" + str(element_id)
         self.trajectory = trajectory
@@ -217,10 +227,20 @@ class GetTrajectoryResult(UserDict):
 
     @classmethod
     def parse(cls, value):
-        #TODO: Should this throw an exception if the items are not there is not in the value or will this produce the error?
-        instance = cls(value.get("element_id", None), value.get("trajectory", None))
-        instance.update(value)
-        #TODO: THIS IS A NEW IMPLEMENTATION AND NEEDS TO BE TESTED
+        # Parse the header separately
+        header_info = value.get("header", None)
+        if header_info is None:
+            raise ValueError("Header information is missing.")
+        header = Header.parse(header_info)
+
+        # Retrieve other required values from the input value
+        element_id = value.get("element_id", None)
+        trajectory = value.get("trajectory", None)
+        if element_id is None or trajectory is None:
+            raise ValueError("required information for GetTrajectoryResult parsing is missing: element_id or trajectory.")
+        # Create an instance of the class with the retrieved values and the provided header
+        instance = cls(element_id=element_id, trajectory=trajectory, header=header)
+
         return instance
     
     @property
@@ -237,9 +257,12 @@ class ApproveTrajectory(UserDict):
 
     A message is fundamentally a dictionary and behaves as one."""
 
-    def __init__(self, element_id, trajectory, approval_status):
+    def __init__(self, element_id, trajectory, approval_status, header=None):
         # super(ApproveTrajectory, self).__init__()
-        self.header = Header()
+        if header is not None:
+            self.header=header
+        else:
+            self.header = Header()
         self.element_id = element_id
         self.trajectory_id = "trajectory_id_" + str(element_id)
         self.trajectory = trajectory
@@ -253,10 +276,22 @@ class ApproveTrajectory(UserDict):
 
     @classmethod
     def parse(cls, value):
-        #TODO: Should this throw an exception if the items are not there is not in the value or will this produce the error?
-        instance = cls(value.get("element_id", None), value.get("trajectory", None), value.get("approval_status", None))
-        instance.update(value)
-        #TODO: THIS IS A NEW IMPLEMENTATION AND NEEDS TO BE TESTED
+        # Parse the header separately
+        header_info = value.get("header", None)
+        if header_info is None:
+            raise ValueError("Header information is missing.")
+        header = Header.parse(header_info)
+
+        # Retrieve other required values from the input value
+        element_id = value.get("element_id", None)
+        trajectory = value.get("trajectory", None)
+        approval_status = value.get("approval_status", None)
+        if element_id is None or trajectory is None or approval_status is None:
+            raise ValueError("required information for ApproveTrajectoryMessage parsing is missing: element_id, trajectory, or approval_status.")
+        
+        # Create an instance of the class with the retrieved values and the provided header
+        instance = cls(element_id=element_id, trajectory=trajectory, approval_status=approval_status, header=header)
+
         return instance
     
     @property
@@ -274,9 +309,12 @@ class ApprovalCounterRequest(UserDict):
 
     A message is fundamentally a dictionary and behaves as one."""
 
-    def __init__(self, element_id):
+    def __init__(self, element_id, header=None):
         # super(ApprovalCounterRequest, self).__init__()
-        self.header = Header()
+        if header is not None:
+            self.header=header
+        else:
+            self.header = Header()
         self.element_id = element_id
         self.trajectory_id = "trajectory_id_" + str(element_id)
 
@@ -288,10 +326,19 @@ class ApprovalCounterRequest(UserDict):
 
     @classmethod
     def parse(cls, value):
-        #TODO: Should this throw an exception if the items are not there is not in the value or will this produce the error?
-        instance = cls(value.get("element_id", None))
-        instance.update(value)
-        #TODO: THIS IS A NEW IMPLEMENTATION AND NEEDS TO BE TESTED
+        # Parse the header separately
+        header_info = value.get("header", None)
+        if header_info is None:
+            raise ValueError("Header information is missing.")
+        header = Header.parse(header_info)
+
+        # Retrieve other required values from the input value
+        element_id = value.get("element_id", None)
+        if element_id is None:
+            raise ValueError("required information for ApprovalCounterRequest parsing is missing: element_id.")
+        # Create an instance of the class with the retrieved values and the provided header
+        instance = cls(element_id=element_id, header=header)
+
         return instance
     
     @property
@@ -307,9 +354,12 @@ class ApprovalCounterResult(UserDict):
 
     A message is fundamentally a dictionary and behaves as one."""
 
-    def __init__(self, element_id):
+    def __init__(self, element_id, header=None):
         # super(ApprovalCounterResult, self).__init__()
-        self.header = Header()
+        if header is not None:
+            self.header=header
+        else:
+            self.header = Header()
         self.element_id = element_id
         self.trajectory_id = "trajectory_id_" + str(element_id)
 
@@ -321,9 +371,19 @@ class ApprovalCounterResult(UserDict):
 
     @classmethod
     def parse(cls, value):
-        #TODO: Should this throw an exception if the items are not there is not in the value or will this produce the error?
-        instance = cls(value.get("element_id", None))
-        instance.update(value)
+        # Parse the header separately
+        header_info = value.get("header", None)
+        if header_info is None:
+            raise ValueError("Header information is missing.")
+        header = Header.parse(header_info)
+
+        # Retrieve other required values from the input value
+        element_id = value.get("element_id", None)
+        if element_id is None:
+            raise ValueError("required information for ApprovalCounterResult parsing is missing: element_id.")
+        # Create an instance of the class with the retrieved values and the provided header
+        instance = cls(element_id=element_id, header=header)
+
         return instance
     
     @property
@@ -339,9 +399,12 @@ class SendTrajectory(UserDict):
 
     A message is fundamentally a dictionary and behaves as one."""
 
-    def __init__(self, element_id, trajectory):
+    def __init__(self, element_id, trajectory, header=None):
         # super(SendTrajectory, self).__init__()
-        self.header = Header()
+        if header is not None:
+            self.header=header
+        else:
+            self.header = Header()
         self.element_id = element_id
         self.trajectory_id = "trajectory_id_" + str(element_id)
         self.trajectory = trajectory
@@ -354,9 +417,20 @@ class SendTrajectory(UserDict):
 
     @classmethod
     def parse(cls, value):
-        #TODO: Should this throw an exception if the items are not there is not in the value or will this produce the error?
-        instance = cls(value.get("element_id", None), value.get("trajectory", None))
-        instance.update(value)
+        # Parse the header separately
+        header_info = value.get("header", None)
+        if header_info is None:
+            raise ValueError("Header information is missing.")
+        header = Header.parse(header_info)
+
+        # Retrieve other required values from the input value
+        element_id = value.get("element_id", None)
+        trajectory = value.get("trajectory", None)
+        if element_id is None or trajectory is None:
+            raise ValueError("required information for SendTrajectory parsing is missing: element_id or trajectory.")
+        # Create an instance of the class with the retrieved values and the provided header
+        instance = cls(element_id=element_id, trajectory=trajectory, header=header)
+
         return instance
     
     @property
