@@ -123,7 +123,6 @@ class Header(UserDict):
             self.sequence_id = Header._shared_sequence_counter.increment()
         return self.sequence_id
     
-    #TODO: Check Implementation... should only increment for GetTrajectoryRequest.
     def _ensure_response_id(self, increment_response_ID=False):
         if not Header._shared_response_id_counter:
             Header._shared_response_id_counter = ResponseID()
