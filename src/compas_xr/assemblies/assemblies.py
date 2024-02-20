@@ -20,7 +20,7 @@ class AssemblyAssistant(object):
     def upload_assembly_all_to_database(self, assembly, parentname): 
 
         #Get data from the assembly
-        data = assembly.data
+        data = assembly.__data__
 
         # Upload data using Database Class
         self.database.upload_data_all(data, parentname)
@@ -29,7 +29,7 @@ class AssemblyAssistant(object):
     def upload_assembly_to_database(self, assembly, parentname, parentparamater, parameters, joints):
         
         #Get data from the assembly
-        data = assembly.data
+        data = assembly.__data__
 
         #Create Data Structure form Assembly
         paramaters_nested = {}
@@ -58,7 +58,7 @@ class AssemblyAssistant(object):
     def upload_assembly_aschild_to_database(self, assembly, parentname, childname, parentparameter, childparameter): 
 
         #Get data from the assembly
-        data = assembly.data
+        data = assembly.__data__
 
         #Get Assembly Information from Database
         assembly_info = data[parentparameter][childparameter]
@@ -68,7 +68,7 @@ class AssemblyAssistant(object):
     def upload_assembly_aschildren_to_database(self, assembly, parentname, childname, parentparameter, childparameter, parameters):
 
         #Get data from the assembly
-        data = assembly.data
+        data = assembly.__data__
 
         for param in parameters:
             values = data[parentparameter][childparameter][param]
@@ -77,7 +77,7 @@ class AssemblyAssistant(object):
     def upload_assembly_to_storage(self, path_on_cloud, assembly): 
       
         #Turn Assembly to data
-        data = json_dumps(assembly, pretty=True)
+        data = json_dumps(assembly, pretty=True) #TODO: json_dump vs json_dumps? ALSO Pretty can be false.
 
         #upload data to storage from the storage class method
         self.storage.upload_data(path_on_cloud, data)

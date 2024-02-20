@@ -65,8 +65,8 @@ class AssemblyExtensions(object):
         
         data_type_list = ['0.Cylinder','1.Box','2.ObjFile','3.Mesh']
 
-        data = assembly.data
-        graph = assembly.graph.data
+        data = assembly.__data__
+        graph = assembly.graph.__data__
         graph_node = graph["node"]
 
         for key in graph_node:
@@ -87,16 +87,16 @@ class AssemblyExtensions(object):
             for m in planned_keys:
                 graph_node[str(m)]['is_planned'] = True
 
-        assembly = Assembly.from_data(data)
+        assembly = Assembly.__from_data__(data)
         return assembly
 
     def add_assembly_attributes_timbers(self, assembly, data_type, robot_keys=None, built_keys=None, planned_keys=None):
         
         data_type_list = ['0.Cylinder','1.Box','2.ObjFile','3.Mesh']
 
-        data = assembly.data
+        data = assembly.__data__
         beam_keys = assembly.beam_keys
-        graph = assembly.graph.data
+        graph = assembly.graph.__data__
         graph_node = graph["node"]
 
         for key in beam_keys:
@@ -120,13 +120,13 @@ class AssemblyExtensions(object):
                     if m in beam_keys:
                         graph_node[str(m)]['is_planned'] = True
 
-        timber_assembly = TA.assembly.TimberAssembly.from_data(data)
+        timber_assembly = TA.assembly.TimberAssembly.__from_data__(data)
         return timber_assembly
 
     def adjust_item_attributes(self, assembly, key, data_type, built_status, planning_status, placed_by):
         
         data_type_list = ['0.Cylinder','1.Box','2.ObjFile','3.Mesh']
-        graph = assembly.graph.data
+        graph = assembly.graph.__data__
         graph_node = graph["node"]
         
         graph_node[key]['type_data'] = data_type_list[data_type]
@@ -141,7 +141,7 @@ class AssemblyExtensions(object):
     #Function for Managing Assembly exports
     def export_timberassembly_objs(self, assembly, folder_path, new_folder_name):
         
-        assembly_graph = assembly.graph.data
+        assembly_graph = assembly.graph.__data__
         nodes = assembly_graph["node"]
         assembly_beam_keys = assembly.beam_keys
         z_to_y_mapped_frame = Frame(Point(0,0,0), Vector.Xaxis(), Vector.Zaxis())
@@ -189,7 +189,7 @@ class AssemblyExtensions(object):
     #Function for Managing Assembly exports
     def export_assembly_objs(self, assembly, folder_path, new_folder_name):
         
-        assembly_graph = assembly.graph.data
+        assembly_graph = assembly.graph.__data__
         nodes = assembly_graph["node"]
         z_to_y_mapped_frame = Frame(Point(0,0,0), Vector.Xaxis(), Vector.Zaxis())
 
