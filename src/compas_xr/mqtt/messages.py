@@ -1,6 +1,7 @@
 import threading
 import uuid
 from datetime import datetime
+from compas.geometry import Frame
 
 # Python 2/3 compatibility import list
 try:
@@ -208,13 +209,14 @@ class GetTrajectoryResult(UserDict):
 
     A message is fundamentally a dictionary and behaves as one."""
 
-    def __init__(self, element_id, trajectory, header=None):
+    def __init__(self, element_id, robot_base_frame, trajectory, header=None):
         # super(GetTrajectoryResult, self).__init__()
         if header is not None:
             self.header=header
         else:
             self.header = Header()
         self.element_id = element_id
+        self.robot_base_frame = robot_base_frame
         self.trajectory_id = "trajectory_id_" + str(element_id)
         self.trajectory = trajectory
 
@@ -235,8 +237,13 @@ class GetTrajectoryResult(UserDict):
         # Retrieve other required values from the input value
         element_id = value.get("element_id", None)
         trajectory = value.get("trajectory", None)
-        if element_id is None or trajectory is None:
+        robot_base_frame = value.get("robot_base_frame", None)
+        if element_id is None or robot_base_frame is None or trajectory is None:
             raise ValueError("required information for GetTrajectoryResult parsing is missing: element_id or trajectory.")
+        
+        # Convert the robot_base_frame to a Frame object
+        robot_base_frame = Frame.__from_data__(robot_base_frame)
+
         # Create an instance of the class with the retrieved values and the provided header
         instance = cls(element_id=element_id, trajectory=trajectory, header=header)
 
@@ -247,6 +254,7 @@ class GetTrajectoryResult(UserDict):
         return {
             "header": self.header.data,
             "element_id": self.element_id,
+            "robot_base_frame": self.robot_base_frame.__data__,
             "trajectory_id": self.trajectory_id,
             "trajectory": self.trajectory,
         }
