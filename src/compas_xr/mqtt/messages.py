@@ -245,7 +245,7 @@ class GetTrajectoryResult(UserDict):
         robot_base_frame = Frame.__from_data__(robot_base_frame)
 
         # Create an instance of the class with the retrieved values and the provided header
-        instance = cls(element_id=element_id, trajectory=trajectory, header=header)
+        instance = cls(element_id=element_id, robot_base_frame=robot_base_frame, trajectory=trajectory, header=header)
 
         return instance
     
