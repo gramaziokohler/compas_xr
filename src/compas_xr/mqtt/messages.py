@@ -103,7 +103,6 @@ class Header(UserDict):
         
         return instance
     
-    #TODO: THIS GENERATES A UNIQUE ID FOR THE DEVICE... BUT IT WILL BE REGENERATED EVERY TIME THE MODULE IS UNLOADED AND RELOADED... I COULD ALSO HARD CODE A UNIQUE ID FOR THE MODULE, BUT EVERYONE USING IT WOULD HAVE THE SAME.
     def _get_device_id(self):
         if not Header._device_id:
             Header._device_id = str(uuid.uuid4())
@@ -136,14 +135,12 @@ class Header(UserDict):
                 self.response_id = Header._shared_response_id_counter._value
         return self.response_id
     
-    #TODO: Check Implementation... should update the value of my shared SequenceCounter value if it parses a message where it is greater then the one I have.
     def _update_sequence_counter_from_message(self, sequence_id):
         if Header._shared_sequence_counter is not None:
             Header._shared_sequence_counter.update_from_msg(sequence_id)
         else:
             Header._shared_sequence_counter = SequenceCounter(start=sequence_id)
     
-    #TODO: Check Implementation... should update the value of my shared responseIDCounter value if it parses a message where it is greater then the one I have.
     def _update_response_id_from_message(self, response_id):
         if Header._shared_response_id_counter is not None:
             Header._shared_response_id_counter.update_from_msg(response_id)
@@ -164,13 +161,14 @@ class GetTrajectoryRequest(UserDict):
 
     A message is fundamentally a dictionary and behaves as one."""
 
-    def __init__(self, element_id, header=None):
+    def __init__(self, element_id, robot_name, header=None):
         # super(GetTrajectoryRequest, self).__init__()
         if header is not None:
             self.header=header
         else:
             self.header = Header(increment_response_ID=True)
         self.element_id = element_id
+        self.robot_name = robot_name
         self.trajectory_id = "trajectory_id_" + str(element_id)
 
     def __str__(self):
@@ -189,10 +187,11 @@ class GetTrajectoryRequest(UserDict):
 
         # Retrieve other required values from the input value
         element_id = value.get("element_id", None)
-        if element_id is None:
-            raise ValueError("required information for GetTrajectoryRequest parsing is missing: element_id.")
+        robot_name = value.get("robot_name", None)
+        if element_id is None or robot_name is None:
+            raise ValueError("required information for GetTrajectoryRequest parsing is missing: element_id or robot_name.")
         # Create an instance of the class with the retrieved values and the provided header
-        instance = cls(element_id=element_id, header=header)
+        instance = cls(element_id=element_id, robot_name=robot_name, header=header)
 
         return instance
     
@@ -201,6 +200,7 @@ class GetTrajectoryRequest(UserDict):
         return {
             "header": self.header.data,
             "element_id": self.element_id,
+            "robot_name": self.robot_name,
             "trajectory_id": self.trajectory_id,
         }
     
@@ -209,13 +209,14 @@ class GetTrajectoryResult(UserDict):
 
     A message is fundamentally a dictionary and behaves as one."""
 
-    def __init__(self, element_id, robot_base_frame, trajectory, header=None):
+    def __init__(self, element_id, robot_name, robot_base_frame, trajectory, header=None):
         # super(GetTrajectoryResult, self).__init__()
         if header is not None:
             self.header=header
         else:
             self.header = Header()
         self.element_id = element_id
+        self.robot_name = robot_name
         self.robot_base_frame = robot_base_frame
         self.trajectory_id = "trajectory_id_" + str(element_id)
         self.trajectory = trajectory
@@ -237,15 +238,16 @@ class GetTrajectoryResult(UserDict):
         # Retrieve other required values from the input value
         element_id = value.get("element_id", None)
         trajectory = value.get("trajectory", None)
+        robot_name = value.get("robot_name", None)
         robot_base_frame = value.get("robot_base_frame", None)
-        if element_id is None or robot_base_frame is None or trajectory is None:
-            raise ValueError("required information for GetTrajectoryResult parsing is missing: element_id or trajectory.")
+        if element_id is None or robot_name is None or robot_base_frame is None or trajectory is None:
+            raise ValueError("required information for GetTrajectoryResult parsing is missing: element_id, robot_name, or trajectory.")
         
         # Convert the robot_base_frame to a Frame object
         robot_base_frame = Frame.__from_data__(robot_base_frame)
 
         # Create an instance of the class with the retrieved values and the provided header
-        instance = cls(element_id=element_id, robot_base_frame=robot_base_frame, trajectory=trajectory, header=header)
+        instance = cls(element_id=element_id, robot_name=robot_name, robot_base_frame=robot_base_frame, trajectory=trajectory, header=header)
 
         return instance
     
@@ -254,6 +256,7 @@ class GetTrajectoryResult(UserDict):
         return {
             "header": self.header.data,
             "element_id": self.element_id,
+            "robot_name": self.robot_name,
             "robot_base_frame": self.robot_base_frame.__data__,
             "trajectory_id": self.trajectory_id,
             "trajectory": self.trajectory,
@@ -264,13 +267,14 @@ class ApproveTrajectory(UserDict):
 
     A message is fundamentally a dictionary and behaves as one."""
 
-    def __init__(self, element_id, trajectory, approval_status, header=None):
+    def __init__(self, element_id, robot_name, trajectory, approval_status, header=None):
         # super(ApproveTrajectory, self).__init__()
         if header is not None:
             self.header=header
         else:
             self.header = Header()
         self.element_id = element_id
+        self.robot_name = robot_name
         self.trajectory_id = "trajectory_id_" + str(element_id)
         self.trajectory = trajectory
         self.approval_status = approval_status
@@ -292,12 +296,13 @@ class ApproveTrajectory(UserDict):
         # Retrieve other required values from the input value
         element_id = value.get("element_id", None)
         trajectory = value.get("trajectory", None)
+        robot_name = value.get("robot_name", None)
         approval_status = value.get("approval_status", None)
-        if element_id is None or trajectory is None or approval_status is None:
-            raise ValueError("required information for ApproveTrajectoryMessage parsing is missing: element_id, trajectory, or approval_status.")
+        if element_id is None or robot_name is None or trajectory is None or approval_status is None:
+            raise ValueError("required information for ApproveTrajectoryMessage parsing is missing: element_id, robot_name, trajectory, or approval_status.")
         
         # Create an instance of the class with the retrieved values and the provided header
-        instance = cls(element_id=element_id, trajectory=trajectory, approval_status=approval_status, header=header)
+        instance = cls(element_id=element_id, robot_name=robot_name, trajectory=trajectory, approval_status=approval_status, header=header)
 
         return instance
     
@@ -306,6 +311,7 @@ class ApproveTrajectory(UserDict):
         return {
             "header": self.header.data,
             "element_id": self.element_id,
+            "robot_name": self.robot_name,
             "trajectory_id": self.trajectory_id,
             "trajectory": self.trajectory,
             "approval_status": self.approval_status,
@@ -406,13 +412,14 @@ class SendTrajectory(UserDict):
 
     A message is fundamentally a dictionary and behaves as one."""
 
-    def __init__(self, element_id, trajectory, header=None):
+    def __init__(self, element_id, robot_name, trajectory, header=None):
         # super(SendTrajectory, self).__init__()
         if header is not None:
             self.header=header
         else:
             self.header = Header()
         self.element_id = element_id
+        self.robot_name = robot_name
         self.trajectory_id = "trajectory_id_" + str(element_id)
         self.trajectory = trajectory
 
@@ -433,10 +440,11 @@ class SendTrajectory(UserDict):
         # Retrieve other required values from the input value
         element_id = value.get("element_id", None)
         trajectory = value.get("trajectory", None)
-        if element_id is None or trajectory is None:
-            raise ValueError("required information for SendTrajectory parsing is missing: element_id or trajectory.")
+        robot_name = value.get("robot_name", None)
+        if element_id is None or robot_name is None or trajectory is None:
+            raise ValueError("required information for SendTrajectory parsing is missing: element_id, robot_name, or trajectory.")
         # Create an instance of the class with the retrieved values and the provided header
-        instance = cls(element_id=element_id, trajectory=trajectory, header=header)
+        instance = cls(element_id=element_id, robot_name=robot_name, trajectory=trajectory, header=header)
 
         return instance
     
@@ -445,6 +453,7 @@ class SendTrajectory(UserDict):
         return {
             "header": self.header.data,
             "element_id": self.element_id,
+            "robot_name": self.robot_name,
             "trajectory_id": self.trajectory_id,
             "trajectory": self.trajectory,
         }
