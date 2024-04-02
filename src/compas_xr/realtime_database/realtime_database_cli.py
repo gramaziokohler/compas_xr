@@ -20,7 +20,6 @@ if lib_dir not in sys.path:
 
 clr.AddReference("Firebase.Auth.dll")
 clr.AddReference("Firebase.dll")
-clr.AddReference("Firebase.Storage.dll")
 clr.AddReference("LiteDB.dll")
 clr.AddReference("System.Reactive.dll")
 
