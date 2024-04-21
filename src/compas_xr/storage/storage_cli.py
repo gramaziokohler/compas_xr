@@ -242,7 +242,7 @@ class Storage(StorageInterface):
             for path, name in file_info:
 
                 if os.path.exists(path):
-                    #TODO: Question
+                    #TODO: Call upload obj as an internal method.
                     """
                     Also works with the function call below, but not sure if this is the best idea
                     # self.upload_obj(name, cloud_folder_name, path)
