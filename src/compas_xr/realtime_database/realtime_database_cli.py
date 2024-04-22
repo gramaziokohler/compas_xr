@@ -118,8 +118,18 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
         database_reference = RealtimeDatabase._shared_database
         childquery = database_reference.Child(parentname)
         child_reference = QueryExtensions.Child(childquery, childname)
-        childrenreference = QueryExtensions.Child(child_reference, grandchildname)
-        return childrenreference
+        grand_child_reference = QueryExtensions.Child(child_reference, grandchildname)
+        return grand_child_reference
+
+    def _construct_reference_from_list(self, reference_list):
+
+        reference = RealtimeDatabase._shared_database
+        for ref in reference_list:
+            if ref == reference_list[0]:
+                reference = reference.Child(ref)
+            else:
+                reference = QueryExtensions.Child(reference, ref)
+        return reference
 
     #TODO: Can this be configured to be a global callback where I pass the task and the result? This would simplify the code a lot.
     def _task_awaiter(self, task, result):

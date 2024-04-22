@@ -11,7 +11,10 @@ class RealtimeDatabaseInterface(object):
     
     def _construct_grandchild_refrence(self, parentname, childname, grandchildname):
         raise NotImplementedError("Implemented on child classes")
-    
+
+    def _construct_reference_from_list(self, reference_list):
+        raise NotImplementedError("Implemented on child classes")
+
     def upload_data_to_reference(self, data, database_reference):
         raise NotImplementedError("Implemented on child classes")
     
@@ -36,6 +39,10 @@ class RealtimeDatabaseInterface(object):
             self.upload_data_to_reference(data, database_reference)
         else:
             raise Exception("path does not exist {}".format(path_local))
+
+    def upload_data_to_deep_reference(self, data, reference_list):
+        database_reference = self._construct_reference_from_list(reference_list)
+        self.upload_data_to_reference(data, database_reference)
 
     def get_data(self, project_name):
         database_reference = self._construct_reference(project_name)

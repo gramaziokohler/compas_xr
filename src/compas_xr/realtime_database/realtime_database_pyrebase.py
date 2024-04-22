@@ -45,7 +45,13 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
     
     def _construct_grandchild_refrence(self, parentname, childname, grandchildname):
         return RealtimeDatabase._shared_database.child(parentname).child(childname).child(grandchildname)
-    
+
+    def _construct_reference_from_list(self, reference_list):
+        reference = RealtimeDatabase._shared_database
+        for ref in reference_list:
+            reference = reference.child(ref)
+        return reference
+
     #Functions for uploading .json files specifically
     def upload_file_all(self, path_local, parentname): 
         
