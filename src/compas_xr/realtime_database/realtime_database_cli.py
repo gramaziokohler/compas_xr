@@ -104,15 +104,13 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
 
         database_reference = RealtimeDatabase._shared_database
         reference = database_reference.Child(parentname)
-
         return reference
 
-    def _construct_childreference(self, parentname, childname):
-      
+    def _construct_child_refrence(self, parentname, childname):
+
         database_reference = RealtimeDatabase._shared_database
         childquery = database_reference.Child(parentname)
         child_reference = QueryExtensions.Child(childquery, childname)
-
         return child_reference
 
     def _construct_grandchild_refrence(self, parentname, childname, grandchildname):
@@ -120,9 +118,7 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
         database_reference = RealtimeDatabase._shared_database
         childquery = database_reference.Child(parentname)
         child_reference = QueryExtensions.Child(childquery, childname)
-
         childrenreference = QueryExtensions.Child(child_reference, grandchildname)
-
         return childrenreference
 
     #TODO: Can this be configured to be a global callback where I pass the task and the result? This would simplify the code a lot.
@@ -255,21 +251,49 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
 
         self._start_async_call(_begin_upload)
 
-    def upload_data_to_project(self, data, project_name, child_name): #DONE
-
+    def get_data_from_reference(self, database_reference): #DONE
+       
         #Ensure Database Connection
         self._ensure_database()
-        serialized_data = json_dumps(data)
-
-        def _begin_upload(result):
-            new_childreference = self._construct_childreference(project_name, child_name)
-            uploadtask = new_childreference.PutAsync(serialized_data)
-            task_upload = uploadtask.GetAwaiter()
-            task_upload.OnCompleted(lambda: result["event"].set())
+ 
+        #TODO: THIS ONE IS CUSTOM BECAUSE IT NEEDS TO RETURN THE URL... NOT TASK COMPLETION. THE REST (result["data"] = could be IsCompleted?)
+        def _begin_build_url(result):
+            urlbuldtask = database_reference.BuildUrlAsync()
+            task_url = urlbuldtask.GetAwaiter()
+            task_url.OnCompleted(lambda: result["event"].set())
             result["event"].wait()
-            result["data"] = True
+            result["data"] = urlbuldtask.Result
         
-        self._start_async_call(_begin_upload)
+        url = self._start_async_call(_begin_build_url)
+
+        data = self._get_file_from_remote(url)
+
+        #TODO: json.load(data) vs. json_loads(data)
+        """
+        This is because error will be thrown with json_loads(data)...
+        Because I cannot gaurentee that all data will be filled (FIREBASE DOES NOT UPLOAD NULL VALUES)
+        Therefore, unless the data is completely filled json_loads(data) will throw an error.
+
+        """
+        dictionary = json.loads(data)
+  
+        return dictionary
+
+    # def upload_data_to_project(self, data, project_name, child_name): #DONE
+
+    #     #Ensure Database Connection
+    #     self._ensure_database()
+    #     serialized_data = json_dumps(data)
+
+    #     def _begin_upload(result):
+    #         new_childreference = self._construct_childreference(project_name, child_name)
+    #         uploadtask = new_childreference.PutAsync(serialized_data)
+    #         task_upload = uploadtask.GetAwaiter()
+    #         task_upload.OnCompleted(lambda: result["event"].set())
+    #         result["event"].wait()
+    #         result["data"] = True
+        
+    #     self._start_async_call(_begin_upload)
 
     #Functions for uploading and nesting in the database   
     def upload_file_aschild(self, path_local, parentname, childname, parentparameter, childparameter): #Don't Need - Instead will be upload_file_graph_paramaters() 
@@ -342,48 +366,16 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
         upload = self._start_async_call(_begin_upload)
 
     #Functions for retreiving infomation from the database Streaming and Downloading
-    def stream_parent(self, callback, parentname): #TODO: NEEDS TO BE FIXED #Keep
+    def stream_parent(self, callback, database_reference): #TODO: NEEDS TO BE FIXED #Keep
         raise NotImplementedError("Function Under Developement")
     
         #Ensure Database Connection
         self._ensure_database()
 
-        database_reference = RealtimeDatabase._shared_database
-
-        downloadevent = database_reference.Child(parentname).AsObservable[object]()
+        downloadevent = database_reference.AsObservable[object]()
         print (downloadevent)
 
         subscription = downloadevent.Subscribe(callback)
-
-    def get_parent(self, parentname): #Keep: #TODO: It does not return keys of dictionary, just values get_data_main_directory(self, directoryname):
-       
-        #Ensure Database Connection
-        self._ensure_database()
- 
-        database_reference = RealtimeDatabase._shared_database
-
-        #TODO: THIS ONE IS CUSTOM BECAUSE IT NEEDS TO RETURN THE URL... NOT TASK COMPLETION. THE REST (result["data"] = could be IsCompleted?)
-        def _begin_build_url(result):
-            urlbuldtask = database_reference.Child(parentname).BuildUrlAsync()
-            task_url = urlbuldtask.GetAwaiter()
-            task_url.OnCompleted(lambda: result["event"].set())
-            result["event"].wait()
-            result["data"] = urlbuldtask.Result
-        
-        url = self._start_async_call(_begin_build_url)
-
-        data = self._get_file_from_remote(url)
-
-        #TODO: json.load(data) vs. json_loads(data)
-        """
-        This is because error will be thrown with json_loads(data)...
-        Because I cannot gaurentee that all data will be filled (FIREBASE DOES NOT UPLOAD NULL VALUES)
-        Therefore, unless the data is completely filled json_loads(data) will throw an error.
-
-        """
-        dictionary = json.loads(data)
-  
-        return dictionary
 
     def get_child(self, parentname, childname): #Keep: get_data_child_directory(self, directoryname, childdirectoryname)
         

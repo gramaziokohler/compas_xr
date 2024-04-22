@@ -11,10 +11,31 @@ class RealtimeDatabaseInterface(object):
     
     def upload_data_to_reference(self, data, database_reference):
         raise NotImplementedError("Implemented on child classes")
+    
+    def get_data_from_reference(self, database_reference):
+        raise NotImplementedError("Implemented on child classes")
+    
+    def delete_data_from_reference(self, database_reference):
+        raise NotImplementedError("Implemented on child classes")
+    
+    def stream_data_from_reference(self, callback, database_reference):
+        raise NotImplementedError("Implemented on child classes")
 
     def upload_data(self, data, project_name):
         database_reference = self._construct_reference(project_name)
         self.upload_data_to_reference(data, database_reference)
+
+    def get_data(self, project_name):
+        database_reference = self._construct_reference(project_name)
+        return self.get_data_from_reference(database_reference)
+
+    def upload_data_to_project(self, data, project_name, child_name):
+        database_reference = self._construct_child_refrence(project_name, child_name)
+        self.upload_data_to_reference(data, database_reference)
+
+    def get_data_from_project(self, project_name, child_name):
+        database_reference = self._construct_child_refrence(project_name, child_name)
+        return self.get_data_from_reference(database_reference)
 
     def upload_file_all(self, path_local, parentname):
         raise NotImplementedError("Implemented on child classes")
