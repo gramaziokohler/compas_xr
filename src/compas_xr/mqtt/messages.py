@@ -1,5 +1,6 @@
 import threading
 import uuid
+import sys
 from datetime import datetime
 from compas.geometry import Frame
 
@@ -12,7 +13,7 @@ except ImportError:
 
 class SequenceCounter(object):
     """An atomic, thread-safe sequence increament counter."""
-    ROLLOVER_THRESHOLD = 1000000
+    ROLLOVER_THRESHOLD = sys.maxsize
 
     def __init__(self, start=0):
         """Initialize a new counter to given initial value."""
@@ -38,7 +39,7 @@ class SequenceCounter(object):
                 self._value = value
 class ResponseID(object):
     """An atomic, thread-safe sequence increament counter."""
-    ROLLOVER_THRESHOLD = 1000000
+    ROLLOVER_THRESHOLD = sys.maxsize
 
     def __init__(self, start=0):
         """Initialize a new counter to given initial value."""

@@ -36,7 +36,6 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
         # Still no Database? Fail, we can't do anything
         if not RealtimeDatabase._shared_database:
             raise Exception("Could not initialize database!")
-
     
     #Functions for uploading .json files specifically
     def upload_file_all(self, path_local, parentname): 
@@ -199,7 +198,6 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
         
         else:
             raise Exception("Parent not Found in database")
-        
 
     def get_child(self, parentname, childname): 
         self._ensure_database()
