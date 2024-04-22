@@ -36,6 +36,14 @@ class RealtimeDatabaseInterface(object):
     def get_data_from_project(self, project_name, child_name):
         database_reference = self._construct_child_refrence(project_name, child_name)
         return self.get_data_from_reference(database_reference)
+    
+    def delete_data(self, project_name):
+        database_reference = self._construct_reference(project_name)
+        self.delete_data_from_reference(database_reference)
+    
+    def delete_data_from_project(self, project_name, child_name):
+        database_reference = self._construct_child_refrence(project_name, child_name)
+        self.delete_data_from_reference(database_reference)
 
     def upload_file_all(self, path_local, parentname):
         raise NotImplementedError("Implemented on child classes")

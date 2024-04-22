@@ -279,6 +279,21 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
   
         return dictionary
 
+    def delete_data_from_reference(self, database_reference): #Keep: delete_data_main_directory(self, directoryname)
+
+        #Ensure Database Connection
+        self._ensure_database()
+
+        def _begin_delete(result):
+            deletetask = database_reference.DeleteAsync()
+            delete_data = deletetask.GetAwaiter()
+            delete_data.OnCompleted(lambda: result["event"].set())
+            result["event"].wait()
+            result["data"] = True
+        
+        self._start_async_call(_begin_delete)
+
+
     # def upload_data_to_project(self, data, project_name, child_name): #DONE
 
     #     #Ensure Database Connection
