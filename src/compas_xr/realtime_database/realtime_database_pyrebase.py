@@ -36,6 +36,15 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
         # Still no Database? Fail, we can't do anything
         if not RealtimeDatabase._shared_database:
             raise Exception("Could not initialize database!")
+
+    def _construct_reference(self, project_name):
+        return RealtimeDatabase._shared_database.child(project_name)
+    
+    def _construct_child_refrence(self, parentname, childname):
+        return RealtimeDatabase._shared_database.child(parentname).child(childname)
+    
+    def _construct_grandchild_refrence(self, parentname, childname, grandchildname):
+        return RealtimeDatabase._shared_database.child(parentname).child(childname).child(grandchildname)
     
     #Functions for uploading .json files specifically
     def upload_file_all(self, path_local, parentname): 

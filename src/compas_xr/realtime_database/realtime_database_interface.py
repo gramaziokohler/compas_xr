@@ -3,6 +3,12 @@ class RealtimeDatabaseInterface(object):
     def _construct_reference(self, project_name):
         raise NotImplementedError("Implemented on child classes")
     
+    def _construct_child_refrence(self, parentname, childname):
+        raise NotImplementedError("Implemented on child classes")
+    
+    def _construct_grandchild_refrence(self, parentname, childname, grandchildname):
+        raise NotImplementedError("Implemented on child classes")
+    
     def upload_data_to_reference(self, data, database_reference):
         raise NotImplementedError("Implemented on child classes")
 

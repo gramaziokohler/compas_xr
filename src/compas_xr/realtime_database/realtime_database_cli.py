@@ -115,13 +115,13 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
 
         return child_reference
 
-    def _construct_childrenreference(self, parentname, childname, name):
+    def _construct_grandchild_refrence(self, parentname, childname, grandchildname):
         
         database_reference = RealtimeDatabase._shared_database
         childquery = database_reference.Child(parentname)
         child_reference = QueryExtensions.Child(childquery, childname)
 
-        childrenreference = QueryExtensions.Child(child_reference, name)
+        childrenreference = QueryExtensions.Child(child_reference, grandchildname)
 
         return childrenreference
 
