@@ -226,49 +226,36 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
         print ("upload complete")
 
     #Functions for uploading Data
-    def upload_data_all(self, data, parentname): #Keep: Should be called upload data
+    def upload_data(self, data, project_name): #DONE
 
         #Ensure Database Connection
         self._ensure_database()
-
         serialized_data = json_dumps(data)
-        database_reference = RealtimeDatabase._shared_database 
 
         def _begin_upload(result):
-            uploadtask = database_reference.Child(parentname).PutAsync(serialized_data)
+            uploadtask = RealtimeDatabase._shared_database.Child(project_name).PutAsync(serialized_data)
             task_upload = uploadtask.GetAwaiter()
             task_upload.OnCompleted(lambda: result["event"].set())
             result["event"].wait()
             result["data"] = True
-        
-        upload = self._start_async_call(_begin_upload)
-        print ("upload complete")
-    
-    def upload_data(self, data, parentname, parentparamater, parameters): #DON'T NEED
-            
+
+        self._start_async_call(_begin_upload)
+
+    def upload_data_to_project(self, data, project_name, child_name):
+
         #Ensure Database Connection
         self._ensure_database()
-
-        #Upload Nested Data or not.
-        paramaters_nested = {}
-        
-        for param in parameters:
-            values = data[parentparamater][param]
-            parameters_dict = {param: values}
-            paramaters_nested.update(parameters_dict)
-       
-        serialized_data = json_dumps(paramaters_nested)
-        database_reference = RealtimeDatabase._shared_database 
+        serialized_data = json_dumps(data)
 
         def _begin_upload(result):
-            uploadtask = database_reference.Child(parentname).PutAsync(serialized_data)
+            new_childreference = self._construct_childreference(project_name, child_name)
+            uploadtask = new_childreference.PutAsync(serialized_data)
             task_upload = uploadtask.GetAwaiter()
             task_upload.OnCompleted(lambda: result["event"].set())
             result["event"].wait()
             result["data"] = True
         
-        upload = self._start_async_call(_begin_upload)
-        print ("upload complete")
+        self._start_async_call(_begin_upload)
 
     #Functions for uploading and nesting in the database   
     def upload_file_aschild(self, path_local, parentname, childname, parentparameter, childparameter): #Don't Need - Instead will be upload_file_graph_paramaters() 
@@ -322,24 +309,7 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
                 result["data"] = True
             
             upload = self._start_async_call(_begin_upload)
-    #TODO: CHANGE NAME
-    def upload_data_aschild(self, data, parentname, childname): #Keep: Name = upload_data_to_child_directory()
-           
-        #Ensure Database Connection
-        self._ensure_database()
-        
-        serialized_data = json_dumps(data)
 
-        def _begin_upload(result):
-            new_childreference = self._construct_childreference(parentname, childname)
-            uploadtask = new_childreference.PutAsync(serialized_data)
-            task_upload = uploadtask.GetAwaiter()
-            task_upload.OnCompleted(lambda: result["event"].set())
-            result["event"].wait()
-            result["data"] = True
-        
-        upload = self._start_async_call(_begin_upload)
-    #TODO: CHANGE NAME
     def upload_data_aschildren(self, data, parentname, childname, name): #Keep: upload_data_as_single_entry(data, directoryname, childdirectoryname, entryname)
             
         #Ensure Database Connection
@@ -378,6 +348,7 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
  
         database_reference = RealtimeDatabase._shared_database
 
+        #TODO: THIS ONE IS CUSTOM BECAUSE IT NEEDS TO RETURN THE URL... NOT TASK COMPLETION. THE REST (result["data"] = could be IsCompleted?)
         def _begin_build_url(result):
             urlbuldtask = database_reference.Child(parentname).BuildUrlAsync()
             task_url = urlbuldtask.GetAwaiter()
@@ -388,7 +359,14 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
         url = self._start_async_call(_begin_build_url)
 
         data = self._get_file_from_remote(url)
-        #TODO: CHECK json.load vs json_loads with Danela or Gonzalo
+
+        #TODO: json.load(data) vs. json_loads(data)
+        """
+        This is because error will be thrown with json_loads(data)...
+        Because I cannot gaurentee that all data will be filled (FIREBASE DOES NOT UPLOAD NULL VALUES)
+        Therefore, unless the data is completely filled json_loads(data) will throw an error.
+
+        """
         dictionary = json.loads(data)
   
         return dictionary
