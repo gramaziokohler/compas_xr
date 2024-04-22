@@ -99,7 +99,14 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
         
         else:
             raise Exception("unable to get file from url {}".format(url))
-        
+
+    def _construct_reference(self, parentname):
+
+        database_reference = RealtimeDatabase._shared_database
+        reference = database_reference.Child(parentname)
+
+        return reference
+
     def _construct_childreference(self, parentname, childname):
       
         database_reference = RealtimeDatabase._shared_database
@@ -117,6 +124,13 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
         childrenreference = QueryExtensions.Child(child_reference, name)
 
         return childrenreference
+
+    #TODO: Can this be configured to be a global callback where I pass the task and the result? This would simplify the code a lot.
+    def _task_awaiter(self, task, result):
+        task_awaiter = task.GetAwaiter()
+        task_awaiter.OnCompleted(lambda: result["event"].set())
+        result["event"].wait()
+        result["data"] = True
 
     #Functions for uploading .json files specifically
     def upload_file_all(self, path_local, parentname): #Keep: but should be called
@@ -226,14 +240,14 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
         print ("upload complete")
 
     #Functions for uploading Data
-    def upload_data(self, data, project_name): #DONE
+    def upload_data_to_reference(self, data, database_reference): #DONE
 
         #Ensure Database Connection
         self._ensure_database()
         serialized_data = json_dumps(data)
 
         def _begin_upload(result):
-            uploadtask = RealtimeDatabase._shared_database.Child(project_name).PutAsync(serialized_data)
+            uploadtask = database_reference.PutAsync(serialized_data)
             task_upload = uploadtask.GetAwaiter()
             task_upload.OnCompleted(lambda: result["event"].set())
             result["event"].wait()
@@ -241,7 +255,7 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
 
         self._start_async_call(_begin_upload)
 
-    def upload_data_to_project(self, data, project_name, child_name):
+    def upload_data_to_project(self, data, project_name, child_name): #DONE
 
         #Ensure Database Connection
         self._ensure_database()
