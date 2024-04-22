@@ -47,48 +47,34 @@ class AssemblyExtensions(object):
             else:
                 raise Exception("File path does not exist {}".format(target_folder_path))
 
-    #Function for Managing Assembly exports
-    def export_assembly_objs(self, assembly, folder_path, new_folder_name):
+    def export_mesh_assembly_objs(self, assembly, folder_path, new_folder_name, z_to_y_remap=False):
         
-        assembly_graph = assembly.graph.__data__
-        nodes = assembly_graph["node"]
-        z_to_y_mapped_frame = Frame(Point(0,0,0), Vector.Xaxis(), Vector.Zaxis())
-
         #Construct file path with the new folder name
         target_folder_path = os.path.join(folder_path, new_folder_name)
-
+        
         #Make a folder with the folder name if it does not exist
         if not os.path.exists(target_folder_path):
             os.makedirs(target_folder_path)
 
-        #Iterate through assembly and perform transformation and export
-        for key in nodes:
-            
-            #extract part
-            part = nodes[str(key)]["part"]
-            
-            frame = part.frame
-            
-            #Create Transformation from beam frame to world_xy frame and maybe a copy?
-            transformation = Transformation.from_frame_to_frame(frame, z_to_y_mapped_frame)
-            
-            #Transform box from frame to world xy
-            part_transformed = part.transformed(transformation)
-            
-            if nodes[str(key)]["type_data"] in ["0.Cylinder", "1.Box"]:
-                part_vert, part_faces = part_transformed.to_vertices_and_faces()
-                mesh = Mesh.from_vertices_and_faces(part_vert, part_faces)
-            
-            elif nodes[str(key)]["type_data"] == "3.Mesh":
-                mesh = part_transformed
-            
-            #TODO: what should I do with .obj, also not sure if this needs to be here or if we just make it from assembly data.
+        #Create frame options for orientation of objects
+        if z_to_y_remap:
+            frame = Frame(Point(0,0,0), Vector.Xaxis(), Vector.Zaxis())
+        else:
+            frame = Frame.worldXY()
 
-            #Mesh to obj with file name being KEY and folder being the newly created folder
+        #TODO: CONFIRM TRY EXCEPT BLOCK WITH GONZALO.
+        for part in assembly.parts():
+            try:
+                part_frame = part.frame
+            except:
+                part_frame = Frame.worldXY()
+            
+            #Transform mesh part from frame to to frame
+            part_transformed = part.transformed(Transformation.from_frame_to_frame(part_frame, frame))
+            
+            # Mesh to obj with file name being KEY and folder being the newly created folder
             if os.path.exists(target_folder_path):
-                file_name = str(key)+".obj"
-                obj_file_path = os.path.join(target_folder_path, file_name)
-                mesh.to_obj(obj_file_path)
+                part_transformed.to_obj(r"{}\{}.obj".format(target_folder_path, str(part.key)))
             
             else:
                 raise Exception("File path does not exist {}".format(target_folder_path))
