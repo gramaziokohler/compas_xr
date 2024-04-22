@@ -1,3 +1,6 @@
+import os
+import json
+
 class RealtimeDatabaseInterface(object):
     
     def _construct_reference(self, project_name):
@@ -24,6 +27,15 @@ class RealtimeDatabaseInterface(object):
     def upload_data(self, data, project_name):
         database_reference = self._construct_reference(project_name)
         self.upload_data_to_reference(data, database_reference)
+
+    def upload_data_from_file(self, path_local, project_name):
+        if os.path.exists(path_local):
+            with open(path_local) as config_file:
+                data = json.load(config_file)
+            database_reference = self._construct_reference(project_name)
+            self.upload_data_to_reference(data, database_reference)
+        else:
+            raise Exception("path does not exist {}".format(path_local))
 
     def get_data(self, project_name):
         database_reference = self._construct_reference(project_name)
