@@ -2,7 +2,6 @@ import os
 # from Rhino.Geometry import Mesh, MeshingParameters
 from compas.datastructures import Assembly, Mesh
 from compas.geometry import Transformation, Point, Vector, Frame
-from compas_timber import assembly as TA
 from compas_timber.consumers import BrepGeometryConsumer
 
 class AssemblyExtensions(object):
@@ -10,7 +9,6 @@ class AssemblyExtensions(object):
     def __init__(self):
         pass
     
-    #Function for Managing Assembly exports
     def export_timberassembly_objs(self, assembly, folder_path, new_folder_name, z_to_y_remap=False):
 
         #Construct file path with the new folder name
@@ -48,6 +46,7 @@ class AssemblyExtensions(object):
                 raise Exception("File path does not exist {}".format(target_folder_path))
 
     def export_mesh_assembly_objs(self, assembly, folder_path, new_folder_name, z_to_y_remap=False):
+        
         
         #Construct file path with the new folder name
         target_folder_path = os.path.join(folder_path, new_folder_name)

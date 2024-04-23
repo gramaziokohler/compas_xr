@@ -1,6 +1,6 @@
 import os
 import json
-
+from compas_timber.assembly import TimberAssembly
 class RealtimeDatabaseInterface(object):
     
     def construct_reference(self, project_name):
@@ -74,3 +74,19 @@ class RealtimeDatabaseInterface(object):
     def delete_data_from_deep_reference(self, reference_list):
         database_reference = self.construct_reference_from_list(reference_list)
         self.delete_data_from_reference(database_reference)
+
+    def upload_project_data_from_compas(self, assembly, building_plan, project_name):
+        if isinstance(assembly, TimberAssembly):
+            data = {
+                "assembly": assembly.__data__,
+                "beams": {beam.key: beam for beam in assembly.beams},
+                "joints": {joint.key: joint for joint in assembly.joints},
+                "building_plan": building_plan
+                }
+        else:
+            data = {
+                "assembly": assembly.__data__,
+                "parts": {part.key: part for part in assembly.parts()},
+                "building_plan": building_plan
+                }
+        self.upload_data(data, project_name)
