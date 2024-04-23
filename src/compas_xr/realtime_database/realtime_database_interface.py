@@ -1,6 +1,8 @@
 import os
 import json
+
 from compas_timber.assembly import TimberAssembly
+
 class RealtimeDatabaseInterface(object):
     
     def construct_reference(self, project_name):
@@ -75,6 +77,7 @@ class RealtimeDatabaseInterface(object):
         database_reference = self.construct_reference_from_list(reference_list)
         self.delete_data_from_reference(database_reference)
 
+    #TODO: I am not sure if this is in the correct place... It needs method from AssemblyExtentions and I don't know if the module should be imported here.
     def upload_project_data_from_compas(self, assembly, building_plan, project_name):
         if isinstance(assembly, TimberAssembly):
             data = {

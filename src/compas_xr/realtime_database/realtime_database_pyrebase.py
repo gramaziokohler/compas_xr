@@ -2,11 +2,15 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import os
 import json
-from compas_xr.realtime_database.realtime_database_interface import RealtimeDatabaseInterface
+import os
+
 import pyrebase
-from compas.data import json_dumps,json_loads
+from compas.data import json_dumps
+from compas.data import json_loads
+
+from compas_xr.realtime_database.realtime_database_interface import RealtimeDatabaseInterface
+
 
 class RealtimeDatabase(RealtimeDatabaseInterface):
     """
