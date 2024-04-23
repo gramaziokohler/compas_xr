@@ -1,7 +1,8 @@
+import sys
 import threading
 import uuid
-import sys
 from datetime import datetime
+
 from compas.geometry import Frame
 
 # Python 2/3 compatibility import list

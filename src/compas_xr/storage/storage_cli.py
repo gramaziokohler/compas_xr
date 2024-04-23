@@ -1,14 +1,19 @@
+import json
 import os
 import sys
-import json
-
-from compas.data import json_loads,json_dumps, json_dump
-from compas_xr.storage.storage_interface import StorageInterface
-import clr
 import threading
 
-from System.IO import File, FileStream, FileMode, MemoryStream
+import clr
+from compas.data import json_dump
+from compas.data import json_dumps
+from compas.data import json_loads
+from System.IO import File
+from System.IO import FileMode
+from System.IO import FileStream
+from System.IO import MemoryStream
 from System.Text import Encoding
+
+from compas_xr.storage.storage_interface import StorageInterface
 
 try:
     # from urllib.request import urlopen
@@ -24,8 +29,8 @@ clr.AddReference("Firebase.Auth.dll")
 clr.AddReference("Firebase.dll")
 clr.AddReference("Firebase.Storage.dll")
 
-from Firebase.Auth import FirebaseAuthConfig
 from Firebase.Auth import FirebaseAuthClient
+from Firebase.Auth import FirebaseAuthConfig
 from Firebase.Storage import FirebaseStorage
 
 """

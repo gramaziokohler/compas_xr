@@ -1,12 +1,13 @@
+import json
 import os
 import sys
-import json
+import threading
 
+import clr
+from compas.data import json_dumps
+from compas.data import json_loads
 
 from compas_xr.realtime_database.realtime_database_interface import RealtimeDatabaseInterface
-import clr
-import threading
-from compas.data import json_dumps,json_loads
 
 try:
     from urllib.request import urlopen    
@@ -23,10 +24,11 @@ clr.AddReference("Firebase.dll")
 clr.AddReference("LiteDB.dll")
 clr.AddReference("System.Reactive.dll")
 
-from Firebase.Auth import FirebaseAuthConfig
 from Firebase.Auth import FirebaseAuthClient
+from Firebase.Auth import FirebaseAuthConfig
 from Firebase.Database import FirebaseClient
 from Firebase.Database.Query import QueryExtensions
+
 
 class RealtimeDatabase(RealtimeDatabaseInterface):
     """

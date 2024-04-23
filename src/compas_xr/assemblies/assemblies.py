@@ -1,8 +1,12 @@
 
 import os
-from compas.data import json_dumps,json_loads
-from compas_xr.storage import Storage
+
+from compas.data import json_dumps
+from compas.data import json_loads
+
 from compas_xr.realtime_database import RealtimeDatabase
+from compas_xr.storage import Storage
+
 
 class AssemblyAssistant(object):
 

@@ -15,14 +15,12 @@ compas_xr
 from __future__ import print_function
 
 import os
-# from .realtime_database import RealtimeDatabase
-# from .storage import Storage
 
 
-__author__ = ["GKR"]
+__author__ = ["Joseph Kenny"]
 __copyright__ = "Gramazio Kohler Research"
 __license__ = "MIT License"
-__email__ = "mitterberger@arch.ethz.ch"
+__email__ = "kenny@arch.ethz.ch"
 __version__ = "0.1.0"
 
 

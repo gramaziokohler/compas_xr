@@ -1,7 +1,11 @@
-import pyrebase
 import json
 import os
-from compas.data import Data, json_dumps, json_loads
+
+import pyrebase
+from compas.data import Data
+from compas.data import json_dumps
+from compas.data import json_loads
+
 from compas_xr.storage.storage_interface import StorageInterface
 
 try:
