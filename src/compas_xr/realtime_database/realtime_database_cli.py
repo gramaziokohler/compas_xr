@@ -213,7 +213,7 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
                 reference = QueryExtensions.Child(reference, ref)
         return reference
 
-    def upload_data_to_reference(self, data, database_reference):
+    def delete_data_from_reference(self, database_reference):
         """
         Method for uploading data to a constructed database reference.
 
@@ -229,14 +229,13 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
         None
         """
         self._ensure_database()
-        serialized_data = json_dumps(data)
-        def _begin_upload(result):
-            uploadtask = database_reference.PutAsync(serialized_data)
-            task_upload = uploadtask.GetAwaiter()
-            task_upload.OnCompleted(lambda: result["event"].set())
+        def _begin_delete(result):
+            deletetask = database_reference.DeleteAsync()
+            delete_data = deletetask.GetAwaiter()
+            delete_data.OnCompleted(lambda: result["event"].set())
             result["event"].wait()
             result["data"] = True
-        self._start_async_call(_begin_upload)
+        self._start_async_call(_begin_delete)
 
     def get_data_from_reference(self, database_reference):
         """
@@ -273,7 +272,10 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
         data = json.loads(json_data)
         return data
 
-    def delete_data_from_reference(self, database_reference):
+    def stream_data_from_reference(self, callback, database_reference):
+        raise NotImplementedError("Function Under Developement")
+
+    def upload_data_to_reference(self, data, database_reference):
         """
         Method for uploading data to a constructed database reference.
 
@@ -289,13 +291,11 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
         None
         """
         self._ensure_database()
-        def _begin_delete(result):
-            deletetask = database_reference.DeleteAsync()
-            delete_data = deletetask.GetAwaiter()
-            delete_data.OnCompleted(lambda: result["event"].set())
+        serialized_data = json_dumps(data)
+        def _begin_upload(result):
+            uploadtask = database_reference.PutAsync(serialized_data)
+            task_upload = uploadtask.GetAwaiter()
+            task_upload.OnCompleted(lambda: result["event"].set())
             result["event"].wait()
             result["data"] = True
-        self._start_async_call(_begin_delete)
-
-    def stream_data_from_reference(self, callback, database_reference):
-        raise NotImplementedError("Function Under Developement")
+        self._start_async_call(_begin_upload)
