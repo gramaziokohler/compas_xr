@@ -114,6 +114,23 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
             reference = reference.child(ref)
         return reference
 
+    def delete_data_from_reference(self, database_reference):
+        """
+        Method for deleting data from a constructed database reference.
+
+        Parameters
+        ----------
+        database_reference: 'Firebase.Database.Query.ChildQuery'
+            Reference to the database location where the data will be uploaded.
+
+        Returns
+        -------
+        None
+        """
+        self._ensure_database()
+        database_reference.remove()
+        print ("parent deleted")
+
     #Functions for uploading .json files specifically
     def upload_file_all(self, path_local, parentname): 
         

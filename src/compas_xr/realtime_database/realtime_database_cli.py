@@ -215,12 +215,10 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
 
     def delete_data_from_reference(self, database_reference):
         """
-        Method for uploading data to a constructed database reference.
+        Method for deleting data from a constructed database reference.
 
         Parameters
         ----------
-        data : Any
-            The data to be uploaded. Data should be JSON serializable.
         database_reference: 'Firebase.Database.Query.ChildQuery'
             Reference to the database location where the data will be uploaded.
 
