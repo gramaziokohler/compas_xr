@@ -43,6 +43,10 @@ class RealtimeDatabaseInterface(object):
     def upload_data_to_deep_reference(self, data, reference_list):
         database_reference = self.construct_reference_from_list(reference_list)
         self.upload_data_to_reference(data, database_reference)
+    
+    def get_data_from_deep_reference(self, reference_list):
+        database_reference = self.construct_reference_from_list(reference_list)
+        return self.get_data_from_reference(database_reference)
 
     def get_data(self, project_name):
         database_reference = self.construct_reference(project_name)

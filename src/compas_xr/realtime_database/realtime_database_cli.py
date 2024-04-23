@@ -101,20 +101,65 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
             raise Exception("unable to get file from url {}".format(url))
 
     def construct_reference(self, parentname):
+        """
+        Constructs a database reference under the specified parent name.
 
+        Parameters
+        ----------
+        parentname : str
+            The name of the parent under which the reference will be constructed.
+
+        Returns
+        -------
+        :class: 'Firebase.Database.Query.ChildQuery'
+            The constructed database reference.
+
+        """
         database_reference = RealtimeDatabase._shared_database
         reference = database_reference.Child(parentname)
         return reference
 
     def construct_child_refrence(self, parentname, childname):
+        """
+        Constructs a database reference under the specified parent name & child name.
 
+        Parameters
+        ----------
+        parentname : str
+            The name of the parent under which the reference will be constructed.
+        childname : str
+            The name of the child under which the reference will be constructed.
+
+        Returns
+        -------
+        :class: 'Firebase.Database.Query.ChildQuery'
+            The constructed database reference.
+
+        """
         database_reference = RealtimeDatabase._shared_database
         childquery = database_reference.Child(parentname)
         child_reference = QueryExtensions.Child(childquery, childname)
         return child_reference
 
     def construct_grandchild_refrence(self, parentname, childname, grandchildname):
-        
+        """
+        Constructs a database reference under the specified parent name, child name, & grandchild name.
+
+        Parameters
+        ----------
+        parentname : str
+            The name of the parent under which the reference will be constructed.
+        childname : str
+            The name of the child under which the reference will be constructed.
+        grandchildname : str
+            The name of the grandchild under which the reference will be constructed.
+
+        Returns
+        -------
+        :class: 'Firebase.Database.Query.ChildQuery'
+            The constructed database reference.
+
+        """
         database_reference = RealtimeDatabase._shared_database
         childquery = database_reference.Child(parentname)
         child_reference = QueryExtensions.Child(childquery, childname)
@@ -122,151 +167,81 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
         return grand_child_reference
 
     def construct_reference_from_list(self, reference_list):
+        """
+        Constructs a database reference under the specified refrences in list order.
 
+        Parameters
+        ----------
+        reference_list : list of str
+            The name of the parent under which the reference will be constructed.
+
+        Returns
+        -------
+        :class: 'Firebase.Database.Query.ChildQuery'
+            The constructed database reference.
+
+        """
         reference = RealtimeDatabase._shared_database
         for ref in reference_list:
             if ref == reference_list[0]:
                 reference = reference.Child(ref)
             else:
                 reference = QueryExtensions.Child(reference, ref)
+            print (dir(reference))
         return reference
 
-    #TODO: Can this be configured to be a global callback where I pass the task and the result? This would simplify the code a lot.
-    def _task_awaiter(self, task, result):
+    #TODO: Can this be configured to be a global callback for all methods where I pass the task and the result? This would simplify the code a lot.
+    def _task_callback(self, task, result):
         task_awaiter = task.GetAwaiter()
         task_awaiter.OnCompleted(lambda: result["event"].set())
         result["event"].wait()
         result["data"] = True
 
-    #Functions for uploading .json files specifically
-    def upload_file_all(self, path_local, parentname): #Keep: but should be called
+    def upload_data_to_reference(self, data, database_reference):
+        """
+        Method for uploading data to a constructed database reference.
 
-        #Ensure Database Connection
-        self._ensure_database()
+        Parameters
+        ----------
+        data : Any
+            The data to be uploaded. Data should be JSON serializable.
+        database_reference: 'Firebase.Database.Query.ChildQuery'
+            Reference to the database location where the data will be uploaded.
 
-        if os.path.exists(path_local):
-            with open(path_local) as json_file:
-                json_data = json.load(json_file)
-        
-        else:
-            raise Exception("path does not exist {}".format(path_local))
-
-        serialized_data = json_dumps(json_data)
-        database_reference = RealtimeDatabase._shared_database 
-
-        def _begin_upload(result):
-            uploadtask = database_reference.Child(parentname).PutAsync(serialized_data)
-            task_upload = uploadtask.GetAwaiter()
-            task_upload.OnCompleted(lambda: result["event"].set())
-            result["event"].wait()
-            result["data"] = True
-        
-        upload = self._start_async_call(_begin_upload)
-
-    #TODO: Added joints toggle for uploading timber assembly... joints
-    def upload_file(self, path_local, parentname, parentparameter, parameters, joints): #Maybe: (move) upload_file_graph_paramaters(file_path, paramaters[edge, dna, node]) (If we keep it)
-
-        #Ensure Database Connection
-        self._ensure_database()
-
-        if os.path.exists(path_local):
-
-            with open(path_local) as json_file:
-                json_data = json.load(json_file)
-            
-        else:
-            raise Exception("path does not exist {}".format(path_local))
-        
-        
-        paramaters_nested = {}
-
-        for param in parameters:
-            #TODO: Added Assembly just to be able to access the new timber assembly
-            values = json_data["assembly"][parentparameter][param]
-            parameters_dict = {param: values}
-            paramaters_nested.update(parameters_dict)
-
-        if (joints == False):
-            joint_keys = []
-            elements = paramaters_nested[param]
-
-            for item in elements:
-                values = elements[item]
-                if values["type"] == "joint":
-                    joint_keys.append(item)
-
-            for key in joint_keys:
-                elements.pop(key)
-        
-
-        serialized_data = json_dumps(paramaters_nested)
-        database_reference = RealtimeDatabase._shared_database 
-
-        def _begin_upload(result):
-            uploadtask = database_reference.Child(parentname).PutAsync(serialized_data)
-            task_upload = uploadtask.GetAwaiter()
-            task_upload.OnCompleted(lambda: result["event"].set())
-            result["event"].wait()
-            result["data"] = True
-        
-        upload = self._start_async_call(_begin_upload)
-        print ("upload complete")
-
-    #This function is only for first level paramaters ex. "Attributes" and "Graph" 
-    def upload_file_baselevel(self, path_local, parentname, parameters): #DON'T NEED
-
-        #Ensure Database Connection
-        self._ensure_database()
-
-        if os.path.exists(path_local):
-            with open(path_local) as json_file:
-                json_data = json.load(json_file)
-            
-        else:
-            raise Exception("path does not exist {}".format(path_local))
-        
-        parameters_list = {}
-
-        for param in parameters:
-            values = json_data[param]
-            parameters_dict = {param: values}
-            parameters_list.update(parameters_dict)
-        
-        serialized_data = json_dumps(parameters_list)
-        database_reference = RealtimeDatabase._shared_database 
-
-        def _begin_upload(result):
-            uploadtask = database_reference.Child(parentname).PutAsync(serialized_data)
-            task_upload = uploadtask.GetAwaiter()
-            task_upload.OnCompleted(lambda: result["event"].set())
-            result["event"].wait()
-            result["data"] = True
-        
-        upload = self._start_async_call(_begin_upload)
-        print ("upload complete")
-
-    #Functions for uploading Data
-    def upload_data_to_reference(self, data, database_reference): #DONE
-
-        #Ensure Database Connection
+        Returns
+        -------
+        None
+        """
+        print (type(data))
+        print (type(database_reference))
         self._ensure_database()
         serialized_data = json_dumps(data)
 
         def _begin_upload(result):
             uploadtask = database_reference.PutAsync(serialized_data)
             task_upload = uploadtask.GetAwaiter()
+            print (dir(task_upload))
             task_upload.OnCompleted(lambda: result["event"].set())
             result["event"].wait()
             result["data"] = True
 
         self._start_async_call(_begin_upload)
 
-    def get_data_from_reference(self, database_reference): #DONE
-       
-        #Ensure Database Connection
+    def get_data_from_reference(self, database_reference):
+        """
+        Method for reteriving data from a constructed database reference.
+
+        Parameters
+        ----------
+        database_reference: 'Firebase.Database.Query.ChildQuery'
+            Reference to the database location where the data will be uploaded.
+
+        Returns
+        -------
+        None
+        """
         self._ensure_database()
- 
-        #TODO: THIS ONE IS CUSTOM BECAUSE IT NEEDS TO RETURN THE URL... NOT TASK COMPLETION. THE REST (result["data"] = could be IsCompleted?)
+
         def _begin_build_url(result):
             urlbuldtask = database_reference.BuildUrlAsync()
             task_url = urlbuldtask.GetAwaiter()
@@ -277,6 +252,7 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
         url = self._start_async_call(_begin_build_url)
 
         data = self._get_file_from_remote(url)
+        print (type(data))
 
         #TODO: json.load(data) vs. json_loads(data)
         """
@@ -286,10 +262,11 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
 
         """
         dictionary = json.loads(data)
+        print (type(dictionary))
   
         return dictionary
 
-    def delete_data_from_reference(self, database_reference): #Keep: delete_data_main_directory(self, directoryname)
+    def delete_data_from_reference(self, database_reference):
 
         #Ensure Database Connection
         self._ensure_database()
@@ -303,175 +280,5 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
         
         self._start_async_call(_begin_delete)
 
-
-    # def upload_data_to_project(self, data, project_name, child_name): #DONE
-
-    #     #Ensure Database Connection
-    #     self._ensure_database()
-    #     serialized_data = json_dumps(data)
-
-    #     def _begin_upload(result):
-    #         new_childreference = self._construct_childreference(project_name, child_name)
-    #         uploadtask = new_childreference.PutAsync(serialized_data)
-    #         task_upload = uploadtask.GetAwaiter()
-    #         task_upload.OnCompleted(lambda: result["event"].set())
-    #         result["event"].wait()
-    #         result["data"] = True
-        
-    #     self._start_async_call(_begin_upload)
-
-    #Functions for uploading and nesting in the database   
-    def upload_file_aschild(self, path_local, parentname, childname, parentparameter, childparameter): #Don't Need - Instead will be upload_file_graph_paramaters() 
-           
-        #Ensure Database Connection
-        self._ensure_database()
- 
-        if os.path.exists(path_local):
-            with open(path_local) as json_file:
-                json_data = json.load(json_file)
-
-        else:
-            raise Exception("path does not exist {}".format(path_local))
-        
-        values = json_data[parentparameter][childparameter]
-        serialized_data = json_dumps(values)
-
-        def _begin_upload(result):
-            new_childreference = self._construct_childreference(parentname, childname)
-            uploadtask = new_childreference.PutAsync(serialized_data)
-            task_upload = uploadtask.GetAwaiter()
-            task_upload.OnCompleted(lambda: result["event"].set())
-            result["event"].wait()
-            result["data"] = True
-        
-        upload = self._start_async_call(_begin_upload)
-
-    def upload_file_aschildren(self, path_local, parentname, childname, parentparameter, childparameter, parameters): # Maybe - (move) Uploading specific Nodes from a file but I dont think you need this functionality would use data 
-            
-        #Ensure Database Connection
-        self._ensure_database()
-
-        if os.path.exists(path_local):
-            with open(path_local) as json_file:
-                json_data = json.load(json_file)
-
-        else:
-            raise Exception("path does not exist {}".format(path_local))
-
-        for param in parameters:
-            
-            values = json_data[parentparameter][childparameter][param]
-            serialized_data = json_dumps(values)
-
-            def _begin_upload(result):
-                new_childreference = self._construct_childrenreference(parentname,childname,param)
-                uploadtask = new_childreference.PutAsync(serialized_data)
-                task_upload = uploadtask.GetAwaiter()
-                task_upload.OnCompleted(lambda: result["event"].set())
-                result["event"].wait()
-                result["data"] = True
-            
-            upload = self._start_async_call(_begin_upload)
-
-    def upload_data_aschildren(self, data, parentname, childname, name): #Keep: upload_data_as_single_entry(data, directoryname, childdirectoryname, entryname)
-            
-        #Ensure Database Connection
-        self._ensure_database()
-
-        serialized_data = json_dumps(data)
-
-        def _begin_upload(result):
-            new_childreference = self._construct_childrenreference(parentname,childname,name)
-            uploadtask = new_childreference.PutAsync(serialized_data)
-            task_upload = uploadtask.GetAwaiter()
-            task_upload.OnCompleted(lambda: result["event"].set())
-            result["event"].wait()
-            result["data"] = True
-        
-        upload = self._start_async_call(_begin_upload)
-
-    #Functions for retreiving infomation from the database Streaming and Downloading
-    def stream_parent(self, callback, database_reference): #TODO: NEEDS TO BE FIXED #Keep
+    def stream_data_from_reference(self, callback, database_reference):
         raise NotImplementedError("Function Under Developement")
-    
-        #Ensure Database Connection
-        self._ensure_database()
-
-        downloadevent = database_reference.AsObservable[object]()
-        print (downloadevent)
-
-        subscription = downloadevent.Subscribe(callback)
-
-    def get_child(self, parentname, childname): #Keep: get_data_child_directory(self, directoryname, childdirectoryname)
-        
-        #Ensure Database Connection
-        self._ensure_database()
-
-        def _begin_build_url(result):
-            database_reference = self._construct_childreference(parentname, childname)
-            urlbuldtask = database_reference.BuildUrlAsync()
-            task_url = urlbuldtask.GetAwaiter()
-            task_url.OnCompleted(lambda: result["event"].set())
-
-            result["event"].wait()
-            result["data"] = urlbuldtask.Result
-        
-        url = self._start_async_call(_begin_build_url)
-
-        data = self._get_file_from_remote(url)
-        dictionary = json.loads(data)
-
-        return dictionary
-
-    #Functions for deleting parents and children
-    def delete_parent(self, parentname): #Keep: delete_data_main_directory(self, directoryname)
-
-        #Ensure Database Connection
-        self._ensure_database()
-
-        database_reference = RealtimeDatabase._shared_database 
-
-        def _begin_delete(result):
-            deletetask = database_reference.Child(parentname).DeleteAsync()
-            delete_data = deletetask.GetAwaiter()
-            delete_data.OnCompleted(lambda: result["event"].set())
-            result["event"].wait()
-            result["data"] = True
-        
-        delete = self._start_async_call(_begin_delete)
-        print("parent deleted")
-
-    def delete_child(self, parentname, childname): #Keep: delete_data_child_directory(self, directoryname, childdirectoryname)
-
-        #Ensure Database Connection
-        self._ensure_database()
-
-        def _begin_delete(result):
-            delete_reference = self._construct_childreference( parentname, childname)
-            deletetask = delete_reference.DeleteAsync()
-            delete_data = deletetask.GetAwaiter()
-            delete_data.OnCompleted(lambda: result["event"].set())
-            result["event"].wait()
-            result["data"] = True
-        
-        delete = self._start_async_call(_begin_delete)
-        print("child deleted")
-
-    def delete_children(self, parentname, childname, children): #Keep: #Keep: delete_data_entries(self, directoryname, childdirectoryname, entries)
-
-        #Ensure Database Connection
-        self._ensure_database()
-
-        for child in children:
-            def _begin_delete(result):
-                
-                delete_child_reference = self._construct_childrenreference(parentname, childname, child)
-                deletetask = delete_child_reference.DeleteAsync()
-                delete_data = deletetask.GetAwaiter()
-                delete_data.OnCompleted(lambda: result["event"].set())
-                result["event"].wait()
-                result["data"] = True
-            
-            delete = self._start_async_call(_begin_delete)
-        print("children deleted")
-        
