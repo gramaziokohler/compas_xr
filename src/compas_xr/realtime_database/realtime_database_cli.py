@@ -100,20 +100,20 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
         else:
             raise Exception("unable to get file from url {}".format(url))
 
-    def _construct_reference(self, parentname):
+    def construct_reference(self, parentname):
 
         database_reference = RealtimeDatabase._shared_database
         reference = database_reference.Child(parentname)
         return reference
 
-    def _construct_child_refrence(self, parentname, childname):
+    def construct_child_refrence(self, parentname, childname):
 
         database_reference = RealtimeDatabase._shared_database
         childquery = database_reference.Child(parentname)
         child_reference = QueryExtensions.Child(childquery, childname)
         return child_reference
 
-    def _construct_grandchild_refrence(self, parentname, childname, grandchildname):
+    def construct_grandchild_refrence(self, parentname, childname, grandchildname):
         
         database_reference = RealtimeDatabase._shared_database
         childquery = database_reference.Child(parentname)
@@ -121,7 +121,7 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
         grand_child_reference = QueryExtensions.Child(child_reference, grandchildname)
         return grand_child_reference
 
-    def _construct_reference_from_list(self, reference_list):
+    def construct_reference_from_list(self, reference_list):
 
         reference = RealtimeDatabase._shared_database
         for ref in reference_list:

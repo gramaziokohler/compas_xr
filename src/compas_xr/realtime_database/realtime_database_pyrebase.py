@@ -37,16 +37,16 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
         if not RealtimeDatabase._shared_database:
             raise Exception("Could not initialize database!")
 
-    def _construct_reference(self, project_name):
+    def construct_reference(self, project_name):
         return RealtimeDatabase._shared_database.child(project_name)
     
-    def _construct_child_refrence(self, parentname, childname):
+    def construct_child_refrence(self, parentname, childname):
         return RealtimeDatabase._shared_database.child(parentname).child(childname)
     
-    def _construct_grandchild_refrence(self, parentname, childname, grandchildname):
+    def construct_grandchild_refrence(self, parentname, childname, grandchildname):
         return RealtimeDatabase._shared_database.child(parentname).child(childname).child(grandchildname)
 
-    def _construct_reference_from_list(self, reference_list):
+    def construct_reference_from_list(self, reference_list):
         reference = RealtimeDatabase._shared_database
         for ref in reference_list:
             reference = reference.child(ref)

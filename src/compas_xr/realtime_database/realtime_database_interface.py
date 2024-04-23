@@ -3,16 +3,16 @@ import json
 
 class RealtimeDatabaseInterface(object):
     
-    def _construct_reference(self, project_name):
+    def construct_reference(self, project_name):
         raise NotImplementedError("Implemented on child classes")
     
-    def _construct_child_refrence(self, parentname, childname):
+    def construct_child_refrence(self, parentname, childname):
         raise NotImplementedError("Implemented on child classes")
     
-    def _construct_grandchild_refrence(self, parentname, childname, grandchildname):
+    def construct_grandchild_refrence(self, parentname, childname, grandchildname):
         raise NotImplementedError("Implemented on child classes")
 
-    def _construct_reference_from_list(self, reference_list):
+    def construct_reference_from_list(self, reference_list):
         raise NotImplementedError("Implemented on child classes")
 
     def upload_data_to_reference(self, data, database_reference):
@@ -28,40 +28,40 @@ class RealtimeDatabaseInterface(object):
         raise NotImplementedError("Implemented on child classes")
 
     def upload_data(self, data, project_name):
-        database_reference = self._construct_reference(project_name)
+        database_reference = self.construct_reference(project_name)
         self.upload_data_to_reference(data, database_reference)
 
     def upload_data_from_file(self, path_local, project_name):
         if os.path.exists(path_local):
             with open(path_local) as config_file:
                 data = json.load(config_file)
-            database_reference = self._construct_reference(project_name)
+            database_reference = self.construct_reference(project_name)
             self.upload_data_to_reference(data, database_reference)
         else:
             raise Exception("path does not exist {}".format(path_local))
 
     def upload_data_to_deep_reference(self, data, reference_list):
-        database_reference = self._construct_reference_from_list(reference_list)
+        database_reference = self.construct_reference_from_list(reference_list)
         self.upload_data_to_reference(data, database_reference)
 
     def get_data(self, project_name):
-        database_reference = self._construct_reference(project_name)
+        database_reference = self.construct_reference(project_name)
         return self.get_data_from_reference(database_reference)
 
     def upload_data_to_project(self, data, project_name, child_name):
-        database_reference = self._construct_child_refrence(project_name, child_name)
+        database_reference = self.construct_child_refrence(project_name, child_name)
         self.upload_data_to_reference(data, database_reference)
 
     def get_data_from_project(self, project_name, child_name):
-        database_reference = self._construct_child_refrence(project_name, child_name)
+        database_reference = self.construct_child_refrence(project_name, child_name)
         return self.get_data_from_reference(database_reference)
     
     def delete_data(self, project_name):
-        database_reference = self._construct_reference(project_name)
+        database_reference = self.construct_reference(project_name)
         self.delete_data_from_reference(database_reference)
     
     def delete_data_from_project(self, project_name, child_name):
-        database_reference = self._construct_child_refrence(project_name, child_name)
+        database_reference = self.construct_child_refrence(project_name, child_name)
         self.delete_data_from_reference(database_reference)
 
     def upload_file_all(self, path_local, parentname):
