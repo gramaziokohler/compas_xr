@@ -7,7 +7,7 @@ else:
 
 __all__ = ["Storage"]
 
-
+#TODO: REMOVE BELOW
 # if __name__ == "__main__":
 #     st = Storage()
 #     st.download_file("assembly_structure.json", r"X:\GKR_working\Fall_2023\git_working\compas_xr\data\assembly_structure_test.json")

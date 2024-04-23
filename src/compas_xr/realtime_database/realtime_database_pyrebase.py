@@ -37,16 +37,78 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
         if not RealtimeDatabase._shared_database:
             raise Exception("Could not initialize database!")
 
-    def construct_reference(self, project_name):
-        return RealtimeDatabase._shared_database.child(project_name)
+    def construct_reference(self, parentname):
+        """
+        Constructs a database reference under the specified parent name.
+
+        Parameters
+        ----------
+        parentname : str
+            The name of the parent under which the reference will be constructed.
+
+        Returns
+        -------
+        :class: 'pyrebase.pyrebase.Database'
+            The constructed database reference.
+
+        """
+        return RealtimeDatabase._shared_database.child(parentname)
     
     def construct_child_refrence(self, parentname, childname):
+        """
+        Constructs a database reference under the specified parent name & child name.
+
+        Parameters
+        ----------
+        parentname : str
+            The name of the parent under which the reference will be constructed.
+        childname : str
+            The name of the child under which the reference will be constructed.
+
+        Returns
+        -------
+        :class: 'pyrebase.pyrebase.Database'
+            The constructed database reference.
+
+        """
         return RealtimeDatabase._shared_database.child(parentname).child(childname)
     
     def construct_grandchild_refrence(self, parentname, childname, grandchildname):
+        """
+        Constructs a database reference under the specified parent name, child name, & grandchild name.
+
+        Parameters
+        ----------
+        parentname : str
+            The name of the parent under which the reference will be constructed.
+        childname : str
+            The name of the child under which the reference will be constructed.
+        grandchildname : str
+            The name of the grandchild under which the reference will be constructed.
+
+        Returns
+        -------
+        :class: 'pyrebase.pyrebase.Database'
+            The constructed database reference.
+
+        """
         return RealtimeDatabase._shared_database.child(parentname).child(childname).child(grandchildname)
 
     def construct_reference_from_list(self, reference_list):
+        """
+        Constructs a database reference under the specified refrences in list order.
+
+        Parameters
+        ----------
+        reference_list : list of str
+            The name of the parent under which the reference will be constructed.
+
+        Returns
+        -------
+        :class: 'pyrebase.pyrebase.Database'
+            The constructed database reference.
+
+        """
         reference = RealtimeDatabase._shared_database
         for ref in reference_list:
             reference = reference.child(ref)
