@@ -120,8 +120,8 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
 
         Parameters
         ----------
-        database_reference: 'Firebase.Database.Query.ChildQuery'
-            Reference to the database location where the data will be uploaded.
+        database_reference: 'pyrebase.pyrebase.Database'
+            Reference to the database location where the data will be deleted from.
 
         Returns
         -------
@@ -129,7 +129,27 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
         """
         self._ensure_database()
         database_reference.remove()
-        print ("parent deleted")
+
+    def get_data_from_reference(self, database_reference): 
+        """
+        Method for retrieving data from a constructed database reference.
+
+        Parameters
+        ----------
+        database_reference: 'pyrebase.pyrebase.Database'
+            Reference to the database location where the data will be retreived from.
+
+        Returns
+        -------
+        dict
+            The retrieved data as a dictionary.
+
+        """
+        self._ensure_database()
+        database_directory = database_reference.get()
+        data = database_directory.val()
+        data_dict = dict(data)
+        return data_dict
 
     #Functions for uploading .json files specifically
     def upload_file_all(self, path_local, parentname): 
@@ -283,13 +303,23 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
         self._ensure_database()
         dictionary = {}
         database_reference = RealtimeDatabase._shared_database.child(parentname).get()
-        
+        temp_data = database_reference.val()
+        print("type of temp_data", type(temp_data))
+        print("temp_data", temp_data)
+        test_dict = dict(temp_data)
+        print("type of test_dict", type(test_dict))
+        print("test_dict", test_dict)
+        # json_load_data = json.load(temp_data)
+        # print("type of json_load_data", type(json_load_data))
+        # print("json_load_data", json_load_data)
+
         if database_reference.each():
             for d in database_reference.each():
                 dictionary[d.key()] = d.val()
             print ("got parent")
+            print("dictionary", dictionary)
+            print("type of dictionary", type(dictionary))
             return dictionary
-        
         else:
             raise Exception("Parent not Found in database")
 

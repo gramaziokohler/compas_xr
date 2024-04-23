@@ -7,9 +7,10 @@ else:
 
 __all__ = ["RealtimeDatabase"]
 
-if __name__ == "__main__":
-    rd = RealtimeDatabase(r"X:\GKR_working\Fall_2023\working_local\compas_xr_local\20240422_weeklyworking\python_library_updates\firebase_config\firebase_config.json")
-    rd.construct_reference("Random")
-
+#TODO: REMOVE BELOW
+# if __name__ == "__main__":
+#     rd = RealtimeDatabase(r"X:\GKR_working\Fall_2023\working_local\compas_xr_local\20240422_weeklyworking\python_library_updates\firebase_config\firebase_config.json")
+#     db_ref = rd.construct_child_refrence("240325_TimbersDemo", "QRFrames")
+#     rd.get_data_from_reference(db_ref)
     # from compas.data import json_dumps
     # print(json_dumps(st))

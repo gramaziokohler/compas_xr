@@ -220,7 +220,7 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
         Parameters
         ----------
         database_reference: 'Firebase.Database.Query.ChildQuery'
-            Reference to the database location where the data will be uploaded.
+            Reference to the database location where the data will be deleted from.
 
         Returns
         -------
@@ -242,7 +242,7 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
         Parameters
         ----------
         database_reference: 'Firebase.Database.Query.ChildQuery'
-            Reference to the database location where the data will be uploaded.
+            Reference to the database location where the data will be retreived from.
 
         Returns
         -------
