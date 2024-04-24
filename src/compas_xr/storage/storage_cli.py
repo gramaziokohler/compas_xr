@@ -16,7 +16,6 @@ from System.Text import Encoding
 from compas_xr.storage.storage_interface import StorageInterface
 
 try:
-    # from urllib.request import urlopen
     from urllib.request import urlopen
 except ImportError:
     from urllib import urlopen
@@ -55,16 +54,16 @@ class Storage(StorageInterface):
             path = self.config_path
 
             # Load the Firebase configuration file from the JSON file if the file exists
-            if os.path.exists(path):
-                with open(path) as config_file:
-                    config = json.load(config_file)
+            if not os.path.exists(path):
+                raise Exception("Path Does to config Not Exist: {}".format(path))
+            with open(path) as config_file:
+                config = json.load(config_file)
 
-                #TODO: Authorization for storage security (Works for now for us because our Storage is public)
-
-                #Initialize Storage from storage bucket
-                storage_client = FirebaseStorage(config["storageBucket"])
-                Storage._shared_storage = storage_client
-                print ("Shared Storage Client Set")
+            #TODO: Authorization for storage security (Works for now for us because our Storage is public)
+            #Initialize Storage from storage bucket
+            storage_client = FirebaseStorage(config["storageBucket"])
+            Storage._shared_storage = storage_client
+            print ("Shared Storage Client Set")
 
         # Still no storage? Fail, we can't do anything
         if not Storage._shared_storage:

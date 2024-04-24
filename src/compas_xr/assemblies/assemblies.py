@@ -12,13 +12,10 @@ class AssemblyAssistant(object):
 
     def __init__(self, config_path):
 
-        if os.path.exists(config_path):
-            self.storage = Storage(config_path)
-            self.database = RealtimeDatabase(config_path)
-
-        # Raise Exception that it could not be founda at that path.
-        else:
+        if not os.path.exists(config_path):
             raise Exception("Could not create Storage or Database with path {}!".format(config_path))
+        self.storage = Storage(config_path)
+        self.database = RealtimeDatabase(config_path)
   
     #Functions for uploading Assemblies to the Database and Storage    
     def upload_assembly_all_to_database(self, assembly, parentname): 
