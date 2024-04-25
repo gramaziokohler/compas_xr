@@ -8,7 +8,7 @@ from compas_xr.realtime_database import RealtimeDatabase
 from compas_xr.storage import Storage
 
 
-class AssemblyAssistant(object):
+class ProjectManager(object):
 
     def __init__(self, config_path):
 
