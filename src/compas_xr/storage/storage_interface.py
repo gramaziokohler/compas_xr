@@ -28,7 +28,7 @@ class StorageInterface(object):
         storage_reference = self.construct_reference(cloud_file_name)
         self.upload_data_to_reference(data, storage_reference, pretty)
 
-    def upload_data_from_json(self, path_local, pretty=True): #TODO: THIS SHOULD NOT HAVE A NAME INPUT. (ERROR PRONE)
+    def upload_data_from_json(self, path_local, pretty=True):
         if not os.path.exists(path_local):
             raise Exception("path does not exist {}".format(path_local))
         with open(path_local) as file:
