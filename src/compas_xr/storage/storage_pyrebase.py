@@ -66,7 +66,26 @@ class Storage(StorageInterface):
         
         else:
             raise Exception("unable to get file from url {}".format(url))
-    
+
+    def construct_reference(self, cloud_file_name):
+        return Storage._shared_storage.child(cloud_file_name)
+
+    def construct_reference_with_folder(self, cloud_folder_name, cloud_file_name):
+        return Storage._shared_storage.child(cloud_folder_name).child(cloud_file_name)
+
+    def construct_reference_from_list(self, cloud_path_list):
+        storage_reference = Storage._shared_storage
+        for path in cloud_path_list:
+            storage_reference = storage_reference.child(path)
+        return storage_reference
+
+    def upload_bytes_to_reference_from_local_file(self, file_path, storage_reference):
+        if not os.path.exists(file_path):
+            raise FileNotFoundError("File not found: {}".format(file_path))
+        with open(file_path, 'rb') as file:
+            byte_data = file.read()
+        storage_reference.put(byte_data)
+
     #Functions for uploading datatypes to Firebase Storage
     def upload_file(self, path_on_cloud, path_local):
         self._ensure_storage()
@@ -116,7 +135,7 @@ class Storage(StorageInterface):
 
         else:
             raise Exception("path does not exist {}".format(path_local))
-    
+
     def upload_objs(self, folder_local, cloud_folder_name):
 
         self._ensure_storage()

@@ -132,16 +132,25 @@ class Storage(StorageInterface):
 
         self._start_async_call(_begin_upload)
 
-    def upload_bytes_to_reference(self, byte_data, storage_reference):
+    def upload_bytes_to_reference_from_local_file(self, file_path, storage_reference):
+        if not os.path.exists(file_path):
+            raise FileNotFoundError("File not found: {}".format(file_path))
+        print ("file path exists")
         self._ensure_storage()
-        bytes = Encoding.UTF8.GetBytes(byte_data)
-        stream = MemoryStream(bytes)
+        byte_data = File.ReadAllBytes(file_path)
+        print("file read as bytes", type(byte_data))
+        stream = MemoryStream(byte_data)
+        print("file read as bytes", type(byte_data))
 
         def _begin_upload(result):
             uploadtask = storage_reference.PutAsync(stream)
             task_upload = uploadtask.GetAwaiter()
             task_upload.OnCompleted(lambda: result["event"].set())
             result["event"].wait()
+            print("upload completed", task_upload.IsCompleted)
+            print("upload completed", task_upload.GetResult())
+            # print(dir(task_upload))
+            # print(dir(uploadtask))
             result["data"] = True
 
         self._start_async_call(_begin_upload)

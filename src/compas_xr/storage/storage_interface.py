@@ -2,7 +2,7 @@ import json
 import os
 
 from compas.data import json_dump, json_loads
-from System.IO import File
+
 class StorageInterface(object):
 
     def construct_reference(self, cloud_file_name):
@@ -24,7 +24,7 @@ class StorageInterface(object):
         storage_reference = self.construct_reference(cloud_file_name)
         self.upload_data_to_reference(data, storage_reference, pretty)
 
-    def upload_bytes_to_reference(self, byte_data, storage_reference):
+    def upload_bytes_to_reference_from_local_file(self, file_path, storage_reference):
         raise NotImplementedError("Implemented on child classes")
 
     def upload_data_from_json(self, path_local, cloud_file_name, pretty=True): #TODO: THIS SHOULD NOT HAVE A NAME INPUT. (ERROR PRONE)
@@ -51,15 +51,11 @@ class StorageInterface(object):
         return NotImplementedError("Implemented on child classes")
 
     def upload_file_from_bytes(self, file_path):
-        # Check if the file exists
         if not os.path.exists(file_path):
             raise FileNotFoundError("File not found: {}".format(file_path))
-        with open(file_path, 'rb') as file:
-            byte_data = file.read()
-        print(type(byte_data))
         file_name = os.path.basename(file_path)
         storage_reference = self.construct_reference(file_name)
-        self.upload_bytes_to_reference(byte_data, storage_reference)
+        self.upload_bytes_to_reference_from_local_file(file_path, storage_reference)
 
     #TODO: This is not working... for some reason the GetDownloadUrlAsync always results Faulted
     def get_data_from_folder(self, cloud_folder_name, cloud_file_name):
