@@ -65,12 +65,12 @@ class AssemblyExtensions(object):
             compas_mesh = Mesh()
             for mesh in brep_meshes:
                 compas_mesh.join(mesh)
-            compas_mesh.transformed(Transformation.from_frame_to_frame(beam_frame, frame))
-                        
+            mesh_transformed = compas_mesh.transformed(Transformation.from_frame_to_frame(beam_frame, frame))
+
             if not os.path.exists(target_folder_path):
                 raise Exception("File path does not exist {}".format(target_folder_path))                
             filename = "{}.obj".format(str(key))
-            compas_mesh.to_obj(os.path.join(target_folder_path, filename))
+            mesh_transformed.to_obj(os.path.join(target_folder_path, filename))
 
     def export_mesh_assembly_objs(self, assembly, folder_path, new_folder_name, z_to_y_remap=False):
         """

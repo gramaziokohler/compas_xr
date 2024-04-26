@@ -96,7 +96,7 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
 
     def _start_async_call(self, fn, timeout=10):
         """
-        Manages asynchronous calls to the database.
+        Manages asynchronous calls to the RealtimeDatabase.
         """
         result = {}
         result["event"] = threading.Event()
