@@ -36,30 +36,6 @@ class RealtimeDatabaseInterface(object):
     def stream_data_from_reference(self, callback, database_reference):
         raise NotImplementedError("Implemented on child classes")
 
-    # TODO: Move to ProjectManager.py
-    def application_settings_writer(
-        self, database_parentname, storage_folder="None", obj_orientation=True
-    ):
-        """
-        Uploads required application settings to the Firebase RealtimeDatabase.
-
-        Parameters
-        ----------
-        database_parentname : str
-            The name of the parent under which the reference will be constructed.
-        storage_folder : str, optional
-            The name of the storage folder, by default "None"
-        obj_orientation : bool, optional
-            The orientation of the object, by default True
-
-        Returns
-        -------
-        None
-
-        """
-        data = {"parentname": database_parentname, "storagename": storage_folder, "objorientation": obj_orientation}
-        self.upload_data(data, "ApplicationSettings")
-
     def upload_data(self, data, reference_name):
         """
         Uploads data to the Firebase Realtime Database under specified reference name.
@@ -251,39 +227,3 @@ class RealtimeDatabaseInterface(object):
         """
         database_reference = self.construct_reference_from_list(reference_list)
         self.delete_data_from_reference(database_reference)
-
-    # TODO: Move to Project Manager Class
-    def upload_project_data_from_compas(self, assembly, building_plan, qr_frames_list, project_name):
-        """
-        Formats data structure from Compas Class Objects and uploads them to the RealtimeDatabase in under the specified project name.
-
-        Parameters
-        ----------
-        assembly : compas.datastructures.Assembly or compas_timber.assembly.TimberAssembly
-            The assembly in which data will be extracted from.
-        building_plan : compas_timber.planning.BuildingPlan
-            The BuildingPlan in which data will be extracted from.
-        qr_frames_list : list of compas.geometry.Frame
-            List of frames at specific locations for application localization data.
-        project_name : str
-            The name of the project under which the data will be stored.
-
-        Returns
-        -------
-        None
-
-        """
-        if isinstance(assembly, TimberAssembly):
-            data = {
-                "assembly": assembly.__data__,
-                "beams": {beam.key: beam for beam in assembly.beams},
-                "joints": {joint.key: joint for joint in assembly.joints},
-                "building_plan": building_plan,
-            }
-        else:
-            data = {
-                "assembly": assembly.__data__,
-                "parts": {part.key: part for part in assembly.parts()},
-                "building_plan": building_plan,
-            }
-        self.upload_data(data, project_name)

@@ -1,15 +1,18 @@
 import os
 
+from compas.data import json_dump
 from compas.data import json_dumps
 from compas.data import json_loads
+from compas_timber.assembly import TimberAssembly
 
+from compas_xr.project.assembly_extensions import AssemblyExtensions
 from compas_xr.realtime_database import RealtimeDatabase
 from compas_xr.storage import Storage
-from compas_xr.project.assembly_extensions import AssemblyExtensions
+
 
 class ProjectManager(object):
     """
-    The ProjectManager class is responsible for managing projects data and operations that involve Firebase Storage and Realtime Database configuration.
+    The ProjectManager class is responsible for managing project specific data and operations that involve Firebase Storage and Realtime Database configuration.
 
     Parameters
     ----------
@@ -22,10 +25,6 @@ class ProjectManager(object):
         The storage instance for the project.
     database : RealtimeDatabase
         The realtime database instance for the project.
-
-    Examples
-    --------
-    >>> project_manager = ProjectManager('path/to/config.json')
     """
 
     def __init__(self, config_path):
@@ -33,6 +32,165 @@ class ProjectManager(object):
             raise Exception("Could not create Storage or Database with path {}!".format(config_path))
         self.storage = Storage(config_path)
         self.database = RealtimeDatabase(config_path)
+
+    def application_settings_writer(
+        self, project_name, storage_folder="None", obj_orientation=False
+    ):
+        """
+        Uploads required application settings to the Firebase RealtimeDatabase.
+
+        Parameters
+        ----------
+        project_name : str
+            The name of the project where the app will look for information.
+        storage_folder : str, optional
+            The name of the storage folder, by default "None"
+        obj_orientation : bool, optional
+            The orientation of the object, by default False
+
+        Returns
+        -------
+        None
+
+        """
+        data = {"parentname": project_name, "storagename": storage_folder, "objorientation": obj_orientation}
+        self.database.upload_data(data, "ApplicationSettings")
+
+    def upload_data_to_project(self, data, project_name, data_name):
+        """
+        Uploads data to the Firebase RealtimeDatabase under the specified project name.
+
+        Parameters
+        ----------
+        data : Any should be json serializable
+            The data to be uploaded.
+        project_name : str
+            The name of the project under which the data will be stored.
+        data_name : str
+            The name of the child in which data will be stored.
+
+        Returns
+        -------
+        None
+
+        """
+        self.database.upload_data_to_reference_as_child(data, project_name, data_name)
+
+    def upload_project_data_from_compas(self, project_name, assembly, building_plan, qr_frames_list):
+        """
+        Formats data structure from Compas Class Objects and uploads them to the RealtimeDatabase in under the specified project name.
+
+        Parameters
+        ----------
+        assembly : compas.datastructures.Assembly or compas_timber.assembly.TimberAssembly
+            The assembly in which data will be extracted from.
+        building_plan : compas_timber.planning.BuildingPlan
+            The BuildingPlan in which data will be extracted from.
+        qr_frames_list : list of compas.geometry.Frame
+            List of frames at specific locations for application localization data.
+        project_name : str
+            The name of the project under which the data will be stored.
+
+        Returns
+        -------
+        None
+
+        """
+        qr_assembly = AssemblyExtensions().create_qr_assembly(qr_frames_list)
+        if isinstance(assembly, TimberAssembly):
+            data = {
+                "QRFrames": qr_assembly.__data__,
+                "assembly": assembly.__data__,
+                "beams": {beam.key: beam for beam in assembly.beams},
+                "joints": {joint.key: joint for joint in assembly.joints},
+                "building_plan": building_plan,
+            }
+        else:
+            data = {
+                "QRFrames": qr_assembly.__data__,
+                "assembly": assembly.__data__,
+                "parts": {part.key: part for part in assembly.parts()},
+                "building_plan": building_plan,
+            }
+        self.database.upload_data(data, project_name)
+
+    def upload_qr_frames_to_project(self, project_name, qr_frames_list):
+        """
+        Uploads QR Frames to the Firebase RealtimeDatabase under the specified project name.
+
+        Parameters
+        ----------
+        qr_frames_list : list of compas.geometry.Frame
+            List of frames at specific locations for application localization data.
+        project_name : str
+            The name of the project under which the data will be stored.
+
+        Returns
+        -------
+        None
+
+        """
+        qr_assembly = AssemblyExtensions().create_qr_assembly(qr_frames_list)
+        data = qr_assembly.__data__
+        self.database.upload_data_to_reference_as_child(data, project_name, "QRFrames")
+
+    def upload_obj_to_storage(self, path_local, storage_folder_name):
+        """
+        Upload an .obj file to the Firebase Storage under the specified storage folder name.
+
+        Parameters
+        ----------
+        file_path : str
+            The path at which the obj file is stored.
+        storage_folder_name : str
+            The name of the storage folder where the .obj file will be uploaded.
+
+        Returns
+        -------
+        None
+
+        """
+        storage_folder_list = ["obj_storage", storage_folder_name]
+        self.storage.upload_file_as_bytes_to_deep_reference(path_local, storage_folder_list)
+
+    def upload_objs_from_directory_to_storage(self, local_directory, storage_folder_name):
+        """
+        Uploads all .obj files from a directory to the Firebase Storage under the specified storage folder name.
+
+        Parameters
+        ----------
+        directory_path : str
+            The path to the directory where the projects .obj files are stored.
+        storage_folder_name : str
+            The name of the storage folder where the .obj files will be uploaded.
+
+        Returns
+        -------
+        None
+
+        """
+        storage_folder_list = ["obj_storage", storage_folder_name]
+        self.storage.upload_files_as_bytes_from_directory_to_deep_reference(local_directory, storage_folder_list)
+
+    def get_project_data(self, project_name):
+        """
+        Retrieves data from the Firebase RealtimeDatabase under the specified project name.
+
+        Parameters
+        ----------
+        project_name : str
+            The name of the project under which the data will be stored.
+
+        Returns
+        -------
+        data : dict
+            The data retrieved from the database at the point of fetching.
+
+        """
+        return self.database.get_data(project_name)
+
+
+
 
     # Functions for uploading Assemblies to the Database and Storage
     def upload_assembly_all_to_database(self, assembly, parentname): #TODO: REMOVE
