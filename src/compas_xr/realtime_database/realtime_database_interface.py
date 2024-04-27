@@ -36,8 +36,9 @@ class RealtimeDatabaseInterface(object):
     def stream_data_from_reference(self, callback, database_reference):
         raise NotImplementedError("Implemented on child classes")
 
-
-    def application_settings_writer(self, database_parentname, storage_folder="None", obj_orientation=True): #TODO: Move to ProjectManager.
+    def application_settings_writer(
+        self, database_parentname, storage_folder="None", obj_orientation=True
+    ):  # TODO: Move to ProjectManager.
         """
         Uploads required application settings to the Firebase RealtimeDatabase.
 
