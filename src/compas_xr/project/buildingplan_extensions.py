@@ -36,7 +36,8 @@ class BuildingPlanExtensions(object):
 
         Returns
         -------
-        None
+        building_plan : compas_timber.planning.BuildingPlan
+            The building plan generated from the assembly sequence.
 
         """
         data_type_list = ["0.Cylinder", "1.Box", "2.ObjFile"]
