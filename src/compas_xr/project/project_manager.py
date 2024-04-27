@@ -189,8 +189,72 @@ class ProjectManager(object):
         """
         return self.database.get_data(project_name)
 
+    def upload_assembly_to_storage(self, assembly, cloud_file_name, pretty=True):
+        """
+        Uploads an assembly to the Firebase Storage.
 
+        Parameters
+        ----------
+        assembly : compas.datastructures.Assembly or compas_timber.assembly.TimberAssembly
+            The assembly to be uploaded.
+        cloud_file_name : str
+            The name of the cloud file. Saved in JSON format, and needs to have a .json extension.
 
+        Returns
+        -------
+        None
+
+        """
+        self.storage.upload_data(assembly, cloud_file_name, pretty=pretty)
+
+    def get_assembly_from_storage(self, cloud_file_name):
+        """
+        Retrieves an assembly from the Firebase Storage.
+
+        Parameters
+        ----------
+        cloud_file_name : str
+            The name of the cloud file.
+
+        Returns
+        -------
+        assembly : compas.datastructures.Assembly or compas_timber.assembly.TimberAssembly
+            The assembly retrieved from the storage.
+
+        """
+        return self.storage.get_data(cloud_file_name)
+
+    def edit_step_on_database(self, project_name, key, actor, is_built, is_planned, priority):
+        """
+        Edits a building plan step in the Firebase RealtimeDatabase under the specified project name.
+
+        Parameters
+        ----------
+        project_name : str
+            The name of the project under which the data will be stored.
+        key : str
+            The key of the building plan step to be edited.
+        actor : str
+            The actor who will be performing the step.
+        is_built : bool
+            A boolean that determines if the step is built.
+        is_planned : bool
+            A boolean that determines if the step is planned.
+        priority : int
+            The priority of the step.
+
+        Returns
+        -------
+        None
+
+        """
+        database_reference_list = [project_name, "building_plan", "data", "steps", key, "data"]
+        current_data = self.database.get_data_from_deep_reference(database_reference_list)
+        current_data["actor"] = actor
+        current_data["is_built"] = is_built
+        current_data["is_planned"] = is_planned
+        current_data["priority"] = priority
+        self.database.upload_data_to_deep_reference(current_data, database_reference_list)
 
     # Functions for uploading Assemblies to the Database and Storage
     def upload_assembly_all_to_database(self, assembly, parentname): #TODO: REMOVE
@@ -256,20 +320,20 @@ class ProjectManager(object):
             values = data[parentparameter][childparameter][param]
             self.database.upload_data_aschildren(values, parentname, childname, param)
 
-    def upload_assembly_to_storage(self, path_on_cloud, assembly): #TODO: Keep
+    # def upload_assembly_to_storage(self, path_on_cloud, assembly): #TODO: Keep
 
-        # Turn Assembly to data
-        data = json_dumps(assembly, pretty=True)  # TODO: json_dump vs json_dumps? ALSO Pretty can be false.
+    #     # Turn Assembly to data
+    #     data = json_dumps(assembly, pretty=True)  # TODO: json_dump vs json_dumps? ALSO Pretty can be false.
 
-        # upload data to storage from the storage class method
-        self.storage.upload_data(path_on_cloud, data)
+    #     # upload data to storage from the storage class method
+    #     self.storage.upload_data(path_on_cloud, data)
 
     # Function for getting assemblies from Storage
-    def get_assembly_from_storage(self, path_on_cloud): #TODO: Keep
+    # def get_assembly_from_storage(self, path_on_cloud): #TODO: Keep
 
-        data = self.storage.get_data(path_on_cloud)
+    #     data = self.storage.get_data(path_on_cloud)
 
-        # TODO: I am not sure why, but when I use the get data, this needs to happen twice for it to return an assembly
-        assembly = json_loads(data)
+    #     # TODO: I am not sure why, but when I use the get data, this needs to happen twice for it to return an assembly
+    #     assembly = json_loads(data)
 
-        return assembly
+    #     return assembly
