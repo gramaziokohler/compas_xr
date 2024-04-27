@@ -32,20 +32,6 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
         The Database instance representing the connection to the Firebase Realtime Database.
     _shared_database : Database, class attribute
         The shared Database instance representing the connection to the Firebase Realtime Database.
-
-    Methods
-    -------
-    _ensure_database() : Database
-        Ensures that the database connection is established. If the connection is not yet established, it initializes it. If the connection is already established, it returns the existing connection.
-
-    Raises
-    ------
-    Exception
-        If the configuration file does not exist at the provided path or if the database could not be initialized.
-
-    Examples
-    --------
-    >>> db = RealtimeDatabase('path/to/config.json')
     """
 
     _shared_database = None

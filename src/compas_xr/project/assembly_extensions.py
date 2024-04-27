@@ -17,14 +17,6 @@ class AssemblyExtensions(object):
     The AssemblyExtensions class provides additional functionalities such as exporting parts as .obj files
     and creating a frame assembly from a list of compas.geometry.Frames with a specific data structure for localization information.
 
-    Parameters
-    ----------
-    param1 : type
-        Description of param1.
-
-    Attributes
-    ----------
-    None
     """
 
     def export_timberassembly_objs(self, assembly, folder_path, new_folder_name, z_to_y_remap=False):

@@ -7,15 +7,6 @@ class BuildingPlanExtensions(object):
 
     The BuildingPlanExtensions class provides additional functionalities to the compas_timber.planning.BuildingPlan class
     by providing a way to create a buildling plan from an established assembly sequence.
-
-    Parameters
-    ----------
-    param1 : type
-        Description of param1.
-
-    Attributes
-    ----------
-    None
     """
 
     # TODO: This makes the building plan in a very manual way, but this needs to be resolved in tandem with building plan revisions.

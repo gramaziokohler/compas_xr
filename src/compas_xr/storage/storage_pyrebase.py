@@ -34,20 +34,6 @@ class Storage(StorageInterface):
         The path to the Firebase configuration JSON file.
     _shared_storage : pyrebase.Storage, class attribute
         The shared pyrebase.Storage instance representing the connection to the Firebase Storage.
-
-    Methods
-    -------
-    _ensure_storage() : None
-        Ensures that the storage connection is established. If the connection is not yet established, it initializes it. If the connection is already established, it does nothing.
-
-    Raises
-    ------
-    Exception
-        If the configuration file does not exist at the provided path or if the storage could not be initialized.
-
-    Examples
-    --------
-    >>> storage = Storage('path/to/config.json')
     """
 
     _shared_storage = None
