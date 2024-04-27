@@ -3,7 +3,6 @@ import os
 from copy import deepcopy
 
 from compas.data import json_dump
-from compas.data import json_loads
 
 
 class StorageInterface(object):
