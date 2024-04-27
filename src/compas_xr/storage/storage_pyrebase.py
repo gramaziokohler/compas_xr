@@ -15,6 +15,7 @@ try:
 except ImportError:
     from urllib import urlopen
 
+
 class Storage(StorageInterface):
     """
     A Storage is defined by a Firebase configuration path and a shared storage reference.
@@ -48,6 +49,7 @@ class Storage(StorageInterface):
     --------
     >>> storage = Storage('path/to/config.json')
     """
+
     _shared_storage = None
 
     def __init__(self, config_path):
@@ -66,7 +68,7 @@ class Storage(StorageInterface):
                 raise Exception("Path Does Not Exist: {}".format(path))
             with open(path) as config_file:
                 config = json.load(config_file)
-            #TODO: Authorization for storage security (Works for now for us because our Storage is public)
+            # TODO: Authorization for storage security (Works for now for us because our Storage is public)
             firebase = pyrebase.initialize_app(config)
             Storage._shared_storage = firebase.storage()
 
@@ -82,10 +84,10 @@ class Storage(StorageInterface):
             get = urlopen(url).read().decode()
         except:
             raise Exception("unable to get file from url {}".format(url))
-        
+
         if get is not None and get != "null":
-            return get    
-        
+            return get
+
         else:
             raise Exception("unable to get file from url {}".format(url))
 
@@ -127,7 +129,7 @@ class Storage(StorageInterface):
 
     def construct_reference_from_list(self, cloud_path_list):
         """
-        Constructs a storage reference for the specified cloud path list.
+        Constructs a storage reference for consecutive cloud folders in list order.
 
         Parameters
         ----------
@@ -183,7 +185,7 @@ class Storage(StorageInterface):
         """
         if not os.path.exists(file_path):
             raise FileNotFoundError("File not found: {}".format(file_path))
-        with open(file_path, 'rb') as file:
+        with open(file_path, "rb") as file:
             byte_data = file.read()
         storage_reference.put(byte_data)
 
@@ -208,4 +210,3 @@ class Storage(StorageInterface):
         serialized_data = json_dumps(data, pretty=pretty)
         file_object = io.BytesIO(serialized_data.encode())
         storage_reference.put(file_object)
-

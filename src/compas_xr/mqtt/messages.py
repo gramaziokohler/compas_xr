@@ -14,6 +14,7 @@ except ImportError:
 
 class SequenceCounter(object):
     """An atomic, thread-safe sequence increament counter."""
+
     ROLLOVER_THRESHOLD = sys.maxsize
 
     def __init__(self, start=0):
@@ -38,8 +39,11 @@ class SequenceCounter(object):
         with self._lock:
             if value > self._value:
                 self._value = value
+
+
 class ResponseID(object):
     """An atomic, thread-safe sequence increament counter."""
+
     ROLLOVER_THRESHOLD = sys.maxsize
 
     def __init__(self, start=0):
@@ -64,7 +68,8 @@ class ResponseID(object):
         with self._lock:
             if value > self._value:
                 self._value = value
-    
+
+
 class Header(UserDict):
     """Message header object used for publishing and subscribing to/from topics for compas_XR.
 
@@ -74,9 +79,11 @@ class Header(UserDict):
     _shared_response_id_counter = None
     _device_id = None
 
-    def __init__(self, increment_response_ID=False, sequence_id=None, response_id=None, device_id=None, time_stamp=None):
+    def __init__(
+        self, increment_response_ID=False, sequence_id=None, response_id=None, device_id=None, time_stamp=None
+    ):
         # super(Header, self).__init__()
-        self.sequence_id = sequence_id if sequence_id else self._ensure_sequence_id()    
+        self.sequence_id = sequence_id if sequence_id else self._ensure_sequence_id()
         self.response_id = response_id if response_id else self._ensure_response_id(increment_response_ID)
         self.device_id = device_id if device_id else self._get_device_id()
         self.time_stamp = time_stamp if time_stamp else self._get_time_stamp()
@@ -94,17 +101,25 @@ class Header(UserDict):
         device_id = value.get("device_id", None)
         time_stamp = value.get("time_stamp", None)
 
-        #If any of the required fields are missing raise an error.
+        # If any of the required fields are missing raise an error.
         if sequence_id is None or response_id is None or device_id is None or time_stamp is None:
-            raise ValueError("One or more required fields for Header parsing are missing: sequence_id, response_id, device_id, or time_stamp.")
-        instance = cls(increment_response_ID=False, sequence_id=sequence_id, response_id=response_id, device_id=device_id, time_stamp=time_stamp)
+            raise ValueError(
+                "One or more required fields for Header parsing are missing: sequence_id, response_id, device_id, or time_stamp."
+            )
+        instance = cls(
+            increment_response_ID=False,
+            sequence_id=sequence_id,
+            response_id=response_id,
+            device_id=device_id,
+            time_stamp=time_stamp,
+        )
 
-        #Update the sequence counter and response id from the message received.
+        # Update the sequence counter and response id from the message received.
         cls._update_sequence_counter_from_message(instance, sequence_id)
         cls._update_response_id_from_message(instance, response_id)
-        
+
         return instance
-    
+
     def _get_device_id(self):
         if not Header._device_id:
             Header._device_id = str(uuid.uuid4())
@@ -116,7 +131,7 @@ class Header(UserDict):
     def _get_time_stamp(self):
         self.time_stamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")
         return self.time_stamp
-    
+
     def _ensure_sequence_id(self):
         if not Header._shared_sequence_counter:
             Header._shared_sequence_counter = SequenceCounter()
@@ -124,7 +139,7 @@ class Header(UserDict):
         else:
             self.sequence_id = Header._shared_sequence_counter.increment()
         return self.sequence_id
-    
+
     def _ensure_response_id(self, increment_response_ID=False):
         if not Header._shared_response_id_counter:
             Header._shared_response_id_counter = ResponseID()
@@ -136,13 +151,13 @@ class Header(UserDict):
             else:
                 self.response_id = Header._shared_response_id_counter._value
         return self.response_id
-    
+
     def _update_sequence_counter_from_message(self, sequence_id):
         if Header._shared_sequence_counter is not None:
             Header._shared_sequence_counter.update_from_msg(sequence_id)
         else:
             Header._shared_sequence_counter = SequenceCounter(start=sequence_id)
-    
+
     def _update_response_id_from_message(self, response_id):
         if Header._shared_response_id_counter is not None:
             Header._shared_response_id_counter.update_from_msg(response_id)
@@ -157,7 +172,8 @@ class Header(UserDict):
             "device_id": self.device_id,
             "time_stamp": self.time_stamp,
         }
-    
+
+
 class GetTrajectoryRequest(UserDict):
     """Message objects used for publishing and subscribing to/from topics.
 
@@ -166,7 +182,7 @@ class GetTrajectoryRequest(UserDict):
     def __init__(self, element_id, robot_name, header=None):
         # super(GetTrajectoryRequest, self).__init__()
         if header is not None:
-            self.header=header
+            self.header = header
         else:
             self.header = Header(increment_response_ID=True)
         self.element_id = element_id
@@ -191,12 +207,14 @@ class GetTrajectoryRequest(UserDict):
         element_id = value.get("element_id", None)
         robot_name = value.get("robot_name", None)
         if element_id is None or robot_name is None:
-            raise ValueError("required information for GetTrajectoryRequest parsing is missing: element_id or robot_name.")
+            raise ValueError(
+                "required information for GetTrajectoryRequest parsing is missing: element_id or robot_name."
+            )
         # Create an instance of the class with the retrieved values and the provided header
         instance = cls(element_id=element_id, robot_name=robot_name, header=header)
 
         return instance
-    
+
     @property
     def data(self):
         return {
@@ -205,7 +223,8 @@ class GetTrajectoryRequest(UserDict):
             "robot_name": self.robot_name,
             "trajectory_id": self.trajectory_id,
         }
-    
+
+
 class GetTrajectoryResult(UserDict):
     """Message objects used for publishing and subscribing to/from topics.
 
@@ -214,7 +233,7 @@ class GetTrajectoryResult(UserDict):
     def __init__(self, element_id, robot_name, robot_base_frame, trajectory, header=None):
         # super(GetTrajectoryResult, self).__init__()
         if header is not None:
-            self.header=header
+            self.header = header
         else:
             self.header = Header()
         self.element_id = element_id
@@ -243,16 +262,24 @@ class GetTrajectoryResult(UserDict):
         robot_name = value.get("robot_name", None)
         robot_base_frame = value.get("robot_base_frame", None)
         if element_id is None or robot_name is None or robot_base_frame is None or trajectory is None:
-            raise ValueError("required information for GetTrajectoryResult parsing is missing: element_id, robot_name, or trajectory.")
-        
+            raise ValueError(
+                "required information for GetTrajectoryResult parsing is missing: element_id, robot_name, or trajectory."
+            )
+
         # Convert the robot_base_frame to a Frame object
         robot_base_frame = Frame.__from_data__(robot_base_frame)
 
         # Create an instance of the class with the retrieved values and the provided header
-        instance = cls(element_id=element_id, robot_name=robot_name, robot_base_frame=robot_base_frame, trajectory=trajectory, header=header)
+        instance = cls(
+            element_id=element_id,
+            robot_name=robot_name,
+            robot_base_frame=robot_base_frame,
+            trajectory=trajectory,
+            header=header,
+        )
 
         return instance
-    
+
     @property
     def data(self):
         return {
@@ -263,7 +290,8 @@ class GetTrajectoryResult(UserDict):
             "trajectory_id": self.trajectory_id,
             "trajectory": self.trajectory,
         }
-    
+
+
 class ApproveTrajectory(UserDict):
     """Message objects used for publishing and subscribing to/from topics.
 
@@ -272,7 +300,7 @@ class ApproveTrajectory(UserDict):
     def __init__(self, element_id, robot_name, trajectory, approval_status, header=None):
         # super(ApproveTrajectory, self).__init__()
         if header is not None:
-            self.header=header
+            self.header = header
         else:
             self.header = Header()
         self.element_id = element_id
@@ -301,13 +329,21 @@ class ApproveTrajectory(UserDict):
         robot_name = value.get("robot_name", None)
         approval_status = value.get("approval_status", None)
         if element_id is None or robot_name is None or trajectory is None or approval_status is None:
-            raise ValueError("required information for ApproveTrajectoryMessage parsing is missing: element_id, robot_name, trajectory, or approval_status.")
-        
+            raise ValueError(
+                "required information for ApproveTrajectoryMessage parsing is missing: element_id, robot_name, trajectory, or approval_status."
+            )
+
         # Create an instance of the class with the retrieved values and the provided header
-        instance = cls(element_id=element_id, robot_name=robot_name, trajectory=trajectory, approval_status=approval_status, header=header)
+        instance = cls(
+            element_id=element_id,
+            robot_name=robot_name,
+            trajectory=trajectory,
+            approval_status=approval_status,
+            header=header,
+        )
 
         return instance
-    
+
     @property
     def data(self):
         return {
@@ -319,6 +355,7 @@ class ApproveTrajectory(UserDict):
             "approval_status": self.approval_status,
         }
 
+
 class ApprovalCounterRequest(UserDict):
     """Message objects used for publishing and subscribing to/from topics.
 
@@ -327,7 +364,7 @@ class ApprovalCounterRequest(UserDict):
     def __init__(self, element_id, header=None):
         # super(ApprovalCounterRequest, self).__init__()
         if header is not None:
-            self.header=header
+            self.header = header
         else:
             self.header = Header()
         self.element_id = element_id
@@ -355,7 +392,7 @@ class ApprovalCounterRequest(UserDict):
         instance = cls(element_id=element_id, header=header)
 
         return instance
-    
+
     @property
     def data(self):
         return {
@@ -363,6 +400,7 @@ class ApprovalCounterRequest(UserDict):
             "element_id": self.element_id,
             "trajectory_id": self.trajectory_id,
         }
+
 
 class ApprovalCounterResult(UserDict):
     """Message objects used for publishing and subscribing to/from topics.
@@ -372,7 +410,7 @@ class ApprovalCounterResult(UserDict):
     def __init__(self, element_id, header=None):
         # super(ApprovalCounterResult, self).__init__()
         if header is not None:
-            self.header=header
+            self.header = header
         else:
             self.header = Header()
         self.element_id = element_id
@@ -400,7 +438,7 @@ class ApprovalCounterResult(UserDict):
         instance = cls(element_id=element_id, header=header)
 
         return instance
-    
+
     @property
     def data(self):
         return {
@@ -408,7 +446,8 @@ class ApprovalCounterResult(UserDict):
             "element_id": self.element_id,
             "trajectory_id": self.trajectory_id,
         }
-    
+
+
 class SendTrajectory(UserDict):
     """Message objects used for publishing and subscribing to/from topics.
 
@@ -417,7 +456,7 @@ class SendTrajectory(UserDict):
     def __init__(self, element_id, robot_name, trajectory, header=None):
         # super(SendTrajectory, self).__init__()
         if header is not None:
-            self.header=header
+            self.header = header
         else:
             self.header = Header()
         self.element_id = element_id
@@ -444,12 +483,14 @@ class SendTrajectory(UserDict):
         trajectory = value.get("trajectory", None)
         robot_name = value.get("robot_name", None)
         if element_id is None or robot_name is None or trajectory is None:
-            raise ValueError("required information for SendTrajectory parsing is missing: element_id, robot_name, or trajectory.")
+            raise ValueError(
+                "required information for SendTrajectory parsing is missing: element_id, robot_name, or trajectory."
+            )
         # Create an instance of the class with the retrieved values and the provided header
         instance = cls(element_id=element_id, robot_name=robot_name, trajectory=trajectory, header=header)
 
         return instance
-    
+
     @property
     def data(self):
         return {

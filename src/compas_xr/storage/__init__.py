@@ -6,4 +6,3 @@ else:
     from compas_xr.storage.storage_pyrebase import Storage
 
 __all__ = ["Storage"]
-    

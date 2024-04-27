@@ -47,6 +47,7 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
     --------
     >>> db = RealtimeDatabase('path/to/config.json')
     """
+
     _shared_database = None
 
     def __init__(self, config_path):
@@ -61,12 +62,12 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
         """
         if not RealtimeDatabase._shared_database:
             path = self.config_path
-            
+
             if not os.path.exists(path):
                 raise Exception("Could not find config file at path {}!".format(path))
             with open(path) as config_file:
                 config = json.load(config_file)
-            #TODO: Database Authorization (Works only with public databases)
+            # TODO: Database Authorization (Works only with public databases)
             firebase = pyrebase.initialize_app(config)
             RealtimeDatabase._shared_database = firebase.database()
 
@@ -89,7 +90,7 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
 
         """
         return RealtimeDatabase._shared_database.child(parentname)
-    
+
     def construct_child_refrence(self, parentname, childname):
         """
         Constructs a database reference under the specified parent name & child name.
@@ -108,7 +109,7 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
 
         """
         return RealtimeDatabase._shared_database.child(parentname).child(childname)
-    
+
     def construct_grandchild_refrence(self, parentname, childname, grandchildname):
         """
         Constructs a database reference under the specified parent name, child name, & grandchild name.
@@ -166,7 +167,7 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
         self._ensure_database()
         database_reference.remove()
 
-    def get_data_from_reference(self, database_reference): 
+    def get_data_from_reference(self, database_reference):
         """
         Method for retrieving data from a constructed database reference.
 
@@ -190,7 +191,7 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
     def stream_data_from_reference(self, callback, database_reference):
         raise NotImplementedError("Function Under Developement")
 
-    def upload_data_to_reference(self, data, database_reference): 
+    def upload_data_to_reference(self, data, database_reference):
         """
         Method for uploading data to a constructed database reference.
 
@@ -206,6 +207,6 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
         None
         """
         self._ensure_database()
-        #TODO: Check if it is possible to do this with some sort of serialization for consistency across both?
+        # TODO: Check if it is possible to do this with some sort of serialization for consistency across both?
         # serialized_data = json_dumps(data)
-        database_reference.set(data)  
+        database_reference.set(data)

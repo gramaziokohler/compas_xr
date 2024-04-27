@@ -38,6 +38,7 @@ TODO: Review Function todo's
 TODO: Authorization for Storage.
 """
 
+
 class Storage(StorageInterface):
     """
     A Storage Class is defined by a Firebase configuration path and a shared storage reference.
@@ -71,6 +72,7 @@ class Storage(StorageInterface):
     --------
     >>> storage = Storage('path/to/config.json')
     """
+
     _shared_storage = None
 
     def __init__(self, config_path):
@@ -89,7 +91,7 @@ class Storage(StorageInterface):
                 raise Exception("Path Does to config Not Exist: {}".format(path))
             with open(path) as config_file:
                 config = json.load(config_file)
-            #TODO: Authorization for storage security (Works for now for us because our Storage is public)
+            # TODO: Authorization for storage security (Works for now for us because our Storage is public)
             storage_client = FirebaseStorage(config["storageBucket"])
             Storage._shared_storage = storage_client
 
@@ -97,18 +99,18 @@ class Storage(StorageInterface):
             raise Exception("Could not initialize storage!")
 
         return Storage._shared_storage
-    
+
     def _start_async_call(self, fn, timeout=10):
         """
         Manages asynchronous calls to the Storage.
         """
         result = {}
         result["event"] = threading.Event()
-        async_thread = threading.Thread(target=fn, args=(result, ))
+        async_thread = threading.Thread(target=fn, args=(result,))
         async_thread.start()
         async_thread.join(timeout=timeout)
         return result["data"]
-    
+
     def _get_file_from_remote(self, url):
         """
         This function is used to get the information form the source url and returns a string
@@ -119,14 +121,14 @@ class Storage(StorageInterface):
 
         except:
             raise Exception("unable to get file from url {}".format(url))
-        
+
         if get is not None and get != "null":
-            return get    
-        
+            return get
+
         else:
             raise Exception("unable to get file from url {}".format(url))
 
-    #TODO: Same as RTDB: Can I turn this into a gloabal call back that can be used inside of every method?
+    # TODO: Same as RTDB: Can I turn this into a gloabal call back that can be used inside of every method?
     def _task_callback(task, result):
         task_awaiter = task.GetAwaiter()
         task_awaiter.OnCompleted(lambda: result["event"].set())
@@ -134,18 +136,76 @@ class Storage(StorageInterface):
         result["data"] = True
 
     def construct_reference(self, cloud_file_name):
+        """
+        Constructs a storage reference for the specified cloud file name.
+
+        Parameters
+        ----------
+        cloud_file_name : str
+            The name of the cloud file.
+
+        Returns
+        -------
+        :class: 'Firebase.Storage.FirebaseStorageReference'
+            The constructed storage reference.
+
+        """
         return Storage._shared_storage.Child(cloud_file_name)
 
     def construct_reference_with_folder(self, cloud_folder_name, cloud_file_name):
+        """
+        Constructs a storage reference for the specified cloud folder name and file name.
+
+        Parameters
+        ----------
+        cloud_folder_name : str
+            The name of the cloud folder.
+        cloud_file_name : str
+            The name of the cloud file.
+
+        Returns
+        -------
+        :class: 'Firebase.Storage.FirebaseStorageReference'
+            The constructed storage reference.
+
+        """
         return Storage._shared_storage.Child(cloud_folder_name).Child(cloud_file_name)
 
     def construct_reference_from_list(self, cloud_path_list):
+        """
+        Constructs a storage reference for consecutive cloud folders in list order.
+
+        Parameters
+        ----------
+        cloud_path_list : list of str
+            The list of cloud path names.
+
+        Returns
+        -------
+        :class: 'Firebase.Storage.FirebaseStorageReference'
+            The constructed storage reference.
+
+        """
         storage_ref = Storage._shared_storage
         for path in cloud_path_list:
             storage_ref = storage_ref.Child(path)
         return storage_ref
 
     def get_data_from_reference(self, storage_refrence):
+        """
+        Retrieves data from the specified storage reference.
+
+        Parameters
+        ----------
+        storage_reference : Firebase.Storage.FirebaseStorageReference
+            The storage reference pointing to the desired data.
+
+        Returns
+        -------
+        data : dict or Compas Object
+            The deserialized data retrieved from the storage reference.
+
+        """
         self._ensure_storage()
 
         def _begin_download(result):
@@ -154,13 +214,28 @@ class Storage(StorageInterface):
             task_download.OnCompleted(lambda: result["event"].set())
             result["event"].wait()
             result["data"] = downloadurl_task.Result
-        
+
         url = self._start_async_call(_begin_download)
         data = self._get_file_from_remote(url)
         desearialized_data = json_loads(data)
         return desearialized_data
 
     def upload_bytes_to_reference_from_local_file(self, file_path, storage_reference):
+        """
+        Uploads data from bytes to the specified storage reference from a local file.
+
+        Parameters
+        ----------
+        file_path : str
+            The path to the local file.
+        storage_reference : Firebase.Storage.FirebaseStorageReference
+            The storage reference to upload the byte data to.
+
+        Returns
+        ------
+        None
+
+        """
         if not os.path.exists(file_path):
             raise FileNotFoundError("File not found: {}".format(file_path))
         self._ensure_storage()
@@ -177,6 +252,23 @@ class Storage(StorageInterface):
         self._start_async_call(_begin_upload)
 
     def upload_data_to_reference(self, data, storage_reference, pretty=True):
+        """
+        Uploads data to the specified storage reference.
+
+        Parameters
+        ----------
+        data : Any should be json serializable
+            The data to be uploaded.
+        storage_reference : Firebase.Storage.FirebaseStorageReference
+            The storage reference to upload the data to.
+        pretty : bool, optional
+            Whether to format the JSON data with indentation and line breaks (default is True).
+
+        Returns
+        ------
+        None
+
+        """
         self._ensure_storage()
         serialized_data = json_dumps(data, pretty=pretty)
         byte_data = Encoding.UTF8.GetBytes(serialized_data)

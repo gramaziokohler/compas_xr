@@ -47,7 +47,7 @@ class StorageInterface(object):
         storage_reference = self.construct_reference_from_list(cloud_path_list)
         self.upload_data_to_reference(data, storage_reference, pretty)
 
-    #TODO: This works as it should, but I have a lot of problems with json_loads
+    # TODO: This works as it should, but I have a lot of problems with json_loads
     def get_data(self, cloud_file_name):
         storage_reference = self.construct_reference(cloud_file_name)
         return self.get_data_from_reference(storage_reference)
@@ -78,17 +78,17 @@ class StorageInterface(object):
             print("To cloud path: {}".format(cloud_path_list))
             self.upload_file_as_bytes_to_deep_reference(file_path, cloud_path_list)
 
-    #TODO: This is not working... for some reason the GetDownloadUrlAsync always results Faulted
+    # TODO: This is not working... for some reason the GetDownloadUrlAsync always results Faulted
     def get_data_from_folder(self, cloud_folder_name, cloud_file_name):
         storage_reference = self.construct_reference_with_folder(cloud_folder_name, cloud_file_name)
         return self.get_data_from_reference(storage_reference)
 
-    #TODO: This is not working... for some reason the GetDownloadUrlAsync always results Faulted
+    # TODO: This is not working... for some reason the GetDownloadUrlAsync always results Faulted
     def get_data_from_deep_reference(self, cloud_path_list):
         storage_reference = self.construct_reference_from_list(cloud_path_list)
         return self.get_data_from_reference(storage_reference)
 
-    #TODO: This worked with Frame.__data__ but not with TimberAssembly.__data__
+    # TODO: This worked with Frame.__data__ but not with TimberAssembly.__data__
     def download_data_to_file(self, cloud_file_name, path_local, pretty=True):
         data = self.get_data(cloud_file_name)
         directory_name = os.path.dirname(path_local)

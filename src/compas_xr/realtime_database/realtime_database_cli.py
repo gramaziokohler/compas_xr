@@ -10,7 +10,7 @@ from compas.data import json_loads
 from compas_xr.realtime_database.realtime_database_interface import RealtimeDatabaseInterface
 
 try:
-    from urllib.request import urlopen    
+    from urllib.request import urlopen
 except ImportError:
     from urllib import urlopen
 
@@ -65,6 +65,7 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
     --------
     >>> db = RealtimeDatabase('path/to/config.json')
     """
+
     _shared_database = None
 
     def __init__(self, config_path):
@@ -83,7 +84,7 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
                 raise Exception("Could not find config file at path {}!".format(path))
             with open(path) as config_file:
                 config = json.load(config_file)
-            #TODO: Database Authorization (Works only with public databases)
+            # TODO: Database Authorization (Works only with public databases)
             database_url = config["databaseURL"]
             database_client = FirebaseClient(database_url)
             RealtimeDatabase._shared_database = database_client
@@ -99,12 +100,12 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
         """
         result = {}
         result["event"] = threading.Event()
-        async_thread = threading.Thread(target=fn, args=(result, ))
+        async_thread = threading.Thread(target=fn, args=(result,))
         async_thread.start()
         async_thread.join(timeout=timeout)
         return result["data"]
 
-    def _get_file_from_remote(self, url):        
+    def _get_file_from_remote(self, url):
         """
         This function is used to get the information form the source url and returns a string
         It also checks if the data is None or == null (firebase return if no data)
@@ -114,11 +115,11 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
         except:
             raise Exception("unable to get file from url {}".format(url))
         if get is not None and get != "null":
-            return get    
+            return get
         else:
             raise Exception("unable to get file from url {}".format(url))
 
-    #TODO: Can this be configured to be a global callback for all methods where I pass the task and the result? This would simplify the code a lot.
+    # TODO: Can this be configured to be a global callback for all methods where I pass the task and the result? This would simplify the code a lot.
     def _task_callback(self, task, result):
         task_awaiter = task.GetAwaiter()
         task_awaiter.OnCompleted(lambda: result["event"].set())
@@ -228,12 +229,14 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
         None
         """
         self._ensure_database()
+
         def _begin_delete(result):
             deletetask = database_reference.DeleteAsync()
             delete_data = deletetask.GetAwaiter()
             delete_data.OnCompleted(lambda: result["event"].set())
             result["event"].wait()
             result["data"] = True
+
         self._start_async_call(_begin_delete)
 
     def get_data_from_reference(self, database_reference):
@@ -252,16 +255,18 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
 
         """
         self._ensure_database()
+
         def _begin_build_url(result):
             urlbuldtask = database_reference.BuildUrlAsync()
             task_url = urlbuldtask.GetAwaiter()
             task_url.OnCompleted(lambda: result["event"].set())
             result["event"].wait()
             result["data"] = urlbuldtask.Result
+
         url = self._start_async_call(_begin_build_url)
         json_data = self._get_file_from_remote(url)
 
-        #TODO: json.load(data) vs. json_loads(data)
+        # TODO: json.load(data) vs. json_loads(data)
         """
         This is because error will be thrown with json_loads(data)...
         Because I cannot gaurentee that all data will be filled (FIREBASE DOES NOT UPLOAD NULL VALUES)
@@ -291,10 +296,12 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
         """
         self._ensure_database()
         serialized_data = json_dumps(data)
+
         def _begin_upload(result):
             uploadtask = database_reference.PutAsync(serialized_data)
             task_upload = uploadtask.GetAwaiter()
             task_upload.OnCompleted(lambda: result["event"].set())
             result["event"].wait()
             result["data"] = True
+
         self._start_async_call(_begin_upload)

@@ -5,13 +5,13 @@ from compas_timber.assembly import TimberAssembly
 
 
 class RealtimeDatabaseInterface(object):
-    
+
     def construct_reference(self, project_name):
         raise NotImplementedError("Implemented on child classes")
-    
+
     def construct_child_refrence(self, parentname, childname):
         raise NotImplementedError("Implemented on child classes")
-    
+
     def construct_grandchild_refrence(self, parentname, childname, grandchildname):
         raise NotImplementedError("Implemented on child classes")
 
@@ -20,13 +20,13 @@ class RealtimeDatabaseInterface(object):
 
     def upload_data_to_reference(self, data, database_reference):
         raise NotImplementedError("Implemented on child classes")
-    
+
     def get_data_from_reference(self, database_reference):
         raise NotImplementedError("Implemented on child classes")
-    
+
     def delete_data_from_reference(self, database_reference):
         raise NotImplementedError("Implemented on child classes")
-    
+
     def stream_data_from_reference(self, callback, database_reference):
         raise NotImplementedError("Implemented on child classes")
 
@@ -65,7 +65,7 @@ class RealtimeDatabaseInterface(object):
     def get_data_from_deep_reference(self, reference_list):
         database_reference = self.construct_reference_from_list(reference_list)
         return self.get_data_from_reference(database_reference)
-    
+
     def delete_data(self, project_name):
         database_reference = self.construct_reference(project_name)
         self.delete_data_from_reference(database_reference)
@@ -78,19 +78,19 @@ class RealtimeDatabaseInterface(object):
         database_reference = self.construct_reference_from_list(reference_list)
         self.delete_data_from_reference(database_reference)
 
-    #TODO: I am not sure if this is in the correct place... It needs method from AssemblyExtentions and I don't know if the module should be imported here.
+    # TODO: I am not sure if this is in the correct place... It needs method from AssemblyExtentions and I don't know if the module should be imported here.
     def upload_project_data_from_compas(self, assembly, building_plan, project_name):
         if isinstance(assembly, TimberAssembly):
             data = {
                 "assembly": assembly.__data__,
                 "beams": {beam.key: beam for beam in assembly.beams},
                 "joints": {joint.key: joint for joint in assembly.joints},
-                "building_plan": building_plan
-                }
+                "building_plan": building_plan,
+            }
         else:
             data = {
                 "assembly": assembly.__data__,
                 "parts": {part.key: part for part in assembly.parts()},
-                "building_plan": building_plan
-                }
+                "building_plan": building_plan,
+            }
         self.upload_data(data, project_name)
