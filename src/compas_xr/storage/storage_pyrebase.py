@@ -1,5 +1,6 @@
 import json
 import os
+import io
 
 import pyrebase
 from compas.data import Data
@@ -15,49 +16,70 @@ except ImportError:
     from urllib import urlopen
 
 class Storage(StorageInterface):
+    """
+    A Storage is defined by a Firebase configuration path and a shared storage reference.
 
-    # Class attribute for the shared firebase storage reference
+    The Storage class is responsible for initializing and managing the connection to a Firebase Storage.
+    It ensures that the storage connection is established only once and shared across all instances of the class.
+
+    Parameters
+    ----------
+    config_path : str
+        The path to the Firebase configuration JSON file.
+
+    Attributes
+    ----------
+    config_path : str
+        The path to the Firebase configuration JSON file.
+    _shared_storage : pyrebase.Storage, class attribute
+        The shared pyrebase.Storage instance representing the connection to the Firebase Storage.
+
+    Methods
+    -------
+    _ensure_storage() : None
+        Ensures that the storage connection is established. If the connection is not yet established, it initializes it. If the connection is already established, it does nothing.
+
+    Raises
+    ------
+    Exception
+        If the configuration file does not exist at the provided path or if the storage could not be initialized.
+
+    Examples
+    --------
+    >>> storage = Storage('path/to/config.json')
+    """
     _shared_storage = None
 
-    def __init__(self, config_path=None):
+    def __init__(self, config_path):
         self.config_path = config_path
-        self._guid = None
         self._ensure_storage()
 
-    #Internal Class functions
     def _ensure_storage(self):
-        # Initialize firebase connection and storage only once
+        """
+        Ensures that the storage connection is established.
+        If the connection is not yet established, it initializes it.
+        If the connection is already established, it returns the existing connection.
+        """
         if not Storage._shared_storage:
             path = self.config_path
-
-            # Load the firebase configuration file from the JSON file if file exists.
-            if os.path.exists(path):
-                print(path)
-                with open(path) as config_file:
-                    config = json.load(config_file)
-
-            else:
+            if not os.path.exists(path):
                 raise Exception("Path Does Not Exist: {}".format(path))
-
+            with open(path) as config_file:
+                config = json.load(config_file)
             #TODO: Authorization for storage security (Works for now for us because our Storage is public)
-            
             firebase = pyrebase.initialize_app(config)
             Storage._shared_storage = firebase.storage()
 
-        # Still no storage? Fail, we can't do anything
         if not Storage._shared_storage:
             raise Exception("Could not initialize storage!")
 
     def _get_file_from_remote(self, url):
-        
         """
         This function is used to get the information form the source url and returns a string
         It also checks if the data is None or == null (firebase return if no data)
         """
-
         try:
-            get = urlopen(url).readline().decode()
-
+            get = urlopen(url).read().decode()
         except:
             raise Exception("unable to get file from url {}".format(url))
         
@@ -68,100 +90,122 @@ class Storage(StorageInterface):
             raise Exception("unable to get file from url {}".format(url))
 
     def construct_reference(self, cloud_file_name):
+        """
+        Constructs a storage reference for the specified cloud file name.
+
+        Parameters
+        ----------
+        cloud_file_name : str
+            The name of the cloud file.
+
+        Returns
+        -------
+        :class: 'pyrebase.pyrebase.Storage'
+            The constructed storage reference.
+
+        """
         return Storage._shared_storage.child(cloud_file_name)
 
     def construct_reference_with_folder(self, cloud_folder_name, cloud_file_name):
+        """
+        Constructs a storage reference for the specified cloud folder name and file name.
+
+        Parameters
+        ----------
+        cloud_folder_name : str
+            The name of the cloud folder.
+        cloud_file_name : str
+            The name of the cloud file.
+
+        Returns
+        -------
+        :class: 'pyrebase.pyrebase.Storage'
+            The constructed storage reference.
+
+        """
         return Storage._shared_storage.child(cloud_folder_name).child(cloud_file_name)
 
     def construct_reference_from_list(self, cloud_path_list):
+        """
+        Constructs a storage reference for the specified cloud path list.
+
+        Parameters
+        ----------
+        cloud_path_list : list of str
+            The list of cloud path names.
+
+        Returns
+        -------
+        :class: 'pyrebase.pyrebase.Storage'
+            The constructed storage reference.
+
+        """
         storage_reference = Storage._shared_storage
         for path in cloud_path_list:
             storage_reference = storage_reference.child(path)
         return storage_reference
 
+    def get_data_from_reference(self, storage_reference):
+        """
+        Retrieves data from the specified storage reference.
+
+        Parameters
+        ----------
+        storage_reference : pyrebase.pyrebase.Storage
+            The storage reference pointing to the desired data.
+
+        Returns
+        -------
+        data : dict or Compas Object
+            The deserialized data retrieved from the storage reference.
+
+        """
+        url = storage_reference.get_url(token=None)
+        data = self._get_file_from_remote(url)
+        deserialized_data = json_loads(data)
+        return deserialized_data
+
     def upload_bytes_to_reference_from_local_file(self, file_path, storage_reference):
+        """
+        Uploads data from bytes to the specified storage reference from a local file.
+
+        Parameters
+        ----------
+        file_path : str
+            The path to the local file.
+        storage_reference : pyrebase.pyrebase.Storage
+            The storage reference to upload the byte data to.
+
+        Returns
+        ------
+        None
+
+        """
         if not os.path.exists(file_path):
             raise FileNotFoundError("File not found: {}".format(file_path))
         with open(file_path, 'rb') as file:
             byte_data = file.read()
         storage_reference.put(byte_data)
 
-    #Functions for uploading datatypes to Firebase Storage
-    def upload_file(self, path_on_cloud, path_local):
-        self._ensure_storage()
-        Storage._shared_storage.child(path_on_cloud).put(path_local)
+    def upload_data_to_reference(self, data, storage_reference, pretty=True):
+        """
+        Uploads data to the specified storage reference.
 
-    def upload_data(self, path_on_cloud, data):
-        #Check Storage Refrence
-        self._ensure_storage()
+        Parameters
+        ----------
+        data : Any should be json serializable
+            The data to be uploaded.
+        storage_reference : pyrebase.pyrebase.Storage
+            The storage reference to upload the data to.
+        pretty : bool, optional
+            Whether to format the JSON data with indentation and line breaks (default is True).
 
-        #Serialize data
-        serialized_data = json_dumps(data)
+        Returns
+        ------
+        None
 
-        Storage._shared_storage.child(path_on_cloud).put(serialized_data)
-
-    #Functions for downloading datatypes from Firebase Storage
-    def download_file(self, path_on_cloud, path_local):
-        self._ensure_storage()
-        
-        filename = path_local
-        Storage._shared_storage.child(path_on_cloud).download(path_local, filename)
-    
-    def get_data(self, path_on_cloud):
-        #Check Storage Reference
-        self._ensure_storage()
-        
-        url = Storage._shared_storage.child(path_on_cloud).get_url(token=None)
-        
-        data = self._get_file_from_remote(url)
-
-        # Deserialize data
-        desearlize_data = json_loads(data)
-        
-        return desearlize_data
-    
-    #Manage Objects - .obj upload options
-    def upload_obj(self, path_on_cloud, cloud_folder, path_local):
-        self._ensure_storage()
-
-        storage_reference = Storage._shared_storage.child("obj_storage").child(cloud_folder)
-
-        if os.path.exists(path_local):
-            
-            with open(path_local, 'rb') as file:
-                data = file.read()
-
-            upload = storage_reference.child(path_on_cloud).put(data)
-
-        else:
-            raise Exception("path does not exist {}".format(path_local))
-
-    def upload_objs(self, folder_local, cloud_folder_name):
-
-        self._ensure_storage()
-
-        storage_reference = Storage._shared_storage.child("obj_storage").child(cloud_folder_name)
-
-        if os.path.exists(folder_local) and os.path.isdir(folder_local):
-            
-            file_info = []
-            
-            for f in os.listdir(folder_local):
-                file_path = os.path.join(folder_local, f)
-                if os.path.isfile(file_path):
-                    file_info.append((file_path, f))
-
-            for path, name in file_info:
-
-                if os.path.exists(path):
-                    with open(path, 'rb') as file:
-                        data = file.read()
-
-                    upload = storage_reference.child(name).put(data)
-
-                else:
-                    raise Exception("path does not exist {}".format(path))
-        
-        else:
-            raise Exception("path does not exist {}".format(folder_local))
+        """
+        serialized_data = json_dumps(data, pretty=pretty)
+        file_object = io.BytesIO(serialized_data.encode())
+        storage_reference.put(file_object)
 

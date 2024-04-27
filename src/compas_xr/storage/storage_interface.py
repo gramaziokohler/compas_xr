@@ -2,7 +2,9 @@ import json
 import os
 from copy import deepcopy
 
-from compas.data import json_dump, json_loads
+from compas.data import json_dump
+from compas.data import json_loads
+
 
 class StorageInterface(object):
 
@@ -17,7 +19,7 @@ class StorageInterface(object):
 
     def upload_data_to_reference(self, data, storage_reference, pretty=True):
         raise NotImplementedError("Implemented on child classes")
-    
+
     def get_data_from_reference(self, storage_refrence):
         raise NotImplementedError("Implemented on child classes")
 
@@ -45,6 +47,7 @@ class StorageInterface(object):
         storage_reference = self.construct_reference_from_list(cloud_path_list)
         self.upload_data_to_reference(data, storage_reference, pretty)
 
+    #TODO: This works as it should, but I have a lot of problems with json_loads
     def get_data(self, cloud_file_name):
         storage_reference = self.construct_reference(cloud_file_name)
         return self.get_data_from_reference(storage_reference)

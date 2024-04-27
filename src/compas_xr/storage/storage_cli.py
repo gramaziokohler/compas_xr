@@ -39,32 +39,60 @@ TODO: Authorization for Storage.
 """
 
 class Storage(StorageInterface):
-    
+    """
+    A Storage Class is defined by a Firebase configuration path and a shared storage reference.
+
+    The Storage class is responsible for initializing and managing the connection to a Firebase Storage.
+    It ensures that the storage connection is established only once and shared across all instances of the class.
+
+    Parameters
+    ----------
+    config_path : str
+        The path to the Firebase configuration JSON file.
+
+    Attributes
+    ----------
+    config_path : str
+        The path to the Firebase configuration JSON file.
+    _shared_storage : pyrebase.Storage, class attribute
+        The shared pyrebase.Storage instance representing the connection to the Firebase Storage.
+
+    Methods
+    -------
+    _ensure_storage() : None
+        Ensures that the storage connection is established. If the connection is not yet established, it initializes it. If the connection is already established, it does nothing.
+
+    Raises
+    ------
+    Exception
+        If the configuration file does not exist at the provided path or if the storage could not be initialized.
+
+    Examples
+    --------
+    >>> storage = Storage('path/to/config.json')
+    """
     _shared_storage = None
 
     def __init__(self, config_path):
         self.config_path = config_path
         self.storage = self._ensure_storage()
 
-    #Internal Class Functions
     def _ensure_storage(self):
-        # Initialize Firebase connection and storage only once
+        """
+        Ensures that the storage connection is established.
+        If the connection is not yet established, it initializes it.
+        If the connection is already established, it returns the existing connection.
+        """
         if not Storage._shared_storage:
             path = self.config_path
-
-            # Load the Firebase configuration file from the JSON file if the file exists
             if not os.path.exists(path):
                 raise Exception("Path Does to config Not Exist: {}".format(path))
             with open(path) as config_file:
                 config = json.load(config_file)
-
             #TODO: Authorization for storage security (Works for now for us because our Storage is public)
-            #Initialize Storage from storage bucket
             storage_client = FirebaseStorage(config["storageBucket"])
             Storage._shared_storage = storage_client
-            print ("Shared Storage Client Set")
 
-        # Still no storage? Fail, we can't do anything
         if not Storage._shared_storage:
             raise Exception("Could not initialize storage!")
 
@@ -117,20 +145,20 @@ class Storage(StorageInterface):
             storage_ref = storage_ref.Child(path)
         return storage_ref
 
-    def upload_data_to_reference(self, data, storage_reference, pretty=True):
+    def get_data_from_reference(self, storage_refrence):
         self._ensure_storage()
-        serialized_data = json_dumps(data, pretty=pretty)
-        byte_data = Encoding.UTF8.GetBytes(serialized_data)
-        stream = MemoryStream(byte_data)
 
-        def _begin_upload(result):
-            uploadtask = storage_reference.PutAsync(stream)
-            task_upload = uploadtask.GetAwaiter()
-            task_upload.OnCompleted(lambda: result["event"].set())
+        def _begin_download(result):
+            downloadurl_task = storage_refrence.GetDownloadUrlAsync()
+            task_download = downloadurl_task.GetAwaiter()
+            task_download.OnCompleted(lambda: result["event"].set())
             result["event"].wait()
-            result["data"] = True
-
-        self._start_async_call(_begin_upload)
+            result["data"] = downloadurl_task.Result
+        
+        url = self._start_async_call(_begin_download)
+        data = self._get_file_from_remote(url)
+        desearialized_data = json_loads(data)
+        return desearialized_data
 
     def upload_bytes_to_reference_from_local_file(self, file_path, storage_reference):
         if not os.path.exists(file_path):
@@ -148,17 +176,17 @@ class Storage(StorageInterface):
 
         self._start_async_call(_begin_upload)
 
-    def get_data_from_reference(self, storage_refrence):
+    def upload_data_to_reference(self, data, storage_reference, pretty=True):
         self._ensure_storage()
+        serialized_data = json_dumps(data, pretty=pretty)
+        byte_data = Encoding.UTF8.GetBytes(serialized_data)
+        stream = MemoryStream(byte_data)
 
-        def _begin_download(result):
-            downloadurl_task = storage_refrence.GetDownloadUrlAsync()
-            task_download = downloadurl_task.GetAwaiter()
-            task_download.OnCompleted(lambda: result["event"].set())
+        def _begin_upload(result):
+            uploadtask = storage_reference.PutAsync(stream)
+            task_upload = uploadtask.GetAwaiter()
+            task_upload.OnCompleted(lambda: result["event"].set())
             result["event"].wait()
-            result["data"] = downloadurl_task.Result
-        
-        url = self._start_async_call(_begin_download)
-        data = self._get_file_from_remote(url)
-        desearialized_data = json_loads(data)
-        return desearialized_data
+            result["data"] = True
+
+        self._start_async_call(_begin_upload)

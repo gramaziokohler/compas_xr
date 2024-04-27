@@ -64,7 +64,6 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
     Examples
     --------
     >>> db = RealtimeDatabase('path/to/config.json')
-    >>> db.config_path
     """
     _shared_database = None
 
