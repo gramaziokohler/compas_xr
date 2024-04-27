@@ -256,6 +256,10 @@ class ProjectManager(object):
         current_data["priority"] = priority
         self.database.upload_data_to_deep_reference(current_data, database_reference_list)
 
+    #TODO: visualize_project_data()
+    #TODO: visualize_timbers_project_data()
+    #TODO: Remove Below.
+
     # Functions for uploading Assemblies to the Database and Storage
     def upload_assembly_all_to_database(self, assembly, parentname): #TODO: REMOVE
 
