@@ -36,9 +36,10 @@ class RealtimeDatabaseInterface(object):
     def stream_data_from_reference(self, callback, database_reference):
         raise NotImplementedError("Implemented on child classes")
 
+    # TODO: Move to ProjectManager.py
     def application_settings_writer(
         self, database_parentname, storage_folder="None", obj_orientation=True
-    ):  # TODO: Move to ProjectManager.
+    ):
         """
         Uploads required application settings to the Firebase RealtimeDatabase.
 
@@ -254,7 +255,7 @@ class RealtimeDatabaseInterface(object):
     # TODO: Move to Project Manager Class
     def upload_project_data_from_compas(self, assembly, building_plan, qr_frames_list, project_name):
         """
-        Formats data structure from Compas Objects and uploads them to the RealtimeDatabase in under the specified project name.
+        Formats data structure from Compas Class Objects and uploads them to the RealtimeDatabase in under the specified project name.
 
         Parameters
         ----------

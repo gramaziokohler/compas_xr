@@ -202,7 +202,7 @@ class Storage(StorageInterface):
 
         Returns
         -------
-        data : dict or Compas Object
+        data : dict or Compas Class Object
             The deserialized data retrieved from the storage reference.
 
         """
