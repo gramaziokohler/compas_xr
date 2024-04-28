@@ -194,5 +194,5 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
         """
         self._ensure_database()
         # TODO: Check if this is stupid... it provides the functionality of making it work with compas objects and consistency across both child classes
-        object_json_string = json_dumps(data)
-        database_reference.set(json.loads(object_json_string))
+        json_string = json_dumps(data)
+        database_reference.set(json.loads(json_string))
