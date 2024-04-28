@@ -3,7 +3,10 @@ import os
 from compas.data import json_dump
 from compas.data import json_dumps
 from compas.data import json_loads
+from compas.geometry import Frame
 from compas_timber.assembly import TimberAssembly
+from compas_timber.planning import BuildingPlan
+from compas_timber.planning import Step
 
 from compas_xr.project.assembly_extensions import AssemblyExtensions
 from compas_xr.realtime_database import RealtimeDatabase
@@ -256,5 +259,143 @@ class ProjectManager(object):
         current_data["priority"] = priority
         self.database.upload_data_to_deep_reference(current_data, database_reference_list)
 
-    #TODO: visualize_project_data()
-    #TODO: visualize_timbers_project_data()
+    def visualize_project_state_timbers(self, timber_assembly, project_name):
+        """
+        Retrieves and visualizes data from the Firebase RealtimeDatabase under the specified project name.
+
+        Parameters
+        ----------
+        timber_assembly : compas_timbers.assembly.TimberAssembly
+            The assembly in which the project is based off of: Used for part visulization.
+        project_name : str
+            The name of the project under which the data will be stored.
+
+        Returns
+        -------
+        last_built_index : int
+            The index of the last built part in the project.
+        step_locations : list of compas.geometry.Frame
+            The locations of the building plan steps.
+        built_human : list of compas_timber.beam.Blank
+            The parts that have been built by a human.
+        unbuilt_human : list of compas_timber.beam.Blank
+            The parts that have not been built by a human.
+        built_robot : list of compas_timber.beam.Blank
+            The parts that have been built by a robot.
+        unbuilt_robot : list of compas_timber.beam.Blank
+            The parts that have not been built by a robot.
+
+        """
+        nodes = timber_assembly.graph.__data__["node"]
+        buiding_plan_data_reference_list = [project_name, "building_plan", "data"]
+        current_state_data = self.database.get_data_from_deep_reference(buiding_plan_data_reference_list)
+        
+        built_human = []
+        unbuilt_human = []
+        built_robot = []
+        unbuilt_robot = []
+        step_locations = []
+
+        #Try to get the value for the last built index, if it doesn't exist make it null
+        #TODO: This is a bit weird, but it will throw an error if I pass the last built index to the BuildingPlan constructor
+        try:
+            last_built_index = current_state_data["LastBuiltIndex"]
+            current_state_data.pop("LastBuiltIndex")
+        except:
+            last_built_index = None
+
+        building_plan = BuildingPlan.__from_data__(current_state_data)
+        for step in building_plan.steps:
+            step_data = step["data"]
+            #Try to get the value for device_id, and if it exists remove it.
+            try:
+                step_data["device_id"]
+                step_data.pop("device_id")
+            except:
+                pass
+            step = Step.__from_data__(step["data"])
+            step_locations.append(Frame.__from_data__(step.location))
+            assembly_element_id = step.element_ids[0]
+            #TODO: Tried to write like this, but find_by_key returns a NoneType object
+            part = nodes[assembly_element_id]['part']
+            if step.actor == "HUMAN":
+                if step.is_built:
+                    built_human.append(part.blank)
+                else:
+                    unbuilt_human.append(part.blank)
+            else:
+                if step.is_built:
+                    built_robot.append(part.blank)
+                else:
+                    unbuilt_robot.append(part.blank)
+        return  last_built_index, step_locations, built_human, unbuilt_human, built_robot, unbuilt_robot
+
+    def visualize_project_state(self, assembly, project_name):
+        """
+        Retrieves and visualizes data from the Firebase RealtimeDatabase under the specified project name.
+
+        Parameters
+        ----------
+        assembly : compas.datastructure.Assembly
+            The assembly in which the project is based off of: Used for part visulization.
+        project_name : str
+            The name of the project under which the data is stored.
+
+        Returns
+        -------
+        last_built_index : int
+            The index of the last built part in the project.
+        step_locations : list of compas.geometry.Frame
+            The locations of the building plan steps.
+        built_human : list of compas.datastructures.Part
+            The parts that have been built by a human.
+        unbuilt_human : list of compas.datastructures.Part
+            The parts that have not been built by a human.
+        built_robot : list of compas.datastructures.Part
+            The parts that have been built by a robot.
+        unbuilt_robot : list of compas.datastructures.Part
+            The parts that have not been built by a robot.
+
+        """
+        buiding_plan_data_reference_list = [project_name, "building_plan", "data"]
+        current_state_data = self.database.get_data_from_deep_reference(buiding_plan_data_reference_list)
+        
+        built_human = []
+        unbuilt_human = []
+        built_robot = []
+        unbuilt_robot = []
+        step_locations = []
+
+        #Try to get the value for the last built index, if it doesn't exist make it null
+        #TODO: This is a bit weird, but it will throw an error if I pass the last built index to the BuildingPlan constructor
+        try:
+            last_built_index = current_state_data["LastBuiltIndex"]
+            current_state_data.pop("LastBuiltIndex")
+        except:
+            last_built_index = None
+
+        building_plan = BuildingPlan.__from_data__(current_state_data)
+        for step in building_plan.steps:
+            step_data = step["data"]
+            #Try to get the value for device_id, and if it exists remove it.
+            try:
+                step_data["device_id"]
+                step_data.pop("device_id")
+            except:
+                pass
+            step = Step.__from_data__(step["data"])
+            step_locations.append(Frame.__from_data__(step.location))
+            assembly_element_id = step.element_ids[0]
+            part = assembly.find_by_key(assembly_element_id)
+            if step.actor == "HUMAN":
+                #TODO: I am not sure if this works in all scenarios of Part
+                if step.is_built:
+                    built_human.append(part)
+                else:
+                    unbuilt_human.append(part)
+            else:
+                if step.is_built:
+                    built_robot.append(part)
+                else:
+                    unbuilt_robot.append(part)
+        return  last_built_index, step_locations, built_human, unbuilt_human, built_robot, unbuilt_robot
