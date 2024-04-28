@@ -15,7 +15,8 @@ class AssemblyExtensions(object):
     AssemblyExtensions is a class for extending the functionality of the compas.datastructures.Assembly class.
 
     The AssemblyExtensions class provides additional functionalities such as exporting parts as .obj files
-    and creating a frame assembly from a list of compas.geometry.Frames with a specific data structure for localization information.
+    and creating a frame assembly from a list of compas.geometry.Frames with a specific data structure
+    for localization information.
 
     """
 
@@ -95,9 +96,11 @@ class AssemblyExtensions(object):
 
         for part in assembly.parts():
             # Mesh assembly can be made with or without a frame (ex. assembly.add_part(Mesh)) try & default to worldXY
-            try:
+            if hasattr(part, "frame"):
+                print("Part has frame")
                 part_frame = part.frame
-            except:
+            else:
+                print("Part doesn't have frame")
                 part_frame = Frame.worldXY()
             part_transformed = part.transformed(Transformation.from_frame_to_frame(part_frame, frame))
 

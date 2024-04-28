@@ -104,7 +104,7 @@ class Header(UserDict):
         # If any of the required fields are missing raise an error.
         if sequence_id is None or response_id is None or device_id is None or time_stamp is None:
             raise ValueError(
-                "One or more required fields for Header parsing are missing: sequence_id, response_id, device_id, or time_stamp."
+                "One or more fields for Header parsing are missing: sequence_id, response_id, device_id, or time_stamp."
             )
         instance = cls(
             increment_response_ID=False,
@@ -263,7 +263,7 @@ class GetTrajectoryResult(UserDict):
         robot_base_frame = value.get("robot_base_frame", None)
         if element_id is None or robot_name is None or robot_base_frame is None or trajectory is None:
             raise ValueError(
-                "required information for GetTrajectoryResult parsing is missing: element_id, robot_name, or trajectory."
+                "required information for GetTrajectoryResult parsing missing: element_id, robot_name, or trajectory."
             )
 
         # Convert the robot_base_frame to a Frame object
