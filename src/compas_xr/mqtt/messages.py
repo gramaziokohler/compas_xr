@@ -71,9 +71,9 @@ class ResponseID(object):
 
 
 class Header(UserDict):
-    """Message header object used for publishing and subscribing to/from topics for compas_XR.
-
-    A message header is fundamentally a dictionary and behaves as one."""
+    """Message header object is used for publishing and subscribing to/from topics for CompasXR.
+    Fundamentally it is used to 
+    """
 
     _shared_sequence_counter = None
     _shared_response_id_counter = None

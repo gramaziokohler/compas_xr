@@ -25,12 +25,7 @@ __version__ = "0.1.0"
 
 
 HERE = os.path.dirname(__file__)
-
-HOME = os.path.abspath(os.path.join(HERE, "../../"))
-DATA = os.path.abspath(os.path.join(HOME, "data"))
-DOCS = os.path.abspath(os.path.join(HOME, "docs"))
-TEMP = os.path.abspath(os.path.join(HOME, "temp"))
-SCRIPT = os.path.abspath(os.path.join(HOME, "scripts"))
+DATA = os.path.abspath(os.path.join(HERE, "data"))
 
 __all_plugins__ = ["compas_xr.rhino.install"]
-__all__ = ["HOME", "DATA", "DOCS", "TEMP"]
+__all__ = ["HERE", "DATA"]
