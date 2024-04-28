@@ -36,9 +36,7 @@ class ProjectManager(object):
         self.storage = Storage(config_path)
         self.database = RealtimeDatabase(config_path)
 
-    def application_settings_writer(
-        self, project_name, storage_folder="None", obj_orientation=False
-    ):
+    def application_settings_writer(self, project_name, storage_folder="None", obj_orientation=False):
         """
         Uploads required application settings to the Firebase RealtimeDatabase.
 
@@ -289,15 +287,15 @@ class ProjectManager(object):
         nodes = timber_assembly.graph.__data__["node"]
         buiding_plan_data_reference_list = [project_name, "building_plan", "data"]
         current_state_data = self.database.get_data_from_deep_reference(buiding_plan_data_reference_list)
-        
+
         built_human = []
         unbuilt_human = []
         built_robot = []
         unbuilt_robot = []
         step_locations = []
 
-        #Try to get the value for the last built index, if it doesn't exist make it null
-        #TODO: This is a bit weird, but it will throw an error if I pass the last built index to the BuildingPlan constructor
+        # Try to get the value for the last built index, if it doesn't exist make it null
+        # TODO: This is a bit weird, but it will throw an error if I pass the last built index to the BuildingPlan constructor
         try:
             last_built_index = current_state_data["LastBuiltIndex"]
             current_state_data.pop("LastBuiltIndex")
@@ -307,7 +305,7 @@ class ProjectManager(object):
         building_plan = BuildingPlan.__from_data__(current_state_data)
         for step in building_plan.steps:
             step_data = step["data"]
-            #Try to get the value for device_id, and if it exists remove it.
+            # Try to get the value for device_id, and if it exists remove it.
             try:
                 step_data["device_id"]
                 step_data.pop("device_id")
@@ -316,8 +314,8 @@ class ProjectManager(object):
             step = Step.__from_data__(step["data"])
             step_locations.append(Frame.__from_data__(step.location))
             assembly_element_id = step.element_ids[0]
-            #TODO: Tried to write like this, but find_by_key returns a NoneType object
-            part = nodes[assembly_element_id]['part']
+            # TODO: Tried to write like this, but find_by_key returns a NoneType object
+            part = nodes[assembly_element_id]["part"]
             if step.actor == "HUMAN":
                 if step.is_built:
                     built_human.append(part.blank)
@@ -328,7 +326,7 @@ class ProjectManager(object):
                     built_robot.append(part.blank)
                 else:
                     unbuilt_robot.append(part.blank)
-        return  last_built_index, step_locations, built_human, unbuilt_human, built_robot, unbuilt_robot
+        return last_built_index, step_locations, built_human, unbuilt_human, built_robot, unbuilt_robot
 
     def visualize_project_state(self, assembly, project_name):
         """
@@ -359,15 +357,15 @@ class ProjectManager(object):
         """
         buiding_plan_data_reference_list = [project_name, "building_plan", "data"]
         current_state_data = self.database.get_data_from_deep_reference(buiding_plan_data_reference_list)
-        
+
         built_human = []
         unbuilt_human = []
         built_robot = []
         unbuilt_robot = []
         step_locations = []
 
-        #Try to get the value for the last built index, if it doesn't exist make it null
-        #TODO: This is a bit weird, but it will throw an error if I pass the last built index to the BuildingPlan constructor
+        # Try to get the value for the last built index, if it doesn't exist make it null
+        # TODO: This is a bit weird, but it will throw an error if I pass the last built index to the BuildingPlan constructor
         try:
             last_built_index = current_state_data["LastBuiltIndex"]
             current_state_data.pop("LastBuiltIndex")
@@ -377,7 +375,7 @@ class ProjectManager(object):
         building_plan = BuildingPlan.__from_data__(current_state_data)
         for step in building_plan.steps:
             step_data = step["data"]
-            #Try to get the value for device_id, and if it exists remove it.
+            # Try to get the value for device_id, and if it exists remove it.
             try:
                 step_data["device_id"]
                 step_data.pop("device_id")
@@ -388,7 +386,7 @@ class ProjectManager(object):
             assembly_element_id = step.element_ids[0]
             part = assembly.find_by_key(assembly_element_id)
             if step.actor == "HUMAN":
-                #TODO: I am not sure if this works in all scenarios of Part
+                # TODO: I am not sure if this works in all scenarios of Part
                 if step.is_built:
                     built_human.append(part)
                 else:
@@ -398,4 +396,4 @@ class ProjectManager(object):
                     built_robot.append(part)
                 else:
                     unbuilt_robot.append(part)
-        return  last_built_index, step_locations, built_human, unbuilt_human, built_robot, unbuilt_robot
+        return last_built_index, step_locations, built_human, unbuilt_human, built_robot, unbuilt_robot
