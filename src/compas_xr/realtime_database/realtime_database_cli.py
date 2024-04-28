@@ -5,7 +5,6 @@ import threading
 
 import clr
 from compas.data import json_dumps
-from compas.data import json_loads
 
 from compas_xr.realtime_database.realtime_database_interface import RealtimeDatabaseInterface
 
@@ -32,7 +31,7 @@ from Firebase.Database.Query import QueryExtensions
 
 class RealtimeDatabase(RealtimeDatabaseInterface):
     """
-    A RealtimeDatabase is defined by a Firebase configuration path and a shared database reference.
+    A RealtimeDatabase is defined by a Firebase configuration path and database reference.
 
     The RealtimeDatabase class is responsible for initializing and managing the connection to a Firebase Realtime Database.
     It ensures that the database connection is established only once and shared across all instances of the class.

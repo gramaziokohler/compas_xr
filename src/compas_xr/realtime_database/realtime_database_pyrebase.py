@@ -7,7 +7,6 @@ import os
 
 import pyrebase
 from compas.data import json_dumps
-from compas.data import json_loads
 
 from compas_xr.realtime_database.realtime_database_interface import RealtimeDatabaseInterface
 

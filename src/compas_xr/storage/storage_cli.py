@@ -4,12 +4,9 @@ import sys
 import threading
 
 import clr
-from compas.data import json_dump
 from compas.data import json_dumps
 from compas.data import json_loads
 from System.IO import File
-from System.IO import FileMode
-from System.IO import FileStream
 from System.IO import MemoryStream
 from System.Text import Encoding
 
@@ -31,12 +28,6 @@ clr.AddReference("Firebase.Storage.dll")
 from Firebase.Auth import FirebaseAuthClient
 from Firebase.Auth import FirebaseAuthConfig
 from Firebase.Storage import FirebaseStorage
-
-"""
-TODO: add proper comments.
-TODO: Review Function todo's
-TODO: Authorization for Storage.
-"""
 
 
 class Storage(StorageInterface):

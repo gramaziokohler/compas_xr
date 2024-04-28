@@ -96,11 +96,9 @@ class AssemblyExtensions(object):
 
         for part in assembly.parts():
             # Mesh assembly can be made with or without a frame (ex. assembly.add_part(Mesh)) try & default to worldXY
-            if hasattr(part, "frame"):
-                print("Part has frame")
+            if hasattr(part, 'frame'):
                 part_frame = part.frame
             else:
-                print("Part doesn't have frame")
                 part_frame = Frame.worldXY()
             part_transformed = part.transformed(Transformation.from_frame_to_frame(part_frame, frame))
 
@@ -111,12 +109,12 @@ class AssemblyExtensions(object):
 
     def create_qr_assembly(self, qr_frames):
         """
-        Create a frame assembly from a list of compas.geometry.Frames with a specific data structure for localization data.
+        Create a frame assembly from a list of compas.geometry.Frames with a specific data structure for localization.
 
         Parameters
         ----------
         qr_frames : list of 'compas.geometry.Frame'
-            A list of frames at specific locations for application localization data.
+            A list of frames at specific locations for localization data.
 
         Returns
         -------

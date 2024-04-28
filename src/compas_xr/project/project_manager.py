@@ -1,8 +1,5 @@
 import os
 
-from compas.data import json_dump
-from compas.data import json_dumps
-from compas.data import json_loads
 from compas.geometry import Frame
 from compas_timber.assembly import TimberAssembly
 from compas_timber.planning import BuildingPlan
@@ -15,7 +12,8 @@ from compas_xr.storage import Storage
 
 class ProjectManager(object):
     """
-    The ProjectManager class is responsible for managing project specific data and operations that involve Firebase Storage and Realtime Database configuration.
+    The ProjectManager class is responsible for managing project specific data and operations that involve
+    Firebase Storage and Realtime Database configuration.
 
     Parameters
     ----------
@@ -79,7 +77,7 @@ class ProjectManager(object):
 
     def upload_project_data_from_compas(self, project_name, assembly, building_plan, qr_frames_list):
         """
-        Formats data structure from Compas Class Objects and uploads them to the RealtimeDatabase in under the specified project name.
+        Formats data structure from Compas Class Objects and uploads them to the RealtimeDatabase under project name.
 
         Parameters
         ----------
@@ -295,26 +293,27 @@ class ProjectManager(object):
         step_locations = []
 
         # Try to get the value for the last built index, if it doesn't exist make it null
-        # TODO: This is a bit weird, but it will throw an error if I pass the last built index to the BuildingPlan constructor
-        try:
+        # TODO: This is a bit weird, but it will throw an error if I pass the last
+        # TODO: built index to the BuildingPlan constructor
+        if "LastBuiltIndex" in current_state_data:
             last_built_index = current_state_data["LastBuiltIndex"]
             current_state_data.pop("LastBuiltIndex")
-        except:
+        else:
             last_built_index = None
 
         building_plan = BuildingPlan.__from_data__(current_state_data)
         for step in building_plan.steps:
             step_data = step["data"]
             # Try to get the value for device_id, and if it exists remove it.
-            try:
-                step_data["device_id"]
+            if "device_id" in step_data:
                 step_data.pop("device_id")
-            except:
-                pass
             step = Step.__from_data__(step["data"])
             step_locations.append(Frame.__from_data__(step.location))
             assembly_element_id = step.element_ids[0]
             # TODO: Tried to write like this, but find_by_key returns a NoneType object
+            """
+            part = timber_assembly.find_by_key(assembly_element_id)
+            """
             part = nodes[assembly_element_id]["part"]
             if step.actor == "HUMAN":
                 if step.is_built:
@@ -365,22 +364,19 @@ class ProjectManager(object):
         step_locations = []
 
         # Try to get the value for the last built index, if it doesn't exist make it null
-        # TODO: This is a bit weird, but it will throw an error if I pass the last built index to the BuildingPlan constructor
-        try:
+        # TODO: This is a bit weird, but it will throw an error if I pass the last built index to the BuildingPlan
+        if "LastBuiltIndex" in current_state_data:
             last_built_index = current_state_data["LastBuiltIndex"]
             current_state_data.pop("LastBuiltIndex")
-        except:
+        else:
             last_built_index = None
 
         building_plan = BuildingPlan.__from_data__(current_state_data)
         for step in building_plan.steps:
             step_data = step["data"]
             # Try to get the value for device_id, and if it exists remove it.
-            try:
-                step_data["device_id"]
+            if "device_id" in step_data:
                 step_data.pop("device_id")
-            except:
-                pass
             step = Step.__from_data__(step["data"])
             step_locations.append(Frame.__from_data__(step.location))
             assembly_element_id = step.element_ids[0]

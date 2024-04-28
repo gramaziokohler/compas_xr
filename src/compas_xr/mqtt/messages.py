@@ -104,7 +104,7 @@ class Header(UserDict):
         # If any of the required fields are missing raise an error.
         if sequence_id is None or response_id is None or device_id is None or time_stamp is None:
             raise ValueError(
-                "One or more fields for Header parsing are missing: sequence_id, response_id, device_id, or time_stamp."
+                "Information for Header parsing missing: sequence_id, response_id, device_id, or time_stamp."
             )
         instance = cls(
             increment_response_ID=False,
@@ -200,7 +200,7 @@ class GetTrajectoryRequest(UserDict):
         # Parse the header separately
         header_info = value.get("header", None)
         if header_info is None:
-            raise ValueError("Header information is missing.")
+            raise ValueError("Header Information is missing.")
         header = Header.parse(header_info)
 
         # Retrieve other required values from the input value
@@ -208,7 +208,7 @@ class GetTrajectoryRequest(UserDict):
         robot_name = value.get("robot_name", None)
         if element_id is None or robot_name is None:
             raise ValueError(
-                "required information for GetTrajectoryRequest parsing is missing: element_id or robot_name."
+                "Information for message parsing is missing: element_id or robot_name."
             )
         # Create an instance of the class with the retrieved values and the provided header
         instance = cls(element_id=element_id, robot_name=robot_name, header=header)
@@ -253,7 +253,7 @@ class GetTrajectoryResult(UserDict):
         # Parse the header separately
         header_info = value.get("header", None)
         if header_info is None:
-            raise ValueError("Header information is missing.")
+            raise ValueError("Header Information is missing.")
         header = Header.parse(header_info)
 
         # Retrieve other required values from the input value
@@ -263,7 +263,7 @@ class GetTrajectoryResult(UserDict):
         robot_base_frame = value.get("robot_base_frame", None)
         if element_id is None or robot_name is None or robot_base_frame is None or trajectory is None:
             raise ValueError(
-                "required information for GetTrajectoryResult parsing missing: element_id, robot_name, or trajectory."
+                "Information for message parsing is missing: element_id, robot_name, or trajectory."
             )
 
         # Convert the robot_base_frame to a Frame object
@@ -320,7 +320,7 @@ class ApproveTrajectory(UserDict):
         # Parse the header separately
         header_info = value.get("header", None)
         if header_info is None:
-            raise ValueError("Header information is missing.")
+            raise ValueError("Header Information is missing.")
         header = Header.parse(header_info)
 
         # Retrieve other required values from the input value
@@ -330,7 +330,7 @@ class ApproveTrajectory(UserDict):
         approval_status = value.get("approval_status", None)
         if element_id is None or robot_name is None or trajectory is None or approval_status is None:
             raise ValueError(
-                "required information for ApproveTrajectoryMessage parsing is missing: element_id, robot_name, trajectory, or approval_status."
+                "Information for parsing is missing: element_id, robot_name, trajectory, or approval_status."
             )
 
         # Create an instance of the class with the retrieved values and the provided header
@@ -381,13 +381,13 @@ class ApprovalCounterRequest(UserDict):
         # Parse the header separately
         header_info = value.get("header", None)
         if header_info is None:
-            raise ValueError("Header information is missing.")
+            raise ValueError("Header Information is missing.")
         header = Header.parse(header_info)
 
         # Retrieve other required values from the input value
         element_id = value.get("element_id", None)
         if element_id is None:
-            raise ValueError("required information for ApprovalCounterRequest parsing is missing: element_id.")
+            raise ValueError("Information for message parsing is missing: element_id.")
         # Create an instance of the class with the retrieved values and the provided header
         instance = cls(element_id=element_id, header=header)
 
@@ -427,13 +427,13 @@ class ApprovalCounterResult(UserDict):
         # Parse the header separately
         header_info = value.get("header", None)
         if header_info is None:
-            raise ValueError("Header information is missing.")
+            raise ValueError("Header Information is missing.")
         header = Header.parse(header_info)
 
         # Retrieve other required values from the input value
         element_id = value.get("element_id", None)
         if element_id is None:
-            raise ValueError("required information for ApprovalCounterResult parsing is missing: element_id.")
+            raise ValueError("Information for message parsing is missing: element_id.")
         # Create an instance of the class with the retrieved values and the provided header
         instance = cls(element_id=element_id, header=header)
 
@@ -475,7 +475,7 @@ class SendTrajectory(UserDict):
         # Parse the header separately
         header_info = value.get("header", None)
         if header_info is None:
-            raise ValueError("Header information is missing.")
+            raise ValueError("Header Information is missing.")
         header = Header.parse(header_info)
 
         # Retrieve other required values from the input value
@@ -484,7 +484,7 @@ class SendTrajectory(UserDict):
         robot_name = value.get("robot_name", None)
         if element_id is None or robot_name is None or trajectory is None:
             raise ValueError(
-                "required information for SendTrajectory parsing is missing: element_id, robot_name, or trajectory."
+                "Information for message parsing is missing: element_id, robot_name, or trajectory."
             )
         # Create an instance of the class with the retrieved values and the provided header
         instance = cls(element_id=element_id, robot_name=robot_name, trajectory=trajectory, header=header)

@@ -5,11 +5,12 @@ class BuildingPlanExtensions(object):
     """
     BuildingPlanExtensions is a class for extending the functionality of the compas_timber.planning.BuildingPlan class.
 
-    The BuildingPlanExtensions class provides additional functionalities to the compas_timber.planning.BuildingPlan class
+    The BuildingPlanExtensions class provides additional functionalities to the compas_timber.planning.BuildingPlan
     by providing a way to create a buildling plan from an established assembly sequence.
     """
 
-    # TODO: This makes the building plan in a very manual way, but this needs to be resolved in tandem with building plan revisions.
+    # TODO: This makes the building plan in a very manual way
+    # TODO: but this needs to be resolved in tandem with building plan revisions.
     def create_buildingplan_from_assembly_sequence(self, assembly, data_type, robot_keys, priority_keys_lists):
         """
         Create a compas_timber.planning.BuildingPlan based on the sequence of the assembly parts.

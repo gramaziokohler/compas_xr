@@ -1,8 +1,6 @@
 import json
 import os
 
-from compas_timber.assembly import TimberAssembly
-
 
 class RealtimeDatabaseInterface(object):
     """

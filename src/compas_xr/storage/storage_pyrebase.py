@@ -3,7 +3,6 @@ import os
 import io
 
 import pyrebase
-from compas.data import Data
 from compas.data import json_dumps
 from compas.data import json_loads
 
