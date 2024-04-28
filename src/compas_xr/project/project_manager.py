@@ -56,7 +56,7 @@ class ProjectManager(object):
         None
 
         """
-        data = {"parentname": project_name, "storagename": storage_folder, "objorientation": obj_orientation}
+        data = {"project_name": project_name, "storage_folder": storage_folder, "z_to_y_remap": obj_orientation}
         self.database.upload_data(data, "ApplicationSettings")
 
     def upload_data_to_project(self, data, project_name, data_name):
