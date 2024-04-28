@@ -193,6 +193,6 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
         None
         """
         self._ensure_database()
-        # TODO: Check if it is possible to do this with some sort of serialization for consistency across both?
-        # serialized_data = json_dumps(data)
-        database_reference.set(data)
+        # TODO: Check if this is stupid... it provides the functionality of making it work with compas objects and consistency across both child classes
+        object_json_string = json_dumps(data)
+        database_reference.set(json.loads(object_json_string))

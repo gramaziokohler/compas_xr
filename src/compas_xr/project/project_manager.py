@@ -189,14 +189,14 @@ class ProjectManager(object):
         """
         return self.database.get_data(project_name)
 
-    def upload_assembly_to_storage(self, assembly, cloud_file_name, pretty=True):
+    def upload_compas_object_to_storage(self, compas_object, cloud_file_name, pretty=True):
         """
         Uploads an assembly to the Firebase Storage.
 
         Parameters
         ----------
-        assembly : compas.datastructures.Assembly or compas_timber.assembly.TimberAssembly
-            The assembly to be uploaded.
+        compas_object : Any
+            Any compas class instance that is serializable.
         cloud_file_name : str
             The name of the cloud file. Saved in JSON format, and needs to have a .json extension.
 
@@ -205,7 +205,7 @@ class ProjectManager(object):
         None
 
         """
-        self.storage.upload_data(assembly, cloud_file_name, pretty=pretty)
+        self.storage.upload_data(compas_object, cloud_file_name, pretty=pretty)
 
     def get_assembly_from_storage(self, cloud_file_name):
         """
