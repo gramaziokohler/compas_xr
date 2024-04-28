@@ -72,7 +72,7 @@ class ResponseID(object):
 
 class Header(UserDict):
     """Message header object is used for publishing and subscribing to/from topics for CompasXR.
-    Fundamentally it is used to 
+    Fundamentally it is used to
     """
 
     _shared_sequence_counter = None
@@ -207,9 +207,7 @@ class GetTrajectoryRequest(UserDict):
         element_id = value.get("element_id", None)
         robot_name = value.get("robot_name", None)
         if element_id is None or robot_name is None:
-            raise ValueError(
-                "Information for message parsing is missing: element_id or robot_name."
-            )
+            raise ValueError("Information for message parsing is missing: element_id or robot_name.")
         # Create an instance of the class with the retrieved values and the provided header
         instance = cls(element_id=element_id, robot_name=robot_name, header=header)
 
@@ -262,9 +260,7 @@ class GetTrajectoryResult(UserDict):
         robot_name = value.get("robot_name", None)
         robot_base_frame = value.get("robot_base_frame", None)
         if element_id is None or robot_name is None or robot_base_frame is None or trajectory is None:
-            raise ValueError(
-                "Information for message parsing is missing: element_id, robot_name, or trajectory."
-            )
+            raise ValueError("Information for message parsing is missing: element_id, robot_name, or trajectory.")
 
         # Convert the robot_base_frame to a Frame object
         robot_base_frame = Frame.__from_data__(robot_base_frame)
@@ -483,9 +479,7 @@ class SendTrajectory(UserDict):
         trajectory = value.get("trajectory", None)
         robot_name = value.get("robot_name", None)
         if element_id is None or robot_name is None or trajectory is None:
-            raise ValueError(
-                "Information for message parsing is missing: element_id, robot_name, or trajectory."
-            )
+            raise ValueError("Information for message parsing is missing: element_id, robot_name, or trajectory.")
         # Create an instance of the class with the retrieved values and the provided header
         instance = cls(element_id=element_id, robot_name=robot_name, trajectory=trajectory, header=header)
 

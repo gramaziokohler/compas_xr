@@ -96,7 +96,7 @@ class AssemblyExtensions(object):
 
         for part in assembly.parts():
             # Mesh assembly can be made with or without a frame (ex. assembly.add_part(Mesh)) try & default to worldXY
-            if hasattr(part, 'frame'):
+            if hasattr(part, "frame"):
                 part_frame = part.frame
             else:
                 part_frame = Frame.worldXY()
