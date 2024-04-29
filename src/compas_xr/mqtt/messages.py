@@ -13,7 +13,7 @@ except ImportError:
 
 
 class SequenceCounter(object):
-    """An atomic, thread-safe sequence increament counter."""
+    """An atomic, thread-safe sequence increament counter that increments with each message."""
 
     ROLLOVER_THRESHOLD = sys.maxsize
 
@@ -42,7 +42,7 @@ class SequenceCounter(object):
 
 
 class ResponseID(object):
-    """An atomic, thread-safe sequence increament counter."""
+    """An atomic, thread-safe counter that increments with each service routine."""
 
     ROLLOVER_THRESHOLD = sys.maxsize
 
@@ -71,8 +71,37 @@ class ResponseID(object):
 
 
 class Header(UserDict):
-    """Message header object is used for publishing and subscribing to/from topics for CompasXR.
-    Fundamentally it is used to
+    """
+    The header class is responsible for coordinating and understanding messages between users.
+
+    The Header class provides methods for parsing, updating, and accessing the header fields of a message,
+    and provides a means of defining attributes of the message in order to accept or ignore specific messages.
+
+    Parameters
+    ----------
+    increment_response_ID : bool, optional
+        Whether to increment the response ID when creating a new instance of Header.
+    sequence_id : int, optional
+        The sequence ID of the message. Optional for parsing.
+    response_id : int, optional
+        The response ID of the message. Optional for parsing.
+    device_id : str, optional
+        The device ID of the message. Optional for parsing.
+    time_stamp : str, optional
+        The timestamp of the message. Optional for parsing.
+
+    Attributes
+    ----------
+    increment_response_ID : bool
+        Whether to increment the response ID when creating a new instance of Header.
+    sequence_id : int
+        Sequence ID is an atomic counter that increments with each message.
+    response_id : int
+        Response ID is an int that increments with request routine.
+    device_id : str
+        Device ID coresponds to the unique system identifier that send the message.
+    time_stamp : str
+        Timestamp is the time in which the message was sent.
     """
 
     _shared_sequence_counter = None
@@ -96,12 +125,14 @@ class Header(UserDict):
 
     @classmethod
     def parse(cls, value):
+        """Parse the header information
+        from the input value
+        """
         sequence_id = value.get("sequence_id", None)
         response_id = value.get("response_id", None)
         device_id = value.get("device_id", None)
         time_stamp = value.get("time_stamp", None)
 
-        # If any of the required fields are missing raise an error.
         if sequence_id is None or response_id is None or device_id is None or time_stamp is None:
             raise ValueError(
                 "Information for Header parsing missing: sequence_id, response_id, device_id, or time_stamp."
@@ -114,13 +145,15 @@ class Header(UserDict):
             time_stamp=time_stamp,
         )
 
-        # Update the sequence counter and response id from the message received.
         cls._update_sequence_counter_from_message(instance, sequence_id)
         cls._update_response_id_from_message(instance, response_id)
 
         return instance
 
     def _get_device_id(self):
+        """Ensure device ID is set and return it.
+        If not set, generate a new device ID.
+        """
         if not Header._device_id:
             Header._device_id = str(uuid.uuid4())
             self.device_id = Header._device_id
@@ -129,10 +162,14 @@ class Header(UserDict):
         return self.device_id
 
     def _get_time_stamp(self):
+        """Generate timestamp and return it."""
         self.time_stamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")
         return self.time_stamp
 
     def _ensure_sequence_id(self):
+        """Ensure SequenceID is set and return it.
+        If not set, generate new shared counter.
+        """
         if not Header._shared_sequence_counter:
             Header._shared_sequence_counter = SequenceCounter()
             self.sequence_id = Header._shared_sequence_counter._value
@@ -141,6 +178,9 @@ class Header(UserDict):
         return self.sequence_id
 
     def _ensure_response_id(self, increment_response_ID=False):
+        """Ensure ResponseID is set and return it.
+        If not set, generate new shared counter.
+        """
         if not Header._shared_response_id_counter:
             Header._shared_response_id_counter = ResponseID()
             self.response_id = Header._shared_response_id_counter._value
@@ -153,12 +193,20 @@ class Header(UserDict):
         return self.response_id
 
     def _update_sequence_counter_from_message(self, sequence_id):
+        """Update SequnceID Value if the message input is greater then
+        current value +1. Used to ensure messages across devices are in sync
+        upon receiving a message if device is restarted.
+        """
         if Header._shared_sequence_counter is not None:
             Header._shared_sequence_counter.update_from_msg(sequence_id)
         else:
             Header._shared_sequence_counter = SequenceCounter(start=sequence_id)
 
     def _update_response_id_from_message(self, response_id):
+        """Update ResponseID Value if the message input is greater then
+        current value +1. Used to ensure messages across devices are in sync
+        upon receiving a message if device is restarted.
+        """
         if Header._shared_response_id_counter is not None:
             Header._shared_response_id_counter.update_from_msg(response_id)
         else:
@@ -166,6 +214,7 @@ class Header(UserDict):
 
     @property
     def data(self):
+        """Return the header data as a dictionary."""
         return {
             "sequence_id": self.sequence_id,
             "response_id": self.response_id,
@@ -175,9 +224,30 @@ class Header(UserDict):
 
 
 class GetTrajectoryRequest(UserDict):
-    """Message objects used for publishing and subscribing to/from topics.
+    """
+    The GetTrajectoryRequest class represents a request message from a user
+    to the CAD for retrieving a trajectory.
 
-    A message is fundamentally a dictionary and behaves as one."""
+    Parameters
+    ----------
+    element_id : str
+        The ID of the element associated with the trajectory.
+    robot_name : str
+        The name of the robot associated with the trajectory.
+    header : Header, optional
+        The header object containing additional message information.
+
+    Attributes
+    ----------
+    header : Header
+        The header object containing additional message information.
+    element_id : str
+        The ID of the step in the BuildingPlan associated with the trajectory.
+    robot_name : str
+        The name of the robot associated with the trajectory.
+    trajectory_id : str
+        The ID of the trajectory. Default is "trajectory_id_" + str(element_id).
+    """
 
     def __init__(self, element_id, robot_name, header=None):
         # super(GetTrajectoryRequest, self).__init__()
@@ -197,24 +267,24 @@ class GetTrajectoryRequest(UserDict):
 
     @classmethod
     def parse(cls, value):
-        # Parse the header separately
+        """Parse the GetTrajectoryRequest message from the input value.
+        Starts by parsing the header information and then the Message.
+        """
         header_info = value.get("header", None)
         if header_info is None:
             raise ValueError("Header Information is missing.")
         header = Header.parse(header_info)
 
-        # Retrieve other required values from the input value
         element_id = value.get("element_id", None)
         robot_name = value.get("robot_name", None)
         if element_id is None or robot_name is None:
             raise ValueError("Information for message parsing is missing: element_id or robot_name.")
-        # Create an instance of the class with the retrieved values and the provided header
         instance = cls(element_id=element_id, robot_name=robot_name, header=header)
-
         return instance
 
     @property
     def data(self):
+        """Return the GetTrajectoryRequest data as a dictionary."""
         return {
             "header": self.header.data,
             "element_id": self.element_id,
@@ -224,9 +294,38 @@ class GetTrajectoryRequest(UserDict):
 
 
 class GetTrajectoryResult(UserDict):
-    """Message objects used for publishing and subscribing to/from topics.
+    """
+    The GetTrajectoryResult class represents a response message from the CAD
+    to all active devices containing a retrieved trajectory.
 
-    A message is fundamentally a dictionary and behaves as one."""
+    Parameters
+    ----------
+    element_id : str
+        The ID of the element associated with the trajectory.
+    robot_name : str
+        The name of the robot associated with the trajectory.
+    robot_base_frame : compas.geometry.Frame
+        The base frame of the robot.
+    trajectory : dict of joint names and joint values
+        The retrieved trajectory.
+    header : Header, optional
+        The header object containing additional message information.
+
+    Attributes
+    ----------
+    header : Header
+        The header object containing additional message information.
+    element_id : str
+        The ID of the step in the BuildingPlan associated with the trajectory.
+    robot_name : str
+        The name of the robot associated with the trajectory.
+    robot_base_frame : compas.geometry.Frame
+        The base frame of the robot.
+    trajectory_id : str
+        The ID of the trajectory. Default is "trajectory_id_" + str(element_id).
+    trajectory : dict of joint names and joint values
+        The trajectory information computed for the request.
+    """
 
     def __init__(self, element_id, robot_name, robot_base_frame, trajectory, header=None):
         # super(GetTrajectoryResult, self).__init__()
@@ -248,24 +347,21 @@ class GetTrajectoryResult(UserDict):
 
     @classmethod
     def parse(cls, value):
-        # Parse the header separately
+        """Parse the GetTrajectoryResult message from the input value.
+        Starts by parsing the header information and then the Message.
+        """
         header_info = value.get("header", None)
         if header_info is None:
             raise ValueError("Header Information is missing.")
         header = Header.parse(header_info)
 
-        # Retrieve other required values from the input value
         element_id = value.get("element_id", None)
         trajectory = value.get("trajectory", None)
         robot_name = value.get("robot_name", None)
         robot_base_frame = value.get("robot_base_frame", None)
         if element_id is None or robot_name is None or robot_base_frame is None or trajectory is None:
             raise ValueError("Information for message parsing is missing: element_id, robot_name, or trajectory.")
-
-        # Convert the robot_base_frame to a Frame object
         robot_base_frame = Frame.__from_data__(robot_base_frame)
-
-        # Create an instance of the class with the retrieved values and the provided header
         instance = cls(
             element_id=element_id,
             robot_name=robot_name,
@@ -273,11 +369,11 @@ class GetTrajectoryResult(UserDict):
             trajectory=trajectory,
             header=header,
         )
-
         return instance
 
     @property
     def data(self):
+        """Return the GetTrajectoryResult data as a dictionary."""
         return {
             "header": self.header.data,
             "element_id": self.element_id,
@@ -289,9 +385,39 @@ class GetTrajectoryResult(UserDict):
 
 
 class ApproveTrajectory(UserDict):
-    """Message objects used for publishing and subscribing to/from topics.
+    """
+    The ApproveTrajectory class represents a response message between
+    all active devices containing an approval decision for each user.
 
-    A message is fundamentally a dictionary and behaves as one."""
+    Parameters
+    ----------
+    element_id : str
+        The ID of the element associated with the trajectory.
+    robot_name : str
+        The name of the robot associated with the trajectory.
+    trajectory : dict of joint names and joint values
+        The approved trajectory.
+    approval_status : int
+        The approval status of the trajectory.
+    header : Header, optional
+        The header object containing additional message information.
+
+    Attributes
+    ----------
+    header : Header
+        The header object containing additional message information.
+    element_id : str
+        The ID of the step in the BuildingPlan associated with the trajectory.
+    robot_name : str
+        The name of the robot associated with the trajectory.
+    trajectory_id : str
+        The ID of the trajectory. Default is "trajectory_id_" + str(element_id).
+    trajectory : dict of joint names and joint values
+        The approved trajectory.
+    approval_status : int
+        The approval status of the trajectory.
+        0: Not Approved, 1: Approved, 2: Consensus Approval, 3: Cancelation.
+    """
 
     def __init__(self, element_id, robot_name, trajectory, approval_status, header=None):
         # super(ApproveTrajectory, self).__init__()
@@ -313,13 +439,14 @@ class ApproveTrajectory(UserDict):
 
     @classmethod
     def parse(cls, value):
-        # Parse the header separately
+        """Parse the ApproveTrajectory message from the input value.
+        Starts by parsing the header information and then the Message.
+        """
         header_info = value.get("header", None)
         if header_info is None:
             raise ValueError("Header Information is missing.")
         header = Header.parse(header_info)
 
-        # Retrieve other required values from the input value
         element_id = value.get("element_id", None)
         trajectory = value.get("trajectory", None)
         robot_name = value.get("robot_name", None)
@@ -328,8 +455,6 @@ class ApproveTrajectory(UserDict):
             raise ValueError(
                 "Information for parsing is missing: element_id, robot_name, trajectory, or approval_status."
             )
-
-        # Create an instance of the class with the retrieved values and the provided header
         instance = cls(
             element_id=element_id,
             robot_name=robot_name,
@@ -337,11 +462,11 @@ class ApproveTrajectory(UserDict):
             approval_status=approval_status,
             header=header,
         )
-
         return instance
 
     @property
     def data(self):
+        """Return the ApproveTrajectory data as a dictionary."""
         return {
             "header": self.header.data,
             "element_id": self.element_id,
@@ -353,9 +478,26 @@ class ApproveTrajectory(UserDict):
 
 
 class ApprovalCounterRequest(UserDict):
-    """Message objects used for publishing and subscribing to/from topics.
+    """
+    The ApprovalCounterRequest class represents a request message from a single user
+    to all active users to retrieve a count of all activie devices.
 
-    A message is fundamentally a dictionary and behaves as one."""
+    Parameters
+    ----------
+    element_id : str
+        The ID of the element associated with the approval counter.
+    header : Header, optional
+        The header object containing additional message information.
+
+    Attributes
+    ----------
+    header : Header
+        The header object containing additional message information.
+    element_id : str
+        The ID of the element associated with the approval counter.
+    trajectory_id : str
+        The ID of the trajectory. Default is "trajectory_id_" + str(element_id).
+    """
 
     def __init__(self, element_id, header=None):
         # super(ApprovalCounterRequest, self).__init__()
@@ -374,23 +516,23 @@ class ApprovalCounterRequest(UserDict):
 
     @classmethod
     def parse(cls, value):
-        # Parse the header separately
+        """Parse the ApprovalCounterRequest message from the input value.
+        Starts by parsing the header information and then the Message.
+        """
         header_info = value.get("header", None)
         if header_info is None:
             raise ValueError("Header Information is missing.")
         header = Header.parse(header_info)
 
-        # Retrieve other required values from the input value
         element_id = value.get("element_id", None)
         if element_id is None:
             raise ValueError("Information for message parsing is missing: element_id.")
-        # Create an instance of the class with the retrieved values and the provided header
         instance = cls(element_id=element_id, header=header)
-
         return instance
 
     @property
     def data(self):
+        """Return the ApprovalCounterRequest data as a dictionary."""
         return {
             "header": self.header.data,
             "element_id": self.element_id,
@@ -399,9 +541,26 @@ class ApprovalCounterRequest(UserDict):
 
 
 class ApprovalCounterResult(UserDict):
-    """Message objects used for publishing and subscribing to/from topics.
+    """
+    The ApprovalCounterResult class represents a response message from all active devices
+    containing to notify the primary device of the users listening.
 
-    A message is fundamentally a dictionary and behaves as one."""
+    Parameters
+    ----------
+    element_id : str
+        The ID of the element associated with the approval counter.
+    header : Header, optional
+        The header object containing additional message information.
+
+    Attributes
+    ----------
+    header : Header
+        The header object containing additional message information.
+    element_id : str
+        The ID of the element associated with the approval counter.
+    trajectory_id : str
+        The ID of the trajectory. Default is "trajectory_id_" + str(element_id).
+    """
 
     def __init__(self, element_id, header=None):
         # super(ApprovalCounterResult, self).__init__()
@@ -420,23 +579,23 @@ class ApprovalCounterResult(UserDict):
 
     @classmethod
     def parse(cls, value):
-        # Parse the header separately
+        """Parse the ApprovalCounterResult message from the input value.
+        Starts by parsing the header information and then the Message.
+        """
         header_info = value.get("header", None)
         if header_info is None:
             raise ValueError("Header Information is missing.")
         header = Header.parse(header_info)
 
-        # Retrieve other required values from the input value
         element_id = value.get("element_id", None)
         if element_id is None:
             raise ValueError("Information for message parsing is missing: element_id.")
-        # Create an instance of the class with the retrieved values and the provided header
         instance = cls(element_id=element_id, header=header)
-
         return instance
 
     @property
     def data(self):
+        """Return the ApprovalCounterResult data as a dictionary."""
         return {
             "header": self.header.data,
             "element_id": self.element_id,
@@ -445,9 +604,34 @@ class ApprovalCounterResult(UserDict):
 
 
 class SendTrajectory(UserDict):
-    """Message objects used for publishing and subscribing to/from topics.
+    """
+    The SendTrajectory class represents a message from a user to the CAD
+    to give the Approval for Robotic Exacution.
 
-    A message is fundamentally a dictionary and behaves as one."""
+    Parameters
+    ----------
+    element_id : str
+        The ID of the element associated with the trajectory.
+    robot_name : str
+        The name of the robot associated with the trajectory.
+    trajectory : dict of joint names and joint values
+        The trajectory to be sent.
+    header : Header, optional
+        The header object containing additional message information.
+
+    Attributes
+    ----------
+    header : Header
+        The header object containing additional message information.
+    element_id : str
+        The ID of the element associated with the trajectory.
+    robot_name : str
+        The name of the robot associated with the trajectory.
+    trajectory_id : str
+        The ID of the trajectory. Default is "trajectory_id_" + str(element_id).
+    trajectory : dict of joint names and joint values
+        The trajectory to be sent.
+    """
 
     def __init__(self, element_id, robot_name, trajectory, header=None):
         # super(SendTrajectory, self).__init__()
@@ -468,25 +652,25 @@ class SendTrajectory(UserDict):
 
     @classmethod
     def parse(cls, value):
-        # Parse the header separately
+        """Parse the SendTrajectory message from the input value.
+        Starts by parsing the header information and then the Message.
+        """
         header_info = value.get("header", None)
         if header_info is None:
             raise ValueError("Header Information is missing.")
         header = Header.parse(header_info)
 
-        # Retrieve other required values from the input value
         element_id = value.get("element_id", None)
         trajectory = value.get("trajectory", None)
         robot_name = value.get("robot_name", None)
         if element_id is None or robot_name is None or trajectory is None:
             raise ValueError("Information for message parsing is missing: element_id, robot_name, or trajectory.")
-        # Create an instance of the class with the retrieved values and the provided header
         instance = cls(element_id=element_id, robot_name=robot_name, trajectory=trajectory, header=header)
-
         return instance
 
     @property
     def data(self):
+        """Return the SendTrajectory data as a dictionary."""
         return {
             "header": self.header.data,
             "element_id": self.element_id,
