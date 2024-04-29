@@ -4,13 +4,12 @@ import uuid
 from datetime import datetime
 
 from compas.geometry import Frame
+# from compas_eve import Message
 
-# Python 2/3 compatibility import list
-try:
-    from collections import UserDict
-except ImportError:
-    from UserDict import UserDict
 
+class XrMessage(dict):
+    def __getattr__(self, name):
+        return self.__dict__["data"][name]
 
 class SequenceCounter(object):
     """An atomic, thread-safe sequence increament counter that increments with each message."""
@@ -70,7 +69,7 @@ class ResponseID(object):
                 self._value = value
 
 
-class Header(UserDict):
+class Header(XrMessage):
     """
     The header class is responsible for coordinating and understanding messages between users.
 
@@ -111,17 +110,11 @@ class Header(UserDict):
     def __init__(
         self, increment_response_ID=False, sequence_id=None, response_id=None, device_id=None, time_stamp=None
     ):
-        # super(Header, self).__init__()
-        self.sequence_id = sequence_id if sequence_id else self._ensure_sequence_id()
-        self.response_id = response_id if response_id else self._ensure_response_id(increment_response_ID)
-        self.device_id = device_id if device_id else self._get_device_id()
-        self.time_stamp = time_stamp if time_stamp else self._get_time_stamp()
-
-    def __str__(self):
-        return str(self.data)
-
-    def __getattr__(self, name):
-        return self.data.get(name, None)
+        super(Header, self).__init__()
+        self["sequence_id"] = sequence_id or self._ensure_sequence_id()
+        self["response_id"] = response_id or self._ensure_response_id(increment_response_ID)
+        self["device_id"] = device_id or self._get_device_id()
+        self["time_stamp"] = time_stamp or self._get_time_stamp()
 
     @classmethod
     def parse(cls, value):
@@ -145,8 +138,8 @@ class Header(UserDict):
             time_stamp=time_stamp,
         )
 
-        cls._update_sequence_counter_from_message(instance, sequence_id)
-        cls._update_response_id_from_message(instance, response_id)
+        instance._update_sequence_counter_from_message(sequence_id)
+        instance._update_response_id_from_message(response_id)
 
         return instance
 
@@ -212,18 +205,8 @@ class Header(UserDict):
         else:
             Header._shared_response_id_counter = ResponseID(start=response_id)
 
-    @property
-    def data(self):
-        """Return the header data as a dictionary."""
-        return {
-            "sequence_id": self.sequence_id,
-            "response_id": self.response_id,
-            "device_id": self.device_id,
-            "time_stamp": self.time_stamp,
-        }
 
-
-class GetTrajectoryRequest(UserDict):
+class GetTrajectoryRequest(XrMessage):
     """
     The GetTrajectoryRequest class represents a request message from a user
     to the CAD for retrieving a trajectory.
@@ -249,51 +232,54 @@ class GetTrajectoryRequest(UserDict):
         The ID of the trajectory. Default is "trajectory_id_" + str(element_id).
     """
 
-    def __init__(self, element_id, robot_name, header=None):
-        # super(GetTrajectoryRequest, self).__init__()
-        if header is not None:
-            self.header = header
-        else:
-            self.header = Header(increment_response_ID=True)
-        self.element_id = element_id
-        self.robot_name = robot_name
-        self.trajectory_id = "trajectory_id_" + str(element_id)
-
-    def __str__(self):
-        return str(self.data)
-
-    def __getattr__(self, name):
-        return self.data.get(name, None)
+    def __init__(self, element_id, robot_name, header=None, *args, **kwargs):
+        super(GetTrajectoryRequest, self).__init__(*args, **kwargs)
+        self["header"] = header or Header(increment_response_ID=True)
+        self["element_id"] = element_id
+        self["robot_name"] = robot_name
+        self["trajectory_id"] = "trajectory_id_" + str(element_id)
 
     @classmethod
     def parse(cls, value):
         """Parse the GetTrajectoryRequest message from the input value.
         Starts by parsing the header information and then the Message.
         """
-        header_info = value.get("header", None)
-        if header_info is None:
-            raise ValueError("Header Information is missing.")
-        header = Header.parse(header_info)
+        print("Here")
+        print(str(value))
+        try:
+            header_info = value.get("header", None)
+            print("1")
+            if header_info is None:
+                raise ValueError("Header Information is missing.")
+            print("2")
+            # header = Header.parse(header_info)
+            header = None
+            print("3")
+            element_id = value.get("element_id", None)
+            robot_name = value.get("robot_name", None)
+            if element_id is None or robot_name is None:
+                raise ValueError("Information for message parsing is missing: element_id or robot_name.")
+            print("4")
+            print(cls)
+            instance = cls(element_id=element_id, robot_name=robot_name, header=header)
+            print("Almost done")
+            return instance
+        except Exception as e:
+            print("Error: " + str(e))
+            return None
 
-        element_id = value.get("element_id", None)
-        robot_name = value.get("robot_name", None)
-        if element_id is None or robot_name is None:
-            raise ValueError("Information for message parsing is missing: element_id or robot_name.")
-        instance = cls(element_id=element_id, robot_name=robot_name, header=header)
-        return instance
-
-    @property
-    def data(self):
-        """Return the GetTrajectoryRequest data as a dictionary."""
-        return {
-            "header": self.header.data,
-            "element_id": self.element_id,
-            "robot_name": self.robot_name,
-            "trajectory_id": self.trajectory_id,
-        }
+    # @property
+    # def __data__(self):
+    #     """Return the GetTrajectoryRequest data as a dictionary."""
+    #     return {
+    #         "header": self.header.__data__,
+    #         "element_id": self.element_id,
+    #         "robot_name": self.robot_name,
+    #         "trajectory_id": self.trajectory_id,
+    #     }
 
 
-class GetTrajectoryResult(UserDict):
+class GetTrajectoryResult(XrMessage):
     """
     The GetTrajectoryResult class represents a response message from the CAD
     to all active devices containing a retrieved trajectory.
@@ -328,22 +314,13 @@ class GetTrajectoryResult(UserDict):
     """
 
     def __init__(self, element_id, robot_name, robot_base_frame, trajectory, header=None):
-        # super(GetTrajectoryResult, self).__init__()
-        if header is not None:
-            self.header = header
-        else:
-            self.header = Header()
-        self.element_id = element_id
-        self.robot_name = robot_name
-        self.robot_base_frame = robot_base_frame
-        self.trajectory_id = "trajectory_id_" + str(element_id)
-        self.trajectory = trajectory
-
-    def __str__(self):
-        return str(self.data)
-
-    def __getattr__(self, name):
-        return self.data.get(name, None)
+        super(GetTrajectoryResult, self).__init__()
+        self["header"] = header or Header()
+        self["element_id"] = element_id
+        self["robot_name"] = robot_name
+        self["robot_base_frame"] = robot_base_frame
+        self["trajectory_id"] = "trajectory_id_" + str(element_id)
+        self["trajectory"] = trajectory
 
     @classmethod
     def parse(cls, value):
@@ -371,20 +348,20 @@ class GetTrajectoryResult(UserDict):
         )
         return instance
 
-    @property
-    def data(self):
-        """Return the GetTrajectoryResult data as a dictionary."""
-        return {
-            "header": self.header.data,
-            "element_id": self.element_id,
-            "robot_name": self.robot_name,
-            "robot_base_frame": self.robot_base_frame.__data__,
-            "trajectory_id": self.trajectory_id,
-            "trajectory": self.trajectory,
-        }
+    # @property
+    # def data(self):
+    #     """Return the GetTrajectoryResult data as a dictionary."""
+    #     return {
+    #         "header": self.header.__data__,
+    #         "element_id": self.element_id,
+    #         "robot_name": self.robot_name,
+    #         "robot_base_frame": self.robot_base_frame.__data__,
+    #         "trajectory_id": self.trajectory_id,
+    #         "trajectory": self.trajectory,
+    #     }
 
 
-class ApproveTrajectory(UserDict):
+class ApproveTrajectory(XrMessage):
     """
     The ApproveTrajectory class represents a response message between
     all active devices containing an approval decision for each user.
@@ -420,22 +397,13 @@ class ApproveTrajectory(UserDict):
     """
 
     def __init__(self, element_id, robot_name, trajectory, approval_status, header=None):
-        # super(ApproveTrajectory, self).__init__()
-        if header is not None:
-            self.header = header
-        else:
-            self.header = Header()
-        self.element_id = element_id
-        self.robot_name = robot_name
-        self.trajectory_id = "trajectory_id_" + str(element_id)
-        self.trajectory = trajectory
-        self.approval_status = approval_status
-
-    def __str__(self):
-        return str(self.data)
-
-    def __getattr__(self, name):
-        return self.data.get(name, None)
+        super(ApproveTrajectory, self).__init__()
+        self["header"] = header or Header()
+        self["element_id"] = element_id
+        self["robot_name"] = robot_name
+        self["trajectory_id"] = "trajectory_id_" + str(element_id)
+        self["trajectory"] = trajectory
+        self["approval_status"] = approval_status
 
     @classmethod
     def parse(cls, value):
@@ -464,20 +432,20 @@ class ApproveTrajectory(UserDict):
         )
         return instance
 
-    @property
-    def data(self):
-        """Return the ApproveTrajectory data as a dictionary."""
-        return {
-            "header": self.header.data,
-            "element_id": self.element_id,
-            "robot_name": self.robot_name,
-            "trajectory_id": self.trajectory_id,
-            "trajectory": self.trajectory,
-            "approval_status": self.approval_status,
-        }
+    # @property
+    # def data(self):
+    #     """Return the ApproveTrajectory data as a dictionary."""
+    #     return {
+    #         "header": self.header.__data__,
+    #         "element_id": self.element_id,
+    #         "robot_name": self.robot_name,
+    #         "trajectory_id": self.trajectory_id,
+    #         "trajectory": self.trajectory,
+    #         "approval_status": self.approval_status,
+    #     }
 
 
-class ApprovalCounterRequest(UserDict):
+class ApprovalCounterRequest(XrMessage):
     """
     The ApprovalCounterRequest class represents a request message from a single user
     to all active users to retrieve a count of all activie devices.
@@ -500,19 +468,10 @@ class ApprovalCounterRequest(UserDict):
     """
 
     def __init__(self, element_id, header=None):
-        # super(ApprovalCounterRequest, self).__init__()
-        if header is not None:
-            self.header = header
-        else:
-            self.header = Header()
-        self.element_id = element_id
-        self.trajectory_id = "trajectory_id_" + str(element_id)
-
-    def __str__(self):
-        return str(self.data)
-
-    def __getattr__(self, name):
-        return self.data.get(name, None)
+        super(ApprovalCounterRequest, self).__init__()
+        self["header"] = header or Header()
+        self["element_id"] = element_id
+        self["trajectory_id"] = "trajectory_id_" + str(element_id)
 
     @classmethod
     def parse(cls, value):
@@ -530,17 +489,17 @@ class ApprovalCounterRequest(UserDict):
         instance = cls(element_id=element_id, header=header)
         return instance
 
-    @property
-    def data(self):
-        """Return the ApprovalCounterRequest data as a dictionary."""
-        return {
-            "header": self.header.data,
-            "element_id": self.element_id,
-            "trajectory_id": self.trajectory_id,
-        }
+    # @property
+    # def data(self):
+    #     """Return the ApprovalCounterRequest data as a dictionary."""
+    #     return {
+    #         "header": self.header.__data__,
+    #         "element_id": self.element_id,
+    #         "trajectory_id": self.trajectory_id,
+    #     }
 
 
-class ApprovalCounterResult(UserDict):
+class ApprovalCounterResult(XrMessage):
     """
     The ApprovalCounterResult class represents a response message from all active devices
     containing to notify the primary device of the users listening.
@@ -563,19 +522,10 @@ class ApprovalCounterResult(UserDict):
     """
 
     def __init__(self, element_id, header=None):
-        # super(ApprovalCounterResult, self).__init__()
-        if header is not None:
-            self.header = header
-        else:
-            self.header = Header()
-        self.element_id = element_id
-        self.trajectory_id = "trajectory_id_" + str(element_id)
-
-    def __str__(self):
-        return str(self.data)
-
-    def __getattr__(self, name):
-        return self.data.get(name, None)
+        super(ApprovalCounterResult, self).__init__()
+        self["header"] = header or Header()
+        self["element_id"] = element_id
+        self["trajectory_id"] = "trajectory_id_" + str(element_id)
 
     @classmethod
     def parse(cls, value):
@@ -593,17 +543,17 @@ class ApprovalCounterResult(UserDict):
         instance = cls(element_id=element_id, header=header)
         return instance
 
-    @property
-    def data(self):
-        """Return the ApprovalCounterResult data as a dictionary."""
-        return {
-            "header": self.header.data,
-            "element_id": self.element_id,
-            "trajectory_id": self.trajectory_id,
-        }
+    # @property
+    # def data(self):
+    #     """Return the ApprovalCounterResult data as a dictionary."""
+    #     return {
+    #         "header": self.header.__data__,
+    #         "element_id": self.element_id,
+    #         "trajectory_id": self.trajectory_id,
+    #     }
 
 
-class SendTrajectory(UserDict):
+class SendTrajectory(XrMessage):
     """
     The SendTrajectory class represents a message from a user to the CAD
     to give the Approval for Robotic Exacution.
@@ -634,21 +584,12 @@ class SendTrajectory(UserDict):
     """
 
     def __init__(self, element_id, robot_name, trajectory, header=None):
-        # super(SendTrajectory, self).__init__()
-        if header is not None:
-            self.header = header
-        else:
-            self.header = Header()
-        self.element_id = element_id
-        self.robot_name = robot_name
-        self.trajectory_id = "trajectory_id_" + str(element_id)
-        self.trajectory = trajectory
-
-    def __str__(self):
-        return str(self.data)
-
-    def __getattr__(self, name):
-        return self.data.get(name, None)
+        super(SendTrajectory, self).__init__()
+        self["header"] = header or Header()
+        self["element_id"] = element_id
+        self["robot_name"] = robot_name
+        self["trajectory_id"] = "trajectory_id_" + str(element_id)
+        self["trajectory"] = trajectory
 
     @classmethod
     def parse(cls, value):
@@ -668,13 +609,13 @@ class SendTrajectory(UserDict):
         instance = cls(element_id=element_id, robot_name=robot_name, trajectory=trajectory, header=header)
         return instance
 
-    @property
-    def data(self):
-        """Return the SendTrajectory data as a dictionary."""
-        return {
-            "header": self.header.data,
-            "element_id": self.element_id,
-            "robot_name": self.robot_name,
-            "trajectory_id": self.trajectory_id,
-            "trajectory": self.trajectory,
-        }
+    # @property
+    # def data(self):
+    #     """Return the SendTrajectory data as a dictionary."""
+    #     return {
+    #         "header": self.header.__data__,
+    #         "element_id": self.element_id,
+    #         "robot_name": self.robot_name,
+    #         "trajectory_id": self.trajectory_id,
+    #         "trajectory": self.trajectory,
+    #     }

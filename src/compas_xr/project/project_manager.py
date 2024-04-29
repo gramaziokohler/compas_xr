@@ -55,6 +55,42 @@ class ProjectManager(object):
         data = {"project_name": project_name, "storage_folder": storage_folder, "z_to_y_remap": obj_orientation}
         self.database.upload_data(data, "ApplicationSettings")
 
+    def create_project_data_from_compas(self, assembly, building_plan, qr_frames_list):
+        """
+        Formats data structure from Compas Class Objects.
+
+        Parameters
+        ----------
+        assembly : compas.datastructures.Assembly or compas_timber.assembly.TimberAssembly
+            The assembly in which data will be extracted from.
+        building_plan : compas_timber.planning.BuildingPlan
+            The BuildingPlan in which data will be extracted from.
+        qr_frames_list : list of compas.geometry.Frame
+            List of frames at specific locations for application localization data.
+
+        Returns
+        -------
+        None
+
+        """
+        qr_assembly = AssemblyExtensions().create_qr_assembly(qr_frames_list)
+        if isinstance(assembly, TimberAssembly):
+            data = {
+                "QRFrames": qr_assembly.__data__,
+                "assembly": assembly.__data__,
+                "beams": {beam.key: beam for beam in assembly.beams},
+                "joints": {joint.key: joint for joint in assembly.joints},
+                "building_plan": building_plan,
+            }
+        else:
+            data = {
+                "QRFrames": qr_assembly.__data__,
+                "assembly": assembly.__data__,
+                "parts": {part.key: part for part in assembly.parts()},
+                "building_plan": building_plan,
+            }
+        return data
+
     def upload_data_to_project(self, data, project_name, data_name):
         """
         Uploads data to the Firebase RealtimeDatabase under the specified project name.
@@ -95,22 +131,7 @@ class ProjectManager(object):
         None
 
         """
-        qr_assembly = AssemblyExtensions().create_qr_assembly(qr_frames_list)
-        if isinstance(assembly, TimberAssembly):
-            data = {
-                "QRFrames": qr_assembly.__data__,
-                "assembly": assembly.__data__,
-                "beams": {beam.key: beam for beam in assembly.beams},
-                "joints": {joint.key: joint for joint in assembly.joints},
-                "building_plan": building_plan,
-            }
-        else:
-            data = {
-                "QRFrames": qr_assembly.__data__,
-                "assembly": assembly.__data__,
-                "parts": {part.key: part for part in assembly.parts()},
-                "building_plan": building_plan,
-            }
+        data = self.create_project_data_from_compas(assembly, building_plan, qr_frames_list)
         self.database.upload_data(data, project_name)
 
     def upload_qr_frames_to_project(self, project_name, qr_frames_list):
