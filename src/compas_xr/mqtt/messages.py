@@ -4,11 +4,8 @@ import uuid
 from datetime import datetime
 
 from compas.geometry import Frame
+from compas_eve import Message
 
-
-class XrMessage(dict):
-    def __getattr__(self, name):
-        return self.__dict__["data"][name]
 
 class SequenceCounter(object):
     """An atomic, thread-safe sequence increament counter that increments with each message."""
@@ -68,7 +65,7 @@ class ResponseID(object):
                 self._value = value
 
 
-class Header(XrMessage):
+class Header(Message):
     """
     The header class is responsible for coordinating and understanding messages between users.
 
@@ -205,7 +202,7 @@ class Header(XrMessage):
             Header._shared_response_id_counter = ResponseID(start=response_id)
 
 
-class GetTrajectoryRequest(XrMessage):
+class GetTrajectoryRequest(Message):
     """
     The GetTrajectoryRequest class represents a request message from a user
     to the CAD for retrieving a trajectory.
@@ -233,7 +230,8 @@ class GetTrajectoryRequest(XrMessage):
 
     def __init__(self, element_id, robot_name, header=None, *args, **kwargs):
         super(GetTrajectoryRequest, self).__init__(*args, **kwargs)
-        self["header"] = header or Header(increment_response_ID=True)
+        header = header.data if header else Header(increment_response_ID=True).data
+        self["header"] = header
         self["element_id"] = element_id
         self["robot_name"] = robot_name
         self["trajectory_id"] = "trajectory_id_" + str(element_id)
@@ -251,8 +249,8 @@ class GetTrajectoryRequest(XrMessage):
             if header_info is None:
                 raise ValueError("Header Information is missing.")
             print("2")
-            # header = Header.parse(header_info)
-            header = None
+            header = Header.parse(header_info)
+            # header = None
             print("3")
             element_id = value.get("element_id", None)
             robot_name = value.get("robot_name", None)
@@ -268,7 +266,7 @@ class GetTrajectoryRequest(XrMessage):
             return None
 
 
-class GetTrajectoryResult(XrMessage):
+class GetTrajectoryResult(Message):
     """
     The GetTrajectoryResult class represents a response message from the CAD
     to all active devices containing a retrieved trajectory.
@@ -304,7 +302,8 @@ class GetTrajectoryResult(XrMessage):
 
     def __init__(self, element_id, robot_name, robot_base_frame, trajectory, header=None):
         super(GetTrajectoryResult, self).__init__()
-        self["header"] = header or Header()
+        header = header or Header()
+        self["header"] = header.data
         self["element_id"] = element_id
         self["robot_name"] = robot_name
         self["robot_base_frame"] = robot_base_frame
@@ -338,7 +337,7 @@ class GetTrajectoryResult(XrMessage):
         return instance
 
 
-class ApproveTrajectory(XrMessage):
+class ApproveTrajectory(Message):
     """
     The ApproveTrajectory class represents a response message between
     all active devices containing an approval decision for each user.
@@ -375,7 +374,8 @@ class ApproveTrajectory(XrMessage):
 
     def __init__(self, element_id, robot_name, trajectory, approval_status, header=None):
         super(ApproveTrajectory, self).__init__()
-        self["header"] = header or Header()
+        header = header or Header()
+        self["header"] = header.data
         self["element_id"] = element_id
         self["robot_name"] = robot_name
         self["trajectory_id"] = "trajectory_id_" + str(element_id)
@@ -410,7 +410,7 @@ class ApproveTrajectory(XrMessage):
         return instance
 
 
-class ApprovalCounterRequest(XrMessage):
+class ApprovalCounterRequest(Message):
     """
     The ApprovalCounterRequest class represents a request message from a single user
     to all active users to retrieve a count of all activie devices.
@@ -434,7 +434,8 @@ class ApprovalCounterRequest(XrMessage):
 
     def __init__(self, element_id, header=None):
         super(ApprovalCounterRequest, self).__init__()
-        self["header"] = header or Header()
+        header = header or Header()
+        self["header"] = header.data
         self["element_id"] = element_id
         self["trajectory_id"] = "trajectory_id_" + str(element_id)
 
@@ -455,7 +456,7 @@ class ApprovalCounterRequest(XrMessage):
         return instance
 
 
-class ApprovalCounterResult(XrMessage):
+class ApprovalCounterResult(Message):
     """
     The ApprovalCounterResult class represents a response message from all active devices
     containing to notify the primary device of the users listening.
@@ -479,7 +480,8 @@ class ApprovalCounterResult(XrMessage):
 
     def __init__(self, element_id, header=None):
         super(ApprovalCounterResult, self).__init__()
-        self["header"] = header or Header()
+        header = header or Header()
+        self["header"] = header.data
         self["element_id"] = element_id
         self["trajectory_id"] = "trajectory_id_" + str(element_id)
 
@@ -500,7 +502,7 @@ class ApprovalCounterResult(XrMessage):
         return instance
 
 
-class SendTrajectory(XrMessage):
+class SendTrajectory(Message):
     """
     The SendTrajectory class represents a message from a user to the CAD
     to give the Approval for Robotic Exacution.
@@ -532,7 +534,8 @@ class SendTrajectory(XrMessage):
 
     def __init__(self, element_id, robot_name, trajectory, header=None):
         super(SendTrajectory, self).__init__()
-        self["header"] = header or Header()
+        header = header or Header()
+        self["header"] = header.data
         self["element_id"] = element_id
         self["robot_name"] = robot_name
         self["trajectory_id"] = "trajectory_id_" + str(element_id)
