@@ -1,5 +1,4 @@
 compas >=2.0.4
 compas_timber >=0.7
 compas_eve >=0.3.6
-compas_fab >=1.0.2
 pyrebase4 >=4.7.1
