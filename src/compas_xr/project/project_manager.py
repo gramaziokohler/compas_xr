@@ -377,6 +377,7 @@ class ProjectManager(object):
         """
         buiding_plan_data_reference_list = [project_name, "building_plan", "data"]
         current_state_data = self.database.get_data_from_deep_reference(buiding_plan_data_reference_list)
+        nodes = assembly.graph.__data__["node"]
 
         built_human = []
         unbuilt_human = []
@@ -401,7 +402,8 @@ class ProjectManager(object):
             step = Step.__from_data__(step["data"])
             step_locations.append(Frame.__from_data__(step.location))
             assembly_element_id = step.element_ids[0]
-            part = assembly.find_by_key(assembly_element_id)
+            part = nodes[assembly_element_id]["part"]
+            print(part)
             if step.actor == "HUMAN":
                 # TODO: I am not sure if this works in all scenarios of Part
                 if step.is_built:

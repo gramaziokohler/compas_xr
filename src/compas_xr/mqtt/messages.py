@@ -4,7 +4,6 @@ import uuid
 from datetime import datetime
 
 from compas.geometry import Frame
-# from compas_eve import Message
 
 
 class XrMessage(dict):
@@ -268,16 +267,6 @@ class GetTrajectoryRequest(XrMessage):
             print("Error: " + str(e))
             return None
 
-    # @property
-    # def __data__(self):
-    #     """Return the GetTrajectoryRequest data as a dictionary."""
-    #     return {
-    #         "header": self.header.__data__,
-    #         "element_id": self.element_id,
-    #         "robot_name": self.robot_name,
-    #         "trajectory_id": self.trajectory_id,
-    #     }
-
 
 class GetTrajectoryResult(XrMessage):
     """
@@ -347,18 +336,6 @@ class GetTrajectoryResult(XrMessage):
             header=header,
         )
         return instance
-
-    # @property
-    # def data(self):
-    #     """Return the GetTrajectoryResult data as a dictionary."""
-    #     return {
-    #         "header": self.header.__data__,
-    #         "element_id": self.element_id,
-    #         "robot_name": self.robot_name,
-    #         "robot_base_frame": self.robot_base_frame.__data__,
-    #         "trajectory_id": self.trajectory_id,
-    #         "trajectory": self.trajectory,
-    #     }
 
 
 class ApproveTrajectory(XrMessage):
@@ -432,18 +409,6 @@ class ApproveTrajectory(XrMessage):
         )
         return instance
 
-    # @property
-    # def data(self):
-    #     """Return the ApproveTrajectory data as a dictionary."""
-    #     return {
-    #         "header": self.header.__data__,
-    #         "element_id": self.element_id,
-    #         "robot_name": self.robot_name,
-    #         "trajectory_id": self.trajectory_id,
-    #         "trajectory": self.trajectory,
-    #         "approval_status": self.approval_status,
-    #     }
-
 
 class ApprovalCounterRequest(XrMessage):
     """
@@ -489,15 +454,6 @@ class ApprovalCounterRequest(XrMessage):
         instance = cls(element_id=element_id, header=header)
         return instance
 
-    # @property
-    # def data(self):
-    #     """Return the ApprovalCounterRequest data as a dictionary."""
-    #     return {
-    #         "header": self.header.__data__,
-    #         "element_id": self.element_id,
-    #         "trajectory_id": self.trajectory_id,
-    #     }
-
 
 class ApprovalCounterResult(XrMessage):
     """
@@ -542,15 +498,6 @@ class ApprovalCounterResult(XrMessage):
             raise ValueError("Information for message parsing is missing: element_id.")
         instance = cls(element_id=element_id, header=header)
         return instance
-
-    # @property
-    # def data(self):
-    #     """Return the ApprovalCounterResult data as a dictionary."""
-    #     return {
-    #         "header": self.header.__data__,
-    #         "element_id": self.element_id,
-    #         "trajectory_id": self.trajectory_id,
-    #     }
 
 
 class SendTrajectory(XrMessage):
@@ -608,14 +555,3 @@ class SendTrajectory(XrMessage):
             raise ValueError("Information for message parsing is missing: element_id, robot_name, or trajectory.")
         instance = cls(element_id=element_id, robot_name=robot_name, trajectory=trajectory, header=header)
         return instance
-
-    # @property
-    # def data(self):
-    #     """Return the SendTrajectory data as a dictionary."""
-    #     return {
-    #         "header": self.header.__data__,
-    #         "element_id": self.element_id,
-    #         "robot_name": self.robot_name,
-    #         "trajectory_id": self.trajectory_id,
-    #         "trajectory": self.trajectory,
-    #     }
