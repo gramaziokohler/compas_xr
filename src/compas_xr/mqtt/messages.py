@@ -4,8 +4,8 @@ import uuid
 from datetime import datetime
 
 from compas.geometry import Frame
+from compas.data import Data
 from compas_eve import Message
-
 
 class SequenceCounter(object):
     """An atomic, thread-safe sequence increament counter that increments with each message."""
@@ -117,26 +117,9 @@ class Header(Message):
         """Parse the header information
         from the input value
         """
-        sequence_id = value.get("sequence_id", None)
-        response_id = value.get("response_id", None)
-        device_id = value.get("device_id", None)
-        time_stamp = value.get("time_stamp", None)
-
-        if sequence_id is None or response_id is None or device_id is None or time_stamp is None:
-            raise ValueError(
-                "Information for Header parsing missing: sequence_id, response_id, device_id, or time_stamp."
-            )
-        instance = cls(
-            increment_response_ID=False,
-            sequence_id=sequence_id,
-            response_id=response_id,
-            device_id=device_id,
-            time_stamp=time_stamp,
-        )
-
-        instance._update_sequence_counter_from_message(sequence_id)
-        instance._update_response_id_from_message(response_id)
-
+        instance = cls(value["sequence_id"], value["response_id"], value["device_id"], value["time_stamp"])
+        instance._update_sequence_counter_from_message(value["sequence_id"])
+        instance._update_response_id_from_message(value["response_id"])
         return instance
 
     def _get_device_id(self):
@@ -200,7 +183,11 @@ class Header(Message):
             Header._shared_response_id_counter.update_from_msg(response_id)
         else:
             Header._shared_response_id_counter = ResponseID(start=response_id)
-
+    
+    def update_ids_from_message(self, sequence_id, response_id):
+        """Update SequenceID and ResponseID values based on message inputs."""
+        self._update_sequence_counter_from_message(sequence_id)
+        self._update_response_id_from_message(response_id)
 
 class GetTrajectoryRequest(Message):
     """
@@ -230,41 +217,17 @@ class GetTrajectoryRequest(Message):
 
     def __init__(self, element_id, robot_name, header=None, *args, **kwargs):
         super(GetTrajectoryRequest, self).__init__(*args, **kwargs)
-        header = header.data if header else Header(increment_response_ID=True).data
-        self["header"] = header
+        self["header"] = header or Header(increment_response_ID=True)
         self["element_id"] = element_id
         self["robot_name"] = robot_name
         self["trajectory_id"] = "trajectory_id_" + str(element_id)
 
     @classmethod
-    def parse(cls, value):
-        """Parse the GetTrajectoryRequest message from the input value.
+    def parse(cls, data):
+        """Parse the GetTrajectoryRequest message from the input data.
         Starts by parsing the header information and then the Message.
         """
-        print("Here")
-        print(str(value))
-        try:
-            header_info = value.get("header", None)
-            print("1")
-            if header_info is None:
-                raise ValueError("Header Information is missing.")
-            print("2")
-            header = Header.parse(header_info)
-            # header = None
-            print("3")
-            element_id = value.get("element_id", None)
-            robot_name = value.get("robot_name", None)
-            if element_id is None or robot_name is None:
-                raise ValueError("Information for message parsing is missing: element_id or robot_name.")
-            print("4")
-            print(cls)
-            instance = cls(element_id=element_id, robot_name=robot_name, header=header)
-            print("Almost done")
-            return instance
-        except Exception as e:
-            print("Error: " + str(e))
-            return None
-
+        return cls(data["element_id"], data["robot_name"], Header.parse(data["header"]))
 
 class GetTrajectoryResult(Message):
     """
@@ -302,8 +265,7 @@ class GetTrajectoryResult(Message):
 
     def __init__(self, element_id, robot_name, robot_base_frame, trajectory, header=None):
         super(GetTrajectoryResult, self).__init__()
-        header = header or Header()
-        self["header"] = header.data
+        self["header"] = header or Header()
         self["element_id"] = element_id
         self["robot_name"] = robot_name
         self["robot_base_frame"] = robot_base_frame
@@ -311,30 +273,17 @@ class GetTrajectoryResult(Message):
         self["trajectory"] = trajectory
 
     @classmethod
-    def parse(cls, value):
-        """Parse the GetTrajectoryResult message from the input value.
+    def parse(cls, data):
+        """Parse the GetTrajectoryResult message from the input data.
         Starts by parsing the header information and then the Message.
         """
-        header_info = value.get("header", None)
-        if header_info is None:
-            raise ValueError("Header Information is missing.")
-        header = Header.parse(header_info)
-
-        element_id = value.get("element_id", None)
-        trajectory = value.get("trajectory", None)
-        robot_name = value.get("robot_name", None)
-        robot_base_frame = value.get("robot_base_frame", None)
-        if element_id is None or robot_name is None or robot_base_frame is None or trajectory is None:
-            raise ValueError("Information for message parsing is missing: element_id, robot_name, or trajectory.")
-        robot_base_frame = Frame.__from_data__(robot_base_frame)
-        instance = cls(
-            element_id=element_id,
-            robot_name=robot_name,
-            robot_base_frame=robot_base_frame,
-            trajectory=trajectory,
-            header=header,
+        return cls(
+            data["element_id"],
+            data["robot_name"],
+            Frame(**data["robot_base_frame"]),
+            data["trajectory"],
+            Header.parse(data["header"]),
         )
-        return instance
 
 
 class ApproveTrajectory(Message):
@@ -374,8 +323,7 @@ class ApproveTrajectory(Message):
 
     def __init__(self, element_id, robot_name, trajectory, approval_status, header=None):
         super(ApproveTrajectory, self).__init__()
-        header = header or Header()
-        self["header"] = header.data
+        self["header"] = header or Header()
         self["element_id"] = element_id
         self["robot_name"] = robot_name
         self["trajectory_id"] = "trajectory_id_" + str(element_id)
@@ -383,32 +331,17 @@ class ApproveTrajectory(Message):
         self["approval_status"] = approval_status
 
     @classmethod
-    def parse(cls, value):
-        """Parse the ApproveTrajectory message from the input value.
+    def parse(cls, data):
+        """Parse the ApproveTrajectory message from the input data.
         Starts by parsing the header information and then the Message.
         """
-        header_info = value.get("header", None)
-        if header_info is None:
-            raise ValueError("Header Information is missing.")
-        header = Header.parse(header_info)
-
-        element_id = value.get("element_id", None)
-        trajectory = value.get("trajectory", None)
-        robot_name = value.get("robot_name", None)
-        approval_status = value.get("approval_status", None)
-        if element_id is None or robot_name is None or trajectory is None or approval_status is None:
-            raise ValueError(
-                "Information for parsing is missing: element_id, robot_name, trajectory, or approval_status."
-            )
-        instance = cls(
-            element_id=element_id,
-            robot_name=robot_name,
-            trajectory=trajectory,
-            approval_status=approval_status,
-            header=header,
+        return cls(
+            data["element_id"],
+            data["robot_name"],
+            data["trajectory"],
+            data["approval_status"],
+            Header.parse(data["header"]),
         )
-        return instance
-
 
 class ApprovalCounterRequest(Message):
     """
@@ -434,27 +367,24 @@ class ApprovalCounterRequest(Message):
 
     def __init__(self, element_id, header=None):
         super(ApprovalCounterRequest, self).__init__()
-        header = header or Header()
-        self["header"] = header.data
+        self["header"] = header or Header()
         self["element_id"] = element_id
         self["trajectory_id"] = "trajectory_id_" + str(element_id)
 
     @classmethod
-    def parse(cls, value):
-        """Parse the ApprovalCounterRequest message from the input value.
-        Starts by parsing the header information and then the Message.
+    def parse(cls, data):
+        """Construct an object of this type from the provided data to support COMPAS JSON serialization.
+
+        Parameters
+        ----------
+        data : dict
+            The raw Python data representing the object.
+
+        Returns
+        -------
+        object
         """
-        header_info = value.get("header", None)
-        if header_info is None:
-            raise ValueError("Header Information is missing.")
-        header = Header.parse(header_info)
-
-        element_id = value.get("element_id", None)
-        if element_id is None:
-            raise ValueError("Information for message parsing is missing: element_id.")
-        instance = cls(element_id=element_id, header=header)
-        return instance
-
+        return cls(data["element_id"], Header.parse(data["header"]))
 
 class ApprovalCounterResult(Message):
     """
@@ -480,27 +410,16 @@ class ApprovalCounterResult(Message):
 
     def __init__(self, element_id, header=None):
         super(ApprovalCounterResult, self).__init__()
-        header = header or Header()
-        self["header"] = header.data
+        self["header"] = header or Header()
         self["element_id"] = element_id
         self["trajectory_id"] = "trajectory_id_" + str(element_id)
 
     @classmethod
-    def parse(cls, value):
-        """Parse the ApprovalCounterResult message from the input value.
+    def parse(cls, data):
+        """Parse the ApprovalCounterResult message from the input data.
         Starts by parsing the header information and then the Message.
         """
-        header_info = value.get("header", None)
-        if header_info is None:
-            raise ValueError("Header Information is missing.")
-        header = Header.parse(header_info)
-
-        element_id = value.get("element_id", None)
-        if element_id is None:
-            raise ValueError("Information for message parsing is missing: element_id.")
-        instance = cls(element_id=element_id, header=header)
-        return instance
-
+        return cls(data["element_id"], Header.parse(data["header"]))
 
 class SendTrajectory(Message):
     """
@@ -534,27 +453,17 @@ class SendTrajectory(Message):
 
     def __init__(self, element_id, robot_name, trajectory, header=None):
         super(SendTrajectory, self).__init__()
-        header = header or Header()
-        self["header"] = header.data
+        self["header"] = header or Header()
         self["element_id"] = element_id
         self["robot_name"] = robot_name
         self["trajectory_id"] = "trajectory_id_" + str(element_id)
         self["trajectory"] = trajectory
 
     @classmethod
-    def parse(cls, value):
-        """Parse the SendTrajectory message from the input value.
+    def parse(cls, data):
+        """Parse the SendTrajectory message from the input data.
         Starts by parsing the header information and then the Message.
         """
-        header_info = value.get("header", None)
-        if header_info is None:
-            raise ValueError("Header Information is missing.")
-        header = Header.parse(header_info)
-
-        element_id = value.get("element_id", None)
-        trajectory = value.get("trajectory", None)
-        robot_name = value.get("robot_name", None)
-        if element_id is None or robot_name is None or trajectory is None:
-            raise ValueError("Information for message parsing is missing: element_id, robot_name, or trajectory.")
-        instance = cls(element_id=element_id, robot_name=robot_name, trajectory=trajectory, header=header)
-        return instance
+        return cls(
+            data["element_id"], data["robot_name"], data["trajectory"], Header.parse(data["header"])
+        )
