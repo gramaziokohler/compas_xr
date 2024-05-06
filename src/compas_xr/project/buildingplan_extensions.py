@@ -34,7 +34,7 @@ class BuildingPlanExtensions(object):
         """
         data_type_list = ["0.Cylinder", "1.Box", "2.ObjFile"]
         building_plan = SimpleSequenceGenerator(assembly=assembly).result
-        print(building_plan)
+
         for step in building_plan.steps:
             step.geometry = data_type_list[data_type]
             # TODO: These are unused for now, but are expeted on the application side

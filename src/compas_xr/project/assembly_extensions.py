@@ -112,27 +112,6 @@ class AssemblyExtensions(object):
             filename = "{}.obj".format(str(part.key))
             part_transformed.to_obj(os.path.join(target_folder_path, filename))
 
-    # def create_qr_assembly(self, qr_frames):
-    #     """
-    #     Create a frame assembly from a list of compas.geometry.Frames with a specific data structure for localization.
-
-    #     Parameters
-    #     ----------
-    #     qr_frames : list of 'compas.geometry.Frame'
-    #         A list of frames at specific locations for localization data.
-
-    #     Returns
-    #     -------
-    #     :class: 'compas.datastructures.Assembly'
-    #         The constructed database reference.
-
-    #     """
-    #     assembly = Assembly()
-    #     for frame in qr_frames:
-    #         part = Part(frame, frame=frame)
-    #         assembly.add_part(part)
-    #     return assembly
-
     def create_qr_assembly(self, qr_frames):
         """
         Create a frame assembly from a list of compas.geometry.Frames with a specific data structure for localization.
