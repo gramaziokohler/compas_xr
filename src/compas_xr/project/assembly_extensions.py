@@ -100,12 +100,38 @@ class AssemblyExtensions(object):
                 part_frame = part.frame
             else:
                 part_frame = Frame.worldXY()
-            part_transformed = part.transformed(Transformation.from_frame_to_frame(part_frame, frame))
+
+            #TODO: This is weird, but I can't transform a Part object, so I need to check if it's a Part or a Mesh
+            if isinstance(part, Part):
+                part_transformed = part.attributes["shape"].transformed(Transformation.from_frame_to_frame(part_frame, frame))
+            else:
+                part_transformed = part.transformed(Transformation.from_frame_to_frame(part_frame, frame))
 
             if not os.path.exists(target_folder_path):
                 raise Exception("File path does not exist {}".format(target_folder_path))
             filename = "{}.obj".format(str(part.key))
             part_transformed.to_obj(os.path.join(target_folder_path, filename))
+
+    # def create_qr_assembly(self, qr_frames):
+    #     """
+    #     Create a frame assembly from a list of compas.geometry.Frames with a specific data structure for localization.
+
+    #     Parameters
+    #     ----------
+    #     qr_frames : list of 'compas.geometry.Frame'
+    #         A list of frames at specific locations for localization data.
+
+    #     Returns
+    #     -------
+    #     :class: 'compas.datastructures.Assembly'
+    #         The constructed database reference.
+
+    #     """
+    #     assembly = Assembly()
+    #     for frame in qr_frames:
+    #         part = Part(frame, frame=frame)
+    #         assembly.add_part(part)
+    #     return assembly
 
     def create_qr_assembly(self, qr_frames):
         """
@@ -123,7 +149,8 @@ class AssemblyExtensions(object):
 
         """
         assembly = Assembly()
-        for frame in qr_frames:
-            part = Part(frame, frame=frame)
+        for i, frame in enumerate(qr_frames):
+            name = "QR_{}".format(i)
+            part = Part(name=name, frame=frame, shape=frame)
             assembly.add_part(part)
         return assembly
