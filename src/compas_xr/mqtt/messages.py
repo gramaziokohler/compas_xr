@@ -7,6 +7,7 @@ from compas.geometry import Frame
 from compas.data import Data
 from compas_eve import Message
 
+
 class SequenceCounter(object):
     """An atomic, thread-safe sequence increament counter that increments with each message."""
 
@@ -183,11 +184,12 @@ class Header(Message):
             Header._shared_response_id_counter.update_from_msg(response_id)
         else:
             Header._shared_response_id_counter = ResponseID(start=response_id)
-    
+
     def update_ids_from_message(self, sequence_id, response_id):
         """Update SequenceID and ResponseID values based on message inputs."""
         self._update_sequence_counter_from_message(sequence_id)
         self._update_response_id_from_message(response_id)
+
 
 class GetTrajectoryRequest(Message):
     """
@@ -228,6 +230,7 @@ class GetTrajectoryRequest(Message):
         Starts by parsing the header information and then the Message.
         """
         return cls(data["element_id"], data["robot_name"], Header.parse(data["header"]))
+
 
 class GetTrajectoryResult(Message):
     """
@@ -343,6 +346,7 @@ class ApproveTrajectory(Message):
             Header.parse(data["header"]),
         )
 
+
 class ApprovalCounterRequest(Message):
     """
     The ApprovalCounterRequest class represents a request message from a single user
@@ -386,6 +390,7 @@ class ApprovalCounterRequest(Message):
         """
         return cls(data["element_id"], Header.parse(data["header"]))
 
+
 class ApprovalCounterResult(Message):
     """
     The ApprovalCounterResult class represents a response message from all active devices
@@ -420,6 +425,7 @@ class ApprovalCounterResult(Message):
         Starts by parsing the header information and then the Message.
         """
         return cls(data["element_id"], Header.parse(data["header"]))
+
 
 class SendTrajectory(Message):
     """
@@ -464,6 +470,4 @@ class SendTrajectory(Message):
         """Parse the SendTrajectory message from the input data.
         Starts by parsing the header information and then the Message.
         """
-        return cls(
-            data["element_id"], data["robot_name"], data["trajectory"], Header.parse(data["header"])
-        )
+        return cls(data["element_id"], data["robot_name"], data["trajectory"], Header.parse(data["header"]))

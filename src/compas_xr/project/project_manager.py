@@ -44,8 +44,8 @@ class ProjectManager(object):
             The name of the project where the app will look for information.
         storage_folder : str, optional
             The name of the storage folder, by default "None"
-        obj_orientation : bool, optional
-            The orientation of the object, by default False
+        z_to_y_remap : bool, optional
+            The orientation of the object, if the obj was exported with z to y remap, by default False
 
         Returns
         -------
