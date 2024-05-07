@@ -34,7 +34,7 @@ class ProjectManager(object):
         self.storage = Storage(config_path)
         self.database = RealtimeDatabase(config_path)
 
-    def application_settings_writer(self, project_name, storage_folder="None", obj_orientation=False):
+    def application_settings_writer(self, project_name, storage_folder="None", z_to_y_remap=False):
         """
         Uploads required application settings to the Firebase RealtimeDatabase.
 
@@ -52,7 +52,7 @@ class ProjectManager(object):
         None
 
         """
-        data = {"project_name": project_name, "storage_folder": storage_folder, "z_to_y_remap": obj_orientation}
+        data = {"project_name": project_name, "storage_folder": storage_folder, "z_to_y_remap": z_to_y_remap}
         self.database.upload_data(data, "ApplicationSettings")
 
     def create_project_data_from_compas(self, assembly, building_plan, qr_frames_list):
