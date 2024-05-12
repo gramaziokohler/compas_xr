@@ -266,7 +266,7 @@ class GetTrajectoryResult(Message):
         The trajectory information computed for the request.
     """
 
-    def __init__(self, element_id, robot_name, robot_base_frame, trajectory, pick_and_place=False, pick_index=None, header=None):
+    def __init__(self, element_id, robot_name, robot_base_frame, trajectory, pick_and_place=False, pick_index=None, end_effector_link_name=None, header=None):
         super(GetTrajectoryResult, self).__init__()
         self["header"] = header or Header()
         self["element_id"] = element_id
@@ -275,6 +275,7 @@ class GetTrajectoryResult(Message):
         self["trajectory_id"] = "trajectory_id_" + str(element_id)
         self["pick_and_place"] = pick_and_place
         self["pick_index"] = pick_index
+        self["end_effector_link_name"] = end_effector_link_name
         self["trajectory"] = trajectory
 
     @classmethod
@@ -289,6 +290,7 @@ class GetTrajectoryResult(Message):
             data["trajectory"],
             data["pick_and_place"],
             data["pick_index"],
+            data["end_effector_link_name"],
             Header.parse(data["header"]),
         )
 
