@@ -392,6 +392,9 @@ class ProjectManager(object):
             current_state_data.pop("LastBuiltIndex")
         else:
             last_built_index = None
+        if "PriorityTreeDictionary" in current_state_data:
+            current_state_data.pop("PriorityTreeDictionary")
+
 
         building_plan = BuildingPlan.__from_data__(current_state_data)
         for step in building_plan.steps:
@@ -403,7 +406,7 @@ class ProjectManager(object):
             step_locations.append(Frame.__from_data__(step.location))
             assembly_element_id = step.element_ids[0]
             part = nodes[assembly_element_id]["part"]
-            print(part)
+
             if step.actor == "HUMAN":
                 # TODO: I am not sure if this works in all scenarios of Part
                 if step.is_built:
