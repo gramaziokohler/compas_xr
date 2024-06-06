@@ -405,7 +405,7 @@ class ProjectManager(object):
             step = Step.__from_data__(step["data"])
             step_locations.append(Frame.__from_data__(step.location))
             assembly_element_id = step.element_ids[0]
-            part = nodes[assembly_element_id]["part"]
+            part = nodes[str(assembly_element_id)]["part"]
 
             if step.actor == "HUMAN":
                 # TODO: I am not sure if this works in all scenarios of Part
