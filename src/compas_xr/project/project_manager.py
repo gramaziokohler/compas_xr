@@ -321,6 +321,9 @@ class ProjectManager(object):
             current_state_data.pop("LastBuiltIndex")
         else:
             last_built_index = None
+        if "PriorityTreeDictionary" in current_state_data:
+            current_state_data.pop("PriorityTreeDictionary")
+
 
         building_plan = BuildingPlan.__from_data__(current_state_data)
         for step in building_plan.steps:
