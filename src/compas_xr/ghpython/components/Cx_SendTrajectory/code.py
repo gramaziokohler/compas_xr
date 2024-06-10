@@ -1,7 +1,7 @@
 """
 Get Trajectory Request Component.
 
-A custom Compas Eve MQTT Subscriber component for receiving planning requests from the application.
+A custom Compas Eve MQTT Subscriber component for receiving exacution requests from the application.
 
 COMPAS XR v0.1.0
 """
@@ -13,7 +13,6 @@ import System
 import Rhino
 import rhinoscriptsyntax as rs
 import time
-import threading
 
 from compas_eve import Message
 from compas_eve import Topic
@@ -21,22 +20,22 @@ from compas_eve import Subscriber
 from compas_eve.mqtt import MqttTransport
 from compas_eve.ghpython import BackgroundWorker
 
-from compas_xr.mqtt import GetTrajectoryRequest
+from compas_xr.mqtt import SendTrajectory
 from compas.data import json_dump
 
 def start_server(worker, options):
-    topic_name_request = 'compas_xr/get_trajectory_request/' + options.project_name
+    topic_name_request = 'compas_xr/send_trajectory/' + options.project_name
 
     worker.count = 0
     
-    def get_trajectory_requested(request_message):
+    def execute_trajectory_requested(request_message):
         worker.count += 1
         worker.display_message("Request #{} started".format(worker.count))
         worker.update_result(request_message, 10)
 
     tx = MqttTransport(options.host)
-    topic = Topic(topic_name_request, GetTrajectoryRequest)
-    worker.subscriber = Subscriber(topic, callback=get_trajectory_requested, transport=tx)
+    topic = Topic(topic_name_request, SendTrajectory)
+    worker.subscriber = Subscriber(topic, callback=execute_trajectory_requested, transport=tx)
     worker.subscriber.subscribe()
     worker.display_message("Subscribed")
 
@@ -44,7 +43,7 @@ def stop_server(worker):
     if hasattr(worker, "subscriber"):
         worker.subscriber.unsubscribe()
     worker.display_message("Stopped")
-
+    
 
 class BackgroundTaskComponent(component):
     def RunScript(self, options, reset, on):
@@ -94,4 +93,5 @@ class BackgroundTaskComponent(component):
             return element_id, robot_name
         else:
             return None, None
+
 
