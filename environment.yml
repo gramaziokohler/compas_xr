@@ -1,0 +1,25 @@
+name: compas_xr_docs
+channels:
+  - conda-forge
+  - defaults
+
+dependencies:
+  - python=3.11
+  - pip
+  - compas=2.*
+  - compas_timber=0.7.*
+  - compas_eve=1.*
+  - compas_fab=1.*
+  - pip:
+    - pyrebase4>4.7.1
+    # dev requirements
+    - attrs >=17.4
+    - black >=22.12.0
+    - bump-my-version
+    - compas_invocations2
+    - invoke >=0.14
+    - ruff
+    - sphinx_compas2_theme
+    - twine
+    - wheel
+
