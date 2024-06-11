@@ -8,18 +8,12 @@ import io
 from os import path
 
 from setuptools import setup
-from setuptools.command.develop import develop
-from setuptools.command.install import install
-
 
 here = path.abspath(path.dirname(__file__))
 
 
 def read(*names, **kwargs):
-    return io.open(
-        path.join(here, *names),
-        encoding=kwargs.get("encoding", "utf8")
-    ).read()
+    return io.open(path.join(here, *names), encoding=kwargs.get("encoding", "utf8")).read()
 
 
 long_description = read("README.md")
@@ -28,8 +22,8 @@ optional_requirements = {}
 
 setup(
     name="compas_xr",
-    version="0.1.0",
-    description="COMPAS XR facilitates XR workflows to foster the application of XR technologies both in research and teaching.",
+    version="0.8.0",
+    description="COMPAS XR streamlines extended reality workflows to ease the implementation of human-machine collaborative applications in architectural research and educational environments.",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/gramaziokohler/compas_xr",
