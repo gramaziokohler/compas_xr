@@ -9,6 +9,11 @@ compas_xr
 .. toctree::
     :maxdepth: 1
 
+    compas_xr.ghpython
+    compas_xr.mqtt
+    compas_xr.project
+    compas_xr.realtime_database
+    compas_xr.storage
 
 """
 
