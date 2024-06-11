@@ -4,7 +4,6 @@ import uuid
 from datetime import datetime
 
 from compas.geometry import Frame
-from compas.data import Data
 from compas_eve import Message
 
 
