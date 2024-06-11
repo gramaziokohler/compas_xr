@@ -33,8 +33,8 @@ setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/gramaziokohler/compas_xr",
-    author="GKR",
-    author_email="mitterberger@arch.ethz.ch",
+    author="Joseph Kenny",
+    author_email="kenny@arch.ethz.ch",
     license="MIT license",
     classifiers=[
         "Development Status :: 4 - Beta",
