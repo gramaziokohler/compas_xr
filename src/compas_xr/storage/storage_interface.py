@@ -161,7 +161,6 @@ class StorageInterface(object):
         file_name = os.path.basename(file_path)
         new_path_list = deepcopy(cloud_path_list)
         new_path_list.append(file_name)
-        print("new_path_list: {}".format(new_path_list))
         storage_reference = self.construct_reference_from_list(new_path_list)
         self.upload_bytes_to_reference_from_local_file(file_path, storage_reference)
 
@@ -185,8 +184,6 @@ class StorageInterface(object):
             raise FileNotFoundError("Directory not found: {}".format(directory_path))
         for file_name in os.listdir(directory_path):
             file_path = os.path.join(directory_path, file_name)
-            print("Uploading file: {}".format(file_path))
-            print("To cloud path: {}".format(cloud_path_list))
             self.upload_file_as_bytes_to_deep_reference(file_path, cloud_path_list)
 
     # TODO: This works as it should, but I have a lot of problems with json_loads
@@ -272,5 +269,5 @@ class StorageInterface(object):
         data = self.get_data(cloud_file_name)
         directory_name = os.path.dirname(path_local)
         if not os.path.exists(directory_name):
-            print("Directory {} does not exist!".format(directory_name))
+            raise FileNotFoundError("Directory {} does not exist!".format(directory_name))
         json_dump(data=data, fp=path_local, pretty=pretty)
