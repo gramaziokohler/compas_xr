@@ -416,9 +416,11 @@ class ProjectManager(object):
                     built_human.append(part)
                 else:
                     unbuilt_human.append(part)
-            else:
+            elif step.actor == "ROBOT":
                 if step.is_built:
                     built_robot.append(part)
                 else:
                     unbuilt_robot.append(part)
+            else:
+                raise Exception("Part actor is Unknown!")
         return last_built_index, step_locations, built_human, unbuilt_human, built_robot, unbuilt_robot
