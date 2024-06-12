@@ -60,8 +60,6 @@ class AssemblyExtensions(object):
                 compas_mesh.join(mesh)
             mesh_transformed = compas_mesh.transformed(Transformation.from_frame_to_frame(beam_frame, frame))
 
-            if not os.path.exists(target_folder_path):
-                raise Exception("File path does not exist {}".format(target_folder_path))
             filename = "{}.obj".format(str(key))
             mesh_transformed.to_obj(os.path.join(target_folder_path, filename))
 
