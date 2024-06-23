@@ -4,8 +4,8 @@ Installation
 
 This chapter provides a step-by-step guide for installing compas_xr on your system. The library can be
 installed using either pip or conda, which are widely-used package managers for Python. The following
-instructions will guide you through each method. Alternatively, you can clone the compas_xr library
-directly from our `repository <https://github.com/gramaziokohler>`_.
+instructions will guide you through each method. Alternatively, you can clone the ``compas_xr`` library
+directly from our `repository <https://github.com/gramaziokohler/compas_xr>`_.
 
 Installation using conda
 ========================
@@ -64,8 +64,8 @@ Compas XR Unity - Phone Based AR Application
 This chapter provides a step-by-step guide for installing compas_xr_unity on your device. The use and installation of
 the application is supported by both Android and ios devices. If you would like to install the application without
 functionality or code modifications Android .apk file, and ios xcode build can be found `here <https://github.com/gramaziokohler>`_.
+
 However, if you would like to modify any application functionalities or anything the entire code base for the application
-can be found and cloned from our `repository <https://github.com/gramaziokohler>`_.
+can be found and cloned from our `repository <https://github.com/gramaziokohler/compas_xr>`_.
 
 Additionally, both Android and device installation procedures can be found in the Release Procedures chapter of the documentation.
-
