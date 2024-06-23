@@ -66,12 +66,12 @@ class Storage(StorageInterface):
         It also checks if the data is None or == null (firebase return if no data)
         """
         try:
-            get = urlopen(url).read().decode()
+            file_content = urlopen(url).read().decode()
         except:
             raise Exception("unable to get file from url {}".format(url))
 
-        if get is not None and get != "null":
-            return get
+        if file_content is not None and file_content != "null":
+            return file_content
 
         else:
             raise Exception("unable to get file from url {}".format(url))
