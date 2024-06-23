@@ -17,7 +17,7 @@ try:
 except ImportError:
     from urllib import urlopen
 
-lib_dir = os.path.join(os.path.dirname(__file__), "dependencies")
+lib_dir = os.path.join(os.path.dirname(__file__), "..", "dependencies")
 if lib_dir not in sys.path:
     sys.path.append(lib_dir)
 
