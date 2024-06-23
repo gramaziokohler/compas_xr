@@ -5,14 +5,14 @@ import math
 import numpy
 
 
-def pytest_ignore_collect(path):
-    if "rhino" in str(path):
+def pytest_ignore_collect(collection_path):
+    if "rhino" in str(collection_path):
         return True
 
-    if "blender" in str(path):
+    if "blender" in str(collection_path):
         return True
 
-    if "ghpython" in str(path):
+    if "ghpython" in str(collection_path):
         return True
 
 
