@@ -12,10 +12,10 @@ from compas_timber.consumers import BrepGeometryConsumer
 
 class AssemblyExtensions(object):
     """
-    AssemblyExtensions is a class for extending the functionality of the compas.datastructures.Assembly class.
+    AssemblyExtensions is a class for extending the functionality of the :class:`~compas.datastructures.Assembly` class.
 
     The AssemblyExtensions class provides additional functionalities such as exporting parts as .obj files
-    and creating a frame assembly from a list of compas.geometry.Frames with a specific data structure
+    and creating a frame assembly from a list of :class:`~compas.geometry.Frame` with a specific data structure
     for localization information.
 
     """
@@ -26,7 +26,7 @@ class AssemblyExtensions(object):
 
         Parameters
         ----------
-        assembly : compas_timber.assembly.TimberAssembly
+        assembly : :class:`~compas_timber.assembly.TimberAssembly`
             The assembly that you want to export beams from.
         folder_path : str
             The path in which you would like to create a storage folder.
@@ -69,8 +69,8 @@ class AssemblyExtensions(object):
 
         Parameters
         ----------
-        assembly : compas.datastructures.Assembly
-            The Mesh (compas.datastructures.Mesh) assembly that you want to export parts from.
+        assembly : :class:`~compas.datastructures.Assembly`
+            The Mesh assembly that you want to export parts from.
         folder_path : str
             The path in which you would like to create a storage folder.
         new_folder_name : str
@@ -111,16 +111,16 @@ class AssemblyExtensions(object):
 
     def create_qr_assembly(self, qr_frames):
         """
-        Create a frame assembly from a list of compas.geometry.Frames with a specific data structure for localization.
+        Create a frame assembly from a list of :class:`~compas.geometry.Frame` with a specific data structure for localization.
 
         Parameters
         ----------
-        qr_frames : list of 'compas.geometry.Frame'
+        qr_frames : list of :class:`~compas.geometry.Frame`
             A list of frames at specific locations for localization data.
 
         Returns
         -------
-        :class: 'compas.datastructures.Assembly'
+        :class:`~compas.datastructures.Assembly`
             The constructed database reference.
 
         """

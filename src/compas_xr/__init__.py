@@ -23,7 +23,7 @@ import os
 
 
 __author__ = ["Joseph Kenny"]
-__copyright__ = "Gramazio Kohler Research"
+__copyright__ = "ETH Zurich, Princeton University"
 __license__ = "MIT License"
 __email__ = "kenny@arch.ethz.ch"
 __version__ = "0.8.0"

@@ -5,9 +5,9 @@ from compas_timber.planning import Step
 
 class BuildingPlanExtensions(object):
     """
-    BuildingPlanExtensions is a class for extending the functionality of the compas_timber.planning.BuildingPlan class.
+    BuildingPlanExtensions is a class for extending the functionality of the :class:`~compas_timber.planning.BuildingPlan` class.
 
-    The BuildingPlanExtensions class provides additional functionalities to the compas_timber.planning.BuildingPlan
+    The BuildingPlanExtensions class provides additional functionalities to the :class:`~compas_timber.planning.BuildingPlan`
     by providing a way to create a buildling plan from an established assembly sequence.
     """
 
@@ -19,7 +19,7 @@ class BuildingPlanExtensions(object):
 
         Parameters
         ----------
-        assembly : compas_timber.assembly.TimberAssembly or compas.datastructures.Assembly
+        assembly : :class:`~compas_timber.assembly.TimberAssembly` or :class:`~compas.datastructures.Assembly`
             The assembly that you want to generate the buiding plan for.
         data_type : int
             List index of which data type will be loaded on the application side [0: 'Cylinder', 1: 'Box', 2: 'ObjFile']
@@ -30,7 +30,7 @@ class BuildingPlanExtensions(object):
 
         Returns
         -------
-        building_plan : compas_timber.planning.BuildingPlan
+        building_plan : :class:`~compas_timber.planning.BuildingPlan`
             The building plan generated from the assembly sequence.
 
         """

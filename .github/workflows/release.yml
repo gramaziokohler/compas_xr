@@ -1,0 +1,30 @@
+on:
+  push:
+    tags:
+      - 'v*'
+
+name: Create Release
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [macos-latest, windows-latest, ubuntu-latest]
+        python: ['3.10', '3.11']
+
+    steps:
+      - uses: compas-dev/compas-actions.build@v4
+        with:
+          python: ${{ matrix.python }}
+          invoke_lint: true
+          check_import: true
+
+  publish:
+    needs: build
+    runs-on: windows-latest
+    steps:
+      - uses: compas-dev/compas-actions.publish@v3
+        with:
+          pypi_token: ${{ secrets.PYPI }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}

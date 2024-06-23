@@ -6,3 +6,4 @@ API Reference
     :maxdepth: 1
 
     api/compas_xr
+    api/compas_xr_unity

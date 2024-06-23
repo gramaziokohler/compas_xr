@@ -7,7 +7,7 @@ import sphinx_compas2_theme
 # -- General configuration ------------------------------------------------
 
 project = "COMPAS XR"
-copyright = "Gramazio Kohler Research"
+copyright = "ETH Zurich, Princeton University"
 author = "Joseph Kenny"
 organization = "gramaziokohler"
 package = "compas_xr"
@@ -145,7 +145,7 @@ html_theme_options = {
         "image_dark": "_static/compas_icon_white.png",
         "text": "COMPAS XR",
     },
-    "navigation_depth": 2,
+    "navigation_depth": 3,
 }
 
 html_context = {
