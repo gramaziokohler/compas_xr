@@ -59,7 +59,7 @@
         </script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Examples" href="examples.html" />
+    <link rel="next" title="API Reference" href="api.html" />
     <link rel="prev" title="Installation" href="installation.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
@@ -172,15 +172,15 @@
                 
 
                     <li class="nav-item">
-                      <a class="nav-link nav-internal" href="examples.html">
-                        Examples
+                      <a class="nav-link nav-internal" href="api.html">
+                        API Reference
                       </a>
                     </li>
                 
 
                     <li class="nav-item">
-                      <a class="nav-link nav-internal" href="api.html">
-                        API Reference
+                      <a class="nav-link nav-internal" href="license.html">
+                        License
                       </a>
                     </li>
                 
@@ -190,13 +190,6 @@
                 </button>
                 <div class="dropdown-menu">
                     
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="license.html">
-                        License
-                      </a>
-                    </li>
-                
-
                     <li class="nav-item">
                       <a class="nav-link nav-internal" href="citing.html">
                         Citing
@@ -367,15 +360,15 @@ document.write(`
                 
 
                     <li class="nav-item">
-                      <a class="nav-link nav-internal" href="examples.html">
-                        Examples
+                      <a class="nav-link nav-internal" href="api.html">
+                        API Reference
                       </a>
                     </li>
                 
 
                     <li class="nav-item">
-                      <a class="nav-link nav-internal" href="api.html">
-                        API Reference
+                      <a class="nav-link nav-internal" href="license.html">
+                        License
                       </a>
                     </li>
                 
@@ -385,13 +378,6 @@ document.write(`
                 </button>
                 <div class="dropdown-menu">
                     
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="license.html">
-                        License
-                      </a>
-                    </li>
-                
-
                     <li class="nav-item">
                       <a class="nav-link nav-internal" href="citing.html">
                         Citing
@@ -494,9 +480,16 @@ document.write(`
 <li class="toctree-l1"><a class="reference internal" href="index.html">Introduction</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1 current active"><a class="current reference internal" href="#">User Guide</a></li>
-<li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="api.html">API Reference</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l2"><a class="reference internal" href="api/compas_xr.html">compas_xr</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="api/compas_xr.html">COMPAS XR</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/compas_xr.ghpython.html">compas_xr.ghpython</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/compas_xr.mqtt.html">compas_xr.mqtt</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/compas_xr.project.html">compas_xr.project</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/compas_xr.realtime_database.html">compas_xr.realtime_database</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/compas_xr.storage.html">compas_xr.storage</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/compas_xr_unity.html">COMPAS XR Unity</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="license.html">License</a></li>
@@ -598,33 +591,33 @@ found <a class="reference external" href="https://compas.dev/compas/latest/api/g
 <p>Here are some key aspects of constructing assemblies in COMPAS for COMPAS XR Visualization. Additionally, the definition
 should come from each user depending on the assembly in which they would like to visualize and construct.</p>
 <p>Only Assemblies of the Geometry types listed below are acceptable for visualization and assembly:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">#COMPAS Geometries that can be used to create assemblies</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># COMPAS Geometries that can be used to create assemblies</span>
 <span class="n">compas</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">Box</span>
 <span class="n">compas</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">Cylinder</span>
 
-<span class="c1">#COMPAS Assemblies that Require .obj export for COMPAS XR Visualization</span>
+<span class="c1"># COMPAS Assemblies that Require .obj export for COMPAS XR Visualization</span>
 <span class="n">compas_timber</span><span class="o">.</span><span class="n">assembly</span><span class="o">.</span><span class="n">TimberAssemblies</span>
 <span class="n">compas</span><span class="o">.</span><span class="n">datastructures</span><span class="o">.</span><span class="n">Mesh</span>
 </pre></div>
 </div>
 <p>Only assemblies constructed with the processes below allow visualization in COMPAS XR Unity App:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Import the Assembly, Part, and Mesh classes from the compas.datastructures</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Import the Assembly, Part, and Mesh classes from the compas.datastructures</span>
 <span class="kn">from</span> <span class="nn">compas.datastructures</span> <span class="kn">import</span> <span class="n">Assembly</span><span class="p">,</span> <span class="n">Part</span><span class="p">,</span> <span class="n">Mesh</span>
 
 <span class="c1"># Import the Box and Cylinder classes from the compas.geometry module</span>
 <span class="kn">from</span> <span class="nn">compas.geometry</span> <span class="kn">import</span> <span class="n">Box</span><span class="p">,</span> <span class="n">Cylinder</span>
 
-<span class="c1">#For Geometry Assemblies acceptable add part methods</span>
+<span class="c1"># For Geometry Assemblies acceptable add part methods</span>
 <span class="n">box_assembly</span><span class="o">.</span><span class="n">add_part</span> <span class="p">(</span><span class="n">box</span><span class="p">)</span>
 <span class="n">box_assembly</span><span class="o">.</span><span class="n">add_part</span><span class="p">(</span><span class="n">box</span><span class="p">,</span> <span class="n">frame</span><span class="o">=</span><span class="n">frame</span><span class="p">)</span>
 <span class="n">cylinder_assembly</span><span class="o">.</span><span class="n">add_part</span><span class="p">(</span><span class="n">cylinder</span><span class="p">)</span>
 <span class="n">cylinder_assembly</span><span class="o">.</span><span class="n">add_part</span><span class="p">(</span><span class="n">cylinder</span><span class="p">,</span> <span class="n">frame</span><span class="o">=</span><span class="n">frame</span><span class="p">)</span>
 
-<span class="c1">#For Custom Meshes, meshes must be added as type Part</span>
+<span class="c1"># For Custom Meshes, meshes must be added as type Part</span>
 <span class="n">part</span> <span class="o">=</span> <span class="n">Part</span><span class="p">(</span><span class="n">frame</span><span class="o">=</span> <span class="n">frame</span><span class="p">,</span> <span class="n">shape</span> <span class="o">=</span> <span class="n">mesh</span><span class="p">)</span>
 <span class="n">part_assembly</span><span class="o">.</span><span class="n">add_part</span><span class="p">(</span><span class="n">part</span><span class="p">)</span>
 
-<span class="c1">#For all Box, Cylinder, or Mesh Assemblies made of class type Part</span>
+<span class="c1"># For all Box, Cylinder, or Mesh Assemblies made of class type Part</span>
 <span class="n">part</span> <span class="o">=</span> <span class="n">Part</span><span class="p">(</span><span class="n">name</span><span class="o">=...</span><span class="p">,</span> <span class="n">frame</span><span class="o">=...</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span> <span class="n">GEO</span><span class="p">)</span>
 <span class="n">part</span> <span class="o">=</span> <span class="n">Part</span><span class="p">(</span><span class="n">frame</span><span class="o">=...</span><span class="p">,</span> <span class="n">shape</span> <span class="o">=</span> <span class="n">GEO</span><span class="p">)</span>
 <span class="n">part_assembly</span><span class="o">.</span><span class="n">add_part</span><span class="p">(</span><span class="n">part</span><span class="p">)</span>
@@ -684,6 +677,9 @@ a wide range of tools and services that help developers build high-quality apps 
 </ol>
 <figure class="figure align-default">
 <img alt="_images/firebase_8.png" class="figure-img img-fluid" src="_images/firebase_8.png" />
+</figure>
+<figure class="figure align-default">
+<img alt="_images/firebase_9.png" class="figure-img img-fluid" src="_images/firebase_9.png" />
 </figure>
 <ol class="arabic simple" start="7">
 <li><p>Once the Storage is created, search for “Rules” in your Database and rewrite “false” to “true”. Do not forget to publish.</p></li>
@@ -788,7 +784,7 @@ as a list of Steps or actions needed to complete assembly.</p>
 building plan directly from an assembly sequence provided through the COMPAS XR library and is demonstrated in the
 example below. However the <strong>Building Plan</strong> and <strong>COMPAS XR Unity</strong> provide flexibility to create building steps from assembly
 parts in any sequence order as long as all steps have the complete information as seen above.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Import the BuildingPlanExtensions class from the compas_xr.project module</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Import the BuildingPlanExtensions class from the compas_xr.project module</span>
 <span class="kn">from</span> <span class="nn">compas_xr.project</span> <span class="kn">import</span> <span class="n">BuildingPlanExtensions</span>
 
 <span class="c1"># Initialize an instance of the BuildingPlanExtensions class</span>
@@ -898,7 +894,7 @@ Firebase storage if instructed by the Application Settings data.</p>
 <p>If you are using COMPAS Timber Assemblies or COMPAS Assemblies made of meshes you are required to export and upload meshes
 to FirebaseStorage as .obj files. This can be handled directly through the COMPAS XR python library, and can be handled at
 any point priority to visualization on the application side.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Import the AssemblyExtensions class from the compas_xr.project module</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Import the AssemblyExtensions class from the compas_xr.project module</span>
 <span class="kn">from</span> <span class="nn">compas_xr.project</span> <span class="kn">import</span> <span class="n">AssemblyExtensions</span>
 
 <span class="c1"># Initialize an instance of the AssemblyExtensions class</span>
@@ -917,7 +913,7 @@ any point priority to visualization on the application side.</p>
 <p>As previously mentioned, project information stored under a specific firebase project name that comes directly from rhino
 upload information consists of QRFrames, Assembly, BuildingPlan, Joints, &amp; Parts. Additionally the library allows
 functionality of uploading all required COMPAS class objects.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Import Project Manager class from compas_xr</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Import Project Manager class from compas_xr</span>
 <span class="kn">from</span> <span class="nn">compas_xr.project</span> <span class="kn">import</span> <span class="n">ProjectManager</span>
 
 <span class="c1"># Define instance of Project manager class with firebase config file path as input</span>
@@ -935,7 +931,7 @@ project name cannot include any extension of “.” this will signify a file ty
 <h3>Step 4.3: Upload Application Settings</h3>
 <p>The application settings writer is used as a global constant that is pulled on the user device every time that the
 application is started. Additionally it requires a specific structure, and should be written from <cite>compas_xr library</cite> as follows:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Import Project Manager class from compas_xr</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Import Project Manager class from compas_xr</span>
 <span class="kn">from</span> <span class="nn">compas_xr.project</span> <span class="kn">import</span> <span class="n">ProjectManager</span>
 
 <span class="c1"># Define instance of Project manager class with firebase config file path as input</span>
@@ -969,7 +965,7 @@ application is started. Additionally it requires a specific structure, and shoul
 helpful in particular assemblies of large scale).  Then it should be handled via the compas_xr library
 functionalities listed below, as the order and data structure of uploading localization information to
 the database is particular.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Import Project Manager class from compas_xr</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Import Project Manager class from compas_xr</span>
 <span class="kn">from</span> <span class="nn">compas_xr.project</span> <span class="kn">import</span> <span class="n">ProjectManager</span>
 
 <span class="c1"># Define instance of Project manager class with firebase config file path as input</span>
@@ -1000,7 +996,7 @@ Outputs: last_built_index, step_locations, built_human, unbuilt_human, built_rob
 - A list of elements in the current project data that have already been built by the robot.</p>
 <p><strong>unbuilt_robot:</strong> list of compas.Geometry
 - A list of elements in the current project data that have not been built by the robot yet.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Import Project Manager class from compas_xr</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Import Project Manager class from compas_xr</span>
 <span class="kn">from</span> <span class="nn">compas_xr.project</span> <span class="kn">import</span> <span class="n">ProjectManager</span>
 
 <span class="c1"># Define instance of Project Manager class with firebase config file path as input</span>
@@ -1047,8 +1043,8 @@ involves several critical steps to ensure accuracy and collaboration between all
 <p>The application includes a drop down for simple robot selection and visualizatio, offering users the opportunity to evaluate
 different robots for completing the task at hand. Users can browse through various robotic options, each with detailed visual
 representations</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">//</span><span class="n">COMPAS</span> <span class="n">XR</span> <span class="n">Default</span> <span class="n">Robot</span> <span class="n">List</span>
-<span class="n">RobotURDFList</span> <span class="o">=</span> <span class="n">new</span> <span class="n">List</span><span class="o">&lt;</span><span class="n">string</span><span class="o">&gt;</span> <span class="p">{</span><span class="s2">&quot;UR3&quot;</span><span class="p">,</span> <span class="s2">&quot;UR5&quot;</span><span class="p">,</span> <span class="s2">&quot;UR10e&quot;</span><span class="p">,</span> <span class="s2">&quot;ETHZurichRFL&quot;</span><span class="p">};</span>
+<div class="highlight-csharp notranslate"><div class="highlight"><pre><span></span><span class="c1">// COMPAS XR Default Robot List</span>
+<span class="n">RobotURDFList</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">List</span><span class="o">&lt;</span><span class="kt">string</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span><span class="s">&quot;UR3&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;UR5&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;UR10e&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;ETHZurichRFL&quot;</span><span class="p">};</span>
 </pre></div>
 </div>
 <p><strong>NOTE:</strong> COMPAS XR currently defines base robot models for the robots listed above. Additionally, it is important to note that
@@ -1129,7 +1125,7 @@ each users needs.</p>
 in order to receive the messages.</p>
 <p><strong>robot_name:</strong> string
 - The name of the robot intended to complete the task.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">#COMPAS XR Default Robot List</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># COMPAS XR Default Robot List</span>
 <span class="n">robot_list</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;UR3&quot;</span><span class="p">,</span> <span class="s2">&quot;UR5&quot;</span><span class="p">,</span> <span class="s2">&quot;UR10e&quot;</span><span class="p">,</span> <span class="s2">&quot;ETHZurichRFL&quot;</span><span class="p">]</span>
 </pre></div>
 </div>
@@ -1157,8 +1153,8 @@ thereby supporting the overall planning and execution workflow.</p>
 If the component is not restarted in the beginning of operation no request will be received.</p>
 <p>Additionally the components will require specific topic creation in order to ensure that the application and CAD are
 only receiving messages intended. The custom topic creation example can be found below</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>#COMPAS XR Get Trajectory Result Topic
-topic = ‘compas_xr/get_trajectory_request/project_name’
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># COMPAS XR Get Trajectory Result Topic</span>
+<span class="n">topic</span> <span class="o">=</span> <span class="s1">&#39;compas_xr/get_trajectory_request/project_name&#39;</span>
 </pre></div>
 </div>
 </section>
@@ -1201,8 +1197,8 @@ processed and coordinated, is made available to the application.</p>
 - User input used to publish the message.</p>
 <p>Additionally the components will require specific topic creation in order to ensure that the application and CAD
 are only receiving messages intended. The custom topic creation example can be found below</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>#COMPAS XR Get Trajectory Result Topic
-topic = ‘compas_xr/get_trajectory_result/project_name’
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># COMPAS XR Get Trajectory Result Topic</span>
+<span class="n">topic</span> <span class="o">=</span> <span class="s1">&#39;compas_xr/get_trajectory_result/project_name&#39;</span>
 </pre></div>
 </div>
 </section>
@@ -1224,8 +1220,8 @@ this component transmits the trajectory details, ensuring the robot receives the
 application. If the component is not restarted in the beginning of operation no request will be received.</p>
 <p>Additionally the components will require specific topic creation in order to ensure that the application and CAD
 are only receiving messages intended. The custom topic creation example can be found below</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>#COMPAS XR Send Trajectory Topic
-topic = ‘compas_xr/send_trajectory/project_name’
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># COMPAS XR Send Trajectory Topic</span>
+<span class="n">topic</span> <span class="o">=</span> <span class="s1">&#39;compas_xr/send_trajectory/project_name&#39;</span>
 </pre></div>
 </div>
 </section>
@@ -1268,8 +1264,10 @@ and import your robot into the application for visualization in AR through COMPA
 <figure class="figure align-default">
 <img alt="_images/Docker_5.png" class="figure-img img-fluid" src="_images/Docker_5.png" />
 </figure>
-<p>6. It is very important to check the settings… and are listed below:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">#Unity URDF GameObject Import Settings</span>
+<ol class="arabic simple" start="6">
+<li><p>It is very important to check the settings… and are listed below:</p></li>
+</ol>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Unity URDF GameObject Import Settings</span>
 
 <span class="n">Address</span><span class="p">:</span> <span class="n">ws</span><span class="p">:</span><span class="o">//</span><span class="n">localhost</span><span class="p">:</span><span class="mi">9090</span> <span class="p">(</span><span class="n">Basically</span> <span class="n">just</span> <span class="n">telling</span> <span class="n">it</span> <span class="n">to</span> <span class="n">read</span> <span class="n">the</span> <span class="n">container</span> <span class="n">that</span> <span class="ow">is</span> <span class="n">running</span> <span class="n">on</span> <span class="n">my</span> <span class="n">computer</span><span class="o">.</span>
 <span class="n">Protocol</span><span class="p">:</span> <span class="n">Web</span> <span class="n">Socket</span> <span class="n">Sharp</span>
@@ -1304,8 +1302,8 @@ and its child game object RobotPrefab.</p>
 <p>3. Navigate to the TrajectoryVisualzier.cs file located in Assets/Scripts/TrajectoryVisualizer.cs of the
 COMPAS XR Unity
 file, and input your robot name into the RobotURDFList.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>//COMPAS XR Default Robot List
-RobotURDFList = new List&lt;string&gt; {&quot;UR3&quot;, &quot;UR5&quot;, &quot;UR10e&quot;, &quot;ETHZurichRFL&quot;, “MyCustomURDF”};
+<div class="highlight-csharp notranslate"><div class="highlight"><pre><span></span><span class="c1">// COMPAS XR Default Robot List</span>
+<span class="n">RobotURDFList</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">List</span><span class="o">&lt;</span><span class="kt">string</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span><span class="s">&quot;UR3&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;UR5&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;UR10e&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;ETHZurichRFL&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;MyCustomURDF&quot;</span><span class="p">};</span>
 </pre></div>
 </div>
 <p>4. The URDF should be added to the Default Robots list and available for use in the application at
@@ -1424,12 +1422,12 @@ resolving CocoaPods issues, configuring Xcode, and enabling developer mode on yo
 <p>Most likely it will fail and you will need to do the following fixes:</p>
 <p><strong>Solution A:</strong> in Terminal</p>
 <p>Set the export path for gems as follows:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">export</span> <span class="n">PATH</span><span class="o">=</span><span class="s2">&quot;/Users/username/.gem/ruby/2.6.0/bin:$PATH&quot;</span>
-<span class="n">Install</span> <span class="n">gem</span> <span class="n">active</span> <span class="n">support</span><span class="p">:</span> <span class="n">gem</span> <span class="n">install</span> <span class="n">activesupport</span> <span class="o">-</span><span class="n">v</span> <span class="mf">6.1.7.6</span> <span class="o">--</span><span class="n">user</span><span class="o">-</span><span class="n">install</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span><span class="s2">&quot;/Users/username/.gem/ruby/2.6.0/bin:</span><span class="nv">$PATH</span><span class="s2">&quot;</span>
+Install<span class="w"> </span>gem<span class="w"> </span>active<span class="w"> </span>support:<span class="w"> </span>gem<span class="w"> </span>install<span class="w"> </span>activesupport<span class="w"> </span>-v<span class="w"> </span><span class="m">6</span>.1.7.6<span class="w"> </span>--user-install
 </pre></div>
 </div>
 <p>Install gem active support:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">gem</span> <span class="n">install</span> <span class="n">activesupport</span> <span class="o">-</span><span class="n">v</span> <span class="mf">6.1.7.6</span> <span class="o">--</span><span class="n">user</span><span class="o">-</span><span class="n">install</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>gem<span class="w"> </span>install<span class="w"> </span>activesupport<span class="w"> </span>-v<span class="w"> </span><span class="m">6</span>.1.7.6<span class="w"> </span>--user-install
 </pre></div>
 </div>
 <figure class="figure align-default">
@@ -1566,10 +1564,10 @@ the connection.</p>
 <h4>User Inputs</h4>
 <p><strong>Optional:</strong></p>
 <ul class="simple">
-<li><p><strong>MQTT Topic:</strong> If you wish to send the firebase information from grasshopper you will</p></li>
+<li><p><strong>MQTT Topic:</strong> If you wish to send the firebase information from grasshopper you will
+need to input the particular topic name in which you would like to subscribe, and start the
+subscription.</p></li>
 </ul>
-<p>need to input the particular topic name in which you would like to subscribe, and start the
-subscription.</p>
 <p><strong>Required:</strong></p>
 <ul class="simple">
 <li><p><strong>app Id:</strong> The app uses its unique Firebase app ID to connect to backend services.</p></li>

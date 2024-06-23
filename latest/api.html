@@ -59,8 +59,8 @@
         </script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="compas_xr" href="api/compas_xr.html" />
-    <link rel="prev" title="Examples" href="examples.html" />
+    <link rel="next" title="COMPAS XR" href="api/compas_xr.html" />
+    <link rel="prev" title="User Guide" href="userguide.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -171,16 +171,16 @@
                     </li>
                 
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="examples.html">
-                        Examples
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="#">
+                        API Reference
                       </a>
                     </li>
                 
 
-                    <li class="nav-item current active">
-                      <a class="nav-link nav-internal" href="#">
-                        API Reference
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="license.html">
+                        License
                       </a>
                     </li>
                 
@@ -190,13 +190,6 @@
                 </button>
                 <div class="dropdown-menu">
                     
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="license.html">
-                        License
-                      </a>
-                    </li>
-                
-
                     <li class="nav-item">
                       <a class="nav-link nav-internal" href="citing.html">
                         Citing
@@ -316,10 +309,6 @@ document.write(`
   
 
   
-    <label class="sidebar-toggle secondary-toggle" for="__secondary">
-      <span class="fa-solid fa-outdent"></span>
-    </label>
-  
 </div>
 
     </nav>
@@ -366,16 +355,16 @@ document.write(`
                     </li>
                 
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="examples.html">
-                        Examples
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="#">
+                        API Reference
                       </a>
                     </li>
                 
 
-                    <li class="nav-item current active">
-                      <a class="nav-link nav-internal" href="#">
-                        API Reference
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="license.html">
+                        License
                       </a>
                     </li>
                 
@@ -385,13 +374,6 @@ document.write(`
                 </button>
                 <div class="dropdown-menu">
                     
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="license.html">
-                        License
-                      </a>
-                    </li>
-                
-
                     <li class="nav-item">
                       <a class="nav-link nav-internal" href="citing.html">
                         Citing
@@ -494,9 +476,16 @@ document.write(`
 <li class="toctree-l1"><a class="reference internal" href="index.html">Introduction</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="userguide.html">User Guide</a></li>
-<li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
 <li class="toctree-l1 current active has-children"><a class="current reference internal" href="#">API Reference</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l2"><a class="reference internal" href="api/compas_xr.html">compas_xr</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="api/compas_xr.html">COMPAS XR</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/compas_xr.ghpython.html">compas_xr.ghpython</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/compas_xr.mqtt.html">compas_xr.mqtt</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/compas_xr.project.html">compas_xr.project</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/compas_xr.realtime_database.html">compas_xr.realtime_database</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/compas_xr.storage.html">compas_xr.storage</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/compas_xr_unity.html">COMPAS XR Unity</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="license.html">License</a></li>
@@ -563,52 +552,12 @@ document.write(`
                   
   <section id="api-reference">
 <h1>API Reference</h1>
-<section id="compas-xr-python-library-for-cad-functionalities">
-<h2>COMPAS XR - Python Library for CAD Functionalities</h2>
 <div class="toctree-wrapper compound">
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="api/compas_xr.html">compas_xr</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/compas_xr.html">COMPAS XR</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/compas_xr_unity.html">COMPAS XR Unity</a></li>
 </ul>
 </div>
-<section id="initialize-unity">
-<h3>Initialize.unity</h3>
-<ul class="simple">
-<li><p><strong>FirebaseInitializer.cs</strong> (initializes Firebase with configured settings and manages scene transitions upon successful initialization, utilizing MqttFirebaseConfigManager for disconnecting MQTT and HelpersExtensions.ChangeScene for scene navigation.)</p></li>
-<li><p><strong>FirebaseConfigSettings.cs</strong> (manages user input Firebase configuration settings, saving and loading them from Player Preferences, and updates a singleton instance FirebaseManager with these values.)</p></li>
-<li><p><strong>MqttFirebaseConfigManager.cs</strong> (manages MQTT connections, handles message events, and allows subscription to custom topics for sending Firebase configuration information.)</p></li>
-<li><p><strong>LogManager.cs</strong> (manages logging by creating a log directory, deleting old log files, and writing log messages with timestamps, scene names, log types, and stack traces to a specified log file.)</p></li>
-</ul>
-</section>
-<section id="login-unity">
-<h3>Login.unity</h3>
-<ul class="simple">
-<li><p><strong>UserManager.cs</strong> (manages user records and device configurations in Firebase, allowing creation of new users and updating existing ones based on unique identifiers.)</p></li>
-</ul>
-</section>
-<section id="maingame-unity">
-<h3>MainGame.unity</h3>
-<ul class="simple">
-<li><p><strong>AppModeControler.cs</strong> (defines a ModeControler class within the CompasXR.AppSettings namespace that manages two enums, VisulizationMode and TouchMode, to control visualization modes and touch interaction modes in an application.)</p></li>
-<li><p><strong>ApplicationSettings.cs</strong> (defines a ApplicationSettings class within the CompasXR.AppSettings namespace, which includes properties for managing the project name, storage folder path, and a boolean for z-to-y axis remapping configuration in an application.)</p></li>
-<li><p><strong>CheckFirebase.cs</strong> (defines a CheckFirebase class within the CompasXR.Database.FirebaseManagement namespace, which checks and initializes Firebase on the Start method, and triggers an event to confirm successful initialization or logs an error if it fails.)</p></li>
-<li><p><strong>CoreData.cs</strong> (defines several classes within the CompasXR.Core.Data namespace, handling data structures, data conversion, and deserialization. The classes represent parts of a building assembly, including nodes, parts, frames, attributes, building plans, steps, data, and user information.)</p></li>
-<li><p><strong>DatabaseManager.cs</strong> (manages a Unity application’s integration with Firebase Realtime Database and Storage, handling data synchronization, event-driven updates, and deserialization of complex data structures for a construction planning and tracking system.)</p></li>
-<li><p><strong>Eventmanager.cs</strong> (orchestrates the setup, initialization, and event-driven interactions between various components and Firebase services within the CompasXR Unity application.)</p></li>
-<li><p><strong>Extentions.cs</strong> (extends Unity engine functionality with methods for scene management, object finding, value remapping, UI interaction checks, data type printing, camera-facing behavior, and object position storage in the CompasXR.Core.Extentions namespace.)</p></li>
-<li><p><strong>FirebaseManager.cs</strong> (implements a sealed singleton class using the Singleton Pattern to manage Firebase configuration settings such as appId, apiKey, databaseUrl, storageBucket, and projectId, with initialization based on the current operating system detected by OperatingSystemManager.GetCurrentOS().)</p></li>
-<li><p><strong>InstantiateObjects.cs</strong> (manages the AR space instantiation and control of objects based on building plan data, handling object visualization, user indicators, and interaction with materials and textures.)</p></li>
-<li><p><strong>MQTTDataCompasXR.cs</strong> (define classes and data structures for managing MQTT communication, service states, and custom message formats within the Compas XR system, ensuring standardized messaging and service management across robotic applications.)</p></li>
-<li><p><strong>MqttTrajectoryManager.cs</strong> (implements an MQTT client in Unity for managing robot trajectory requests and approvals, featuring message handling, connection management, and UI interactions.)</p></li>
-<li><p><strong>ObjectTransformations.cs</strong> ( provides static methods for converting object positions and rotations between Unity and Rhino coordinate systems, utilizing various rotation and transformation algorithms.)</p></li>
-<li><p><strong>OperatingSystemManager.cs</strong> (identifies and logs the current operating system (Android, iOS, or Unknown) based on the Unity platform, providing a static method to retrieve this information.)</p></li>
-<li><p><strong>QRLocalization.cs</strong> (manages the real-time localization of objects in a scene based on QR code data, updating their positions and rotations dynamically.)</p></li>
-<li><p><strong>RosConnectionManager.cs</strong> ( handles the connection to a ROSBridge server, manages connection status, and updates UI elements based on communication toggle state in the CompasXR Application.)</p></li>
-<li><p><strong>ScrollSearchManager.cs</strong> (manages scrollable UI functionality for searching and interacting with elements, including dynamic cell creation, scrolling control, and object coloring based on user selection in the CompasXR Application.)</p></li>
-<li><p><strong>TrajectoryVisualizer.cs</strong> (namespace manages robot visualization and interaction in Unity, facilitating tasks such as setting up robots in the scene, instantiating trajectories, configuring robot configurations from dictionaries, and attaching elements to end effectors based on received data.)</p></li>
-<li><p><strong>UIFunctionalities.cs</strong> (manages various UI elements and functionalities, including primary UI controls, visualizer menus, additional menu functionalities, and communication settings such as MQTT and ROS connections.)</p></li>
-</ul>
-</section>
-</section>
 </section>
 
 
@@ -623,25 +572,6 @@ document.write(`
             </div>
             
             
-              
-                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
-
-  <div class="sidebar-secondary-item">
-  <div class="page-toc tocsection onthispage">
-    <i class="fa-solid fa-list"></i> On this page
-  </div>
-  <nav class="bd-toc-nav page-toc">
-    <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#compas-xr-python-library-for-cad-functionalities">COMPAS XR - Python Library for CAD Functionalities</a><ul class="visible nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#initialize-unity">Initialize.unity</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#login-unity">Login.unity</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#maingame-unity">MainGame.unity</a></li>
-</ul>
-</li>
-</ul>
-  </nav></div>
-
-</div></div>
               
             
           </div>

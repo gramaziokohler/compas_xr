@@ -171,16 +171,16 @@
                     </li>
                 
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../../examples.html">
-                        Examples
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="../../api.html">
+                        API Reference
                       </a>
                     </li>
                 
 
-                    <li class="nav-item current active">
-                      <a class="nav-link nav-internal" href="../../api.html">
-                        API Reference
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../license.html">
+                        License
                       </a>
                     </li>
                 
@@ -190,13 +190,6 @@
                 </button>
                 <div class="dropdown-menu">
                     
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../../license.html">
-                        License
-                      </a>
-                    </li>
-                
-
                     <li class="nav-item">
                       <a class="nav-link nav-internal" href="../../citing.html">
                         Citing
@@ -366,16 +359,16 @@ document.write(`
                     </li>
                 
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../../examples.html">
-                        Examples
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="../../api.html">
+                        API Reference
                       </a>
                     </li>
                 
 
-                    <li class="nav-item current active">
-                      <a class="nav-link nav-internal" href="../../api.html">
-                        API Reference
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../license.html">
+                        License
                       </a>
                     </li>
                 
@@ -385,13 +378,6 @@ document.write(`
                 </button>
                 <div class="dropdown-menu">
                     
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../../license.html">
-                        License
-                      </a>
-                    </li>
-                
-
                     <li class="nav-item">
                       <a class="nav-link nav-internal" href="../../citing.html">
                         Citing
@@ -494,9 +480,16 @@ document.write(`
 <li class="toctree-l1"><a class="reference internal" href="../../index.html">Introduction</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../userguide.html">User Guide</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../examples.html">Examples</a></li>
 <li class="toctree-l1 current active has-children"><a class="reference internal" href="../../api.html">API Reference</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
-<li class="toctree-l2 current active"><a class="reference internal" href="../compas_xr.html">compas_xr</a></li>
+<li class="toctree-l2 current active has-children"><a class="reference internal" href="../compas_xr.html">COMPAS XR</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../compas_xr.ghpython.html">compas_xr.ghpython</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../compas_xr.mqtt.html">compas_xr.mqtt</a></li>
+<li class="toctree-l3 current active"><a class="reference internal" href="../compas_xr.project.html">compas_xr.project</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../compas_xr.realtime_database.html">compas_xr.realtime_database</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../compas_xr.storage.html">compas_xr.storage</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../compas_xr_unity.html">COMPAS XR Unity</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../license.html">License</a></li>
@@ -576,17 +569,17 @@ document.write(`
 <h1>AssemblyExtensions</h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="compas_xr.project.AssemblyExtensions">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compas_xr.project.</span></span><span class="sig-name descname"><span class="pre">AssemblyExtensions</span></span><a class="reference external" href="https://github.com/gramaziokohler/compas_xr/blob/86c522e/src/compas_xr/project/assembly_extensions.py#L13"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compas_xr.project.</span></span><span class="sig-name descname"><span class="pre">AssemblyExtensions</span></span><a class="reference external" href="https://github.com/gramaziokohler/compas_xr/blob/0a9b9d6/src/compas_xr/project/assembly_extensions.py#L13"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
-<p>AssemblyExtensions is a class for extending the functionality of the compas.datastructures.Assembly class.</p>
+<p>AssemblyExtensions is a class for extending the functionality of the <a class="reference external" href="https://compas.dev/compas/latest/api/compas.datastructures.Assembly.html#compas.datastructures.Assembly" title="(in COMPAS vlatest)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Assembly</span></code></a> class.</p>
 <p>The AssemblyExtensions class provides additional functionalities such as exporting parts as .obj files
-and creating a frame assembly from a list of compas.geometry.Frames with a specific data structure
+and creating a frame assembly from a list of <a class="reference external" href="https://compas.dev/compas/latest/api/generated/compas.geometry.Frame.html" title="(in COMPAS vlatest)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Frame</span></code></a> with a specific data structure
 for localization information.</p>
 <p class="rubric">Methods</p>
 <table class="autosummary longtable table autosummary">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="compas_xr.project.AssemblyExtensions.create_qr_assembly.html#compas_xr.project.AssemblyExtensions.create_qr_assembly" title="compas_xr.project.AssemblyExtensions.create_qr_assembly"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_qr_assembly</span></code></a></p></td>
-<td><p>Create a frame assembly from a list of compas.geometry.Frames with a specific data structure for localization.</p></td>
+<td><p>Create a frame assembly from a list of <a class="reference external" href="https://compas.dev/compas/latest/api/generated/compas.geometry.Frame.html" title="(in COMPAS vlatest)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Frame</span></code></a> with a specific data structure for localization.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="compas_xr.project.AssemblyExtensions.export_mesh_assembly_objs.html#compas_xr.project.AssemblyExtensions.export_mesh_assembly_objs" title="compas_xr.project.AssemblyExtensions.export_mesh_assembly_objs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">export_mesh_assembly_objs</span></code></a></p></td>
 <td><p>Export Mesh assembly parts as .obj files to a folder path.</p></td>

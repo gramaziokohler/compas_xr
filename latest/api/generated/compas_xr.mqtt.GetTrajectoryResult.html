@@ -171,16 +171,16 @@
                     </li>
                 
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../../examples.html">
-                        Examples
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="../../api.html">
+                        API Reference
                       </a>
                     </li>
                 
 
-                    <li class="nav-item current active">
-                      <a class="nav-link nav-internal" href="../../api.html">
-                        API Reference
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../license.html">
+                        License
                       </a>
                     </li>
                 
@@ -190,13 +190,6 @@
                 </button>
                 <div class="dropdown-menu">
                     
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../../license.html">
-                        License
-                      </a>
-                    </li>
-                
-
                     <li class="nav-item">
                       <a class="nav-link nav-internal" href="../../citing.html">
                         Citing
@@ -366,16 +359,16 @@ document.write(`
                     </li>
                 
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../../examples.html">
-                        Examples
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="../../api.html">
+                        API Reference
                       </a>
                     </li>
                 
 
-                    <li class="nav-item current active">
-                      <a class="nav-link nav-internal" href="../../api.html">
-                        API Reference
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../license.html">
+                        License
                       </a>
                     </li>
                 
@@ -385,13 +378,6 @@ document.write(`
                 </button>
                 <div class="dropdown-menu">
                     
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../../license.html">
-                        License
-                      </a>
-                    </li>
-                
-
                     <li class="nav-item">
                       <a class="nav-link nav-internal" href="../../citing.html">
                         Citing
@@ -494,9 +480,16 @@ document.write(`
 <li class="toctree-l1"><a class="reference internal" href="../../index.html">Introduction</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../userguide.html">User Guide</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../examples.html">Examples</a></li>
 <li class="toctree-l1 current active has-children"><a class="reference internal" href="../../api.html">API Reference</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
-<li class="toctree-l2 current active"><a class="reference internal" href="../compas_xr.html">compas_xr</a></li>
+<li class="toctree-l2 current active has-children"><a class="reference internal" href="../compas_xr.html">COMPAS XR</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../compas_xr.ghpython.html">compas_xr.ghpython</a></li>
+<li class="toctree-l3 current active"><a class="reference internal" href="../compas_xr.mqtt.html">compas_xr.mqtt</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../compas_xr.project.html">compas_xr.project</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../compas_xr.realtime_database.html">compas_xr.realtime_database</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../compas_xr.storage.html">compas_xr.storage</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../compas_xr_unity.html">COMPAS XR Unity</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../license.html">License</a></li>
@@ -576,7 +569,7 @@ document.write(`
 <h1>GetTrajectoryResult</h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="compas_xr.mqtt.GetTrajectoryResult">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compas_xr.mqtt.</span></span><span class="sig-name descname"><span class="pre">GetTrajectoryResult</span></span><a class="reference external" href="https://github.com/gramaziokohler/compas_xr/blob/86c522e/src/compas_xr/mqtt/messages.py#L234"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compas_xr.mqtt.</span></span><span class="sig-name descname"><span class="pre">GetTrajectoryResult</span></span><a class="reference external" href="https://github.com/gramaziokohler/compas_xr/blob/0a9b9d6/src/compas_xr/mqtt/messages.py#L234"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Message</span></code></p>
 <p>The GetTrajectoryResult class represents a response message from the CAD
 to all active devices containing a retrieved trajectory.</p>
@@ -605,7 +598,7 @@ to all active devices containing a retrieved trajectory.</p>
 </dd>
 <dt><strong>robot_base_frame</strong><span class="classifier">compas.geometry.Frame</span></dt><dd><p>The base frame of the robot.</p>
 </dd>
-<dt><strong>trajectory_id</strong><span class="classifier">str</span></dt><dd><p>The ID of the trajectory. Default is “<a href="#id1"><span class="problematic" id="id2">trajectory_id_</span></a>” + str(element_id).</p>
+<dt><strong>trajectory_id</strong><span class="classifier">str</span></dt><dd><p>The ID of the trajectory. Default is <code class="docutils literal notranslate"><span class="pre">&quot;trajectory_id_&quot;</span> <span class="pre">+</span> <span class="pre">str(element_id)</span></code>.</p>
 </dd>
 <dt><strong>trajectory</strong><span class="classifier">dict of joint names and joint values</span></dt><dd><p>The trajectory information computed for the request.</p>
 </dd>
