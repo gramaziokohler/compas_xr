@@ -1,5 +1,4 @@
 class FirebaseConfig(object):
-
     def __init__(self, api_key, auth_domain, database_url, storage_bucket):
         self.api_key = api_key
         self.auth_domain = auth_domain

@@ -1,5 +1,4 @@
 class MqttMessageOptionsXR(object):
-
     def __init__(self, host, project_name, robot_name):
         self.host = host
         self.project_name = project_name

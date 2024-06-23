@@ -1,5 +1,4 @@
 class AppSettings(object):
-
     def __init__(self, project_name, storage_folder=None, z_to_y_remap=None):
         self.project_name = project_name
         self.storage_folder = storage_folder or "None"
