@@ -34,6 +34,67 @@ architectural design and research, seamlessly integrating human-machine interact
 cutting-edge cloud-based solutions and assembly processes.
 
 
+Example Projects
+=================
+
+.. figure:: /_images/example_1.jpg
+   :figclass: figure
+   :class: figure-img img-fluid
+**AR Timber Assembly** |
+Enabling Human-Robot Cooperation for Reconfigurable Timber Assembly
+
+https://robarch2024.org/Collaborative-Augmented-Assembly
+https://huma-labforadvancedtechnologyinarch.github.io/robarch24/
+
+In this workshop, participants explored a cooperative human-robot design-to-assembly
+workflow, creating a complex timber structure that neither could achieve alone. Using
+a digital design tool guided by human input, they modeled the timber assembly, considering
+fabrication constraints, structural stability, and task distribution between humans and
+robots. During assembly, two mobile robots positioned timber members and provided temporary
+support at critical points. Human participants manually closed the reciprocal frames and
+added mechanical connectors. Both shared a digital-physical workspace, with humans receiving
+instructions via a mobile AR interface, utilizing COMPAS XR features.
+
+*Princeton University: Mitterberger, Alexi, Kenny in collaboration with TU Munich: Dörfler, Atanasova, Saral*
+
+
+.. figure:: /_images/example_2.jpg
+   :figclass: figure
+   :class: figure-img img-fluid
+**Cooperative Augmented Assembly** |
+Augmented Reality for On-Site Cooperative Robotic Fabrication
+
+https://www.arc.ed.tum.de/df/teaching/archive/cdf-ss-2023/
+https://drive.google.com/file/d/1sUCggAQAHKByWS5JAix2g8qEch174QuH/view
+https://www.masdfab.arch.ethz.ch/program/studentwork/2022-23-t3-work
+
+
+The interdisciplinary seminar "Computational Design and Digital Fabrication" aims to bridge fundamental
+principles of geometric computation and structural design and use these insights to develop new algorithms
+and tools for robotic fabrication in architecture. At the interface of the disciplines of architecture,
+structural design and engineering, and digital fabrication, students are taught innovative computational
+design solutions for advanced digital construction techniques at various scales.
+
+*TU Munich: Dörfler, Atanasova in collaboration with Princeton University: Mitterberger, Alexi, Kenny*
+
+
+.. figure:: /_images/example_3.jpg
+   :figclass: figure
+   :class: figure-img img-fluid
+**ARC 595** | Embodied Computation
+
+https://huma-labforadvancedtechnologyinarch.github.io/ARC596_Embodied-Computatio
+
+The seminar Embodied Computation at Princeton University delves into the intersection of architecture and
+computation, focusing on augmented design and fabrication processes. The course is based on lectures and
+practical programming exercises in which students learn concepts and methods of computer-aided design,
+augmented reality (AR) and digital fabrication. The students learn new programming skills to develop augmented
+reality applications for architects to support adaptive and interactive design and fabrication methodologies.
+
+*Princeton University: Mitterberger*
+
+
+
 Table of Contents
 =================
 
@@ -43,11 +104,11 @@ Table of Contents
 
    Introduction <self>
    installation
-   tutorial
+   userguide
    examples
    api
    license
-
+   citing
 
 Indices and tables
 ==================
