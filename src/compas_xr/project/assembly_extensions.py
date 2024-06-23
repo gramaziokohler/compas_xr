@@ -102,15 +102,12 @@ class AssemblyExtensions(object):
                 part_frame = Frame.worldXY()
 
             # TODO: This is weird, but I can't transform a Part object, so I need to check if it's a Part or a Mesh
+            transformation = Transformation.from_frame_to_frame(part_frame, frame)
             if isinstance(part, Part):
-                part_transformed = part.attributes["shape"].transformed(
-                    Transformation.from_frame_to_frame(part_frame, frame)
-                )
+                part_transformed = part.attributes["shape"].transformed(transformation)
             else:
-                part_transformed = part.transformed(Transformation.from_frame_to_frame(part_frame, frame))
+                part_transformed = part.transformed(transformation)
 
-            if not os.path.exists(target_folder_path):
-                raise Exception("File path does not exist {}".format(target_folder_path))
             filename = "{}.obj".format(str(part.key))
             part_transformed.to_obj(os.path.join(target_folder_path, filename))
 
