@@ -57,7 +57,7 @@ class ProjectManager(object):
 
     def create_project_data_from_compas(self, assembly, building_plan, qr_frames_list):
         """
-        Formats data structure from Compas Class Objects.
+        Formats data structure from COMPAS Class Objects.
 
         Parameters
         ----------
@@ -113,7 +113,7 @@ class ProjectManager(object):
 
     def upload_project_data_from_compas(self, project_name, assembly, building_plan, qr_frames_list):
         """
-        Formats data structure from Compas Class Objects and uploads them to the RealtimeDatabase under project name.
+        Formats data structure from COMPAS Class Objects and uploads them to the RealtimeDatabase under project name.
 
         Parameters
         ----------
