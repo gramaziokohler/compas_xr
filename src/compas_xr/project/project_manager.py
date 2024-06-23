@@ -321,6 +321,9 @@ class ProjectManager(object):
             current_state_data.pop("LastBuiltIndex")
         else:
             last_built_index = None
+        if "PriorityTreeDictionary" in current_state_data:
+            current_state_data.pop("PriorityTreeDictionary")
+
 
         if "PriorityTreeDictionary" in current_state_data:
             current_state_data.pop("PriorityTreeDictionary")
@@ -395,6 +398,9 @@ class ProjectManager(object):
             current_state_data.pop("LastBuiltIndex")
         else:
             last_built_index = None
+        if "PriorityTreeDictionary" in current_state_data:
+            current_state_data.pop("PriorityTreeDictionary")
+
 
         if "PriorityTreeDictionary" in current_state_data:
             current_state_data.pop("PriorityTreeDictionary")
