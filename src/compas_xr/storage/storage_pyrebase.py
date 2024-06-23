@@ -1,6 +1,6 @@
+import io
 import json
 import os
-import io
 
 import pyrebase
 from compas.data import json_dumps

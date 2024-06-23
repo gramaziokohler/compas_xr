@@ -7,11 +7,10 @@ COMPAS EVE v0.3.4
 """
 
 import threading
-import scriptcontext as sc
 
+import scriptcontext as sc
 from compas_eve.ghpython import BackgroundWorker
 from ghpythonlib.componentbase import executingcomponent as component
-
 
 DEBUG = False
 
