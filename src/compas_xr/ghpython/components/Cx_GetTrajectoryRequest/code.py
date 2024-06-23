@@ -6,30 +6,23 @@ A custom Compas Eve MQTT Subscriber component for receiving planning requests fr
 COMPAS XR v0.1.0
 """
 
-from ghpythonlib.componentbase import executingcomponent as component
-import functools
-import Grasshopper, GhPython
-import System
-import Rhino
-import rhinoscriptsyntax as rs
-import scriptcontext as sc
-import time
 import threading
 
-from compas.data import json_dump
-from compas_eve import Message
-from compas_eve import Topic
+import scriptcontext as sc
 from compas_eve import Subscriber
-from compas_eve.mqtt import MqttTransport
+from compas_eve import Topic
 from compas_eve.ghpython import BackgroundWorker
+from compas_eve.mqtt import MqttTransport
+from ghpythonlib.componentbase import executingcomponent as component
+
 from compas_xr.mqtt import GetTrajectoryRequest
 
 
 def start_server(worker, options):
-    topic_name_request = 'compas_xr/get_trajectory_request/' + options.project_name
+    topic_name_request = "compas_xr/get_trajectory_request/" + options.project_name
 
     worker.count = 0
-    
+
     def get_trajectory_requested(request_message):
         worker.count += 1
         worker.display_message("Request #{} started".format(worker.count))
@@ -40,6 +33,7 @@ def start_server(worker, options):
     worker.subscriber = Subscriber(topic, callback=get_trajectory_requested, transport=tx)
     worker.subscriber.subscribe()
     worker.display_message("Subscribed")
+
 
 def stop_server(worker):
     if hasattr(worker, "subscriber"):
@@ -53,7 +47,9 @@ class BackgroundTaskComponent(component):
             BackgroundWorker.stop_instance_by_component(ghenv)  # noqa: F821
             return None
 
-        self.worker = BackgroundWorker.instance_by_component(ghenv, start_server, dispose_function=stop_server, force_new=reset, auto_set_done=False, args=(options,))  # noqa: F821
+        self.worker = BackgroundWorker.instance_by_component(
+            ghenv, start_server, dispose_function=stop_server, force_new=reset, auto_set_done=False, args=(options,)
+        )  # noqa: F821
 
         if not self.worker.is_working() and not self.worker.is_done() and reset:
             self.worker.start_work()
@@ -95,4 +91,3 @@ class BackgroundTaskComponent(component):
             return element_id, robot_name
         else:
             return None, None
-

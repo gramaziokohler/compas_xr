@@ -21,6 +21,6 @@ MQTT Messages
 
 """
 
-from .messages import GetTrajectoryRequest, GetTrajectoryResult, ApproveTrajectory, SendTrajectory
+from .messages import ApproveTrajectory, GetTrajectoryRequest, GetTrajectoryResult, SendTrajectory
 
 __all__ = ["GetTrajectoryRequest", "GetTrajectoryResult", "ApproveTrajectory", "SendTrajectory"]

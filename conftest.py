@@ -1,8 +1,10 @@
-import pytest
-import compas
-import compas_xr
 import math
+
+import compas
 import numpy
+import pytest
+
+import compas_xr
 
 
 def pytest_ignore_collect(collection_path):

@@ -6,19 +6,14 @@ A custom Compas Eve MQTT Publisher component for publishing the planning result 
 COMPAS XR v0.1.0
 """
 
-from ghpythonlib.componentbase import executingcomponent as component
-import time
-import Grasshopper, GhPython
-import System
-import Rhino
-import rhinoscriptsyntax as rs
 
-from compas_eve import Message
-from compas_eve import Topic
 from compas_eve import Publisher
+from compas_eve import Topic
 from compas_eve.mqtt import MqttTransport
+from ghpythonlib.componentbase import executingcomponent as component
 
 from compas_xr.mqtt import GetTrajectoryResult
+
 
 class PlanningServiceResponseComponent(component):
     

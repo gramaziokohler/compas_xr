@@ -21,7 +21,6 @@ from __future__ import print_function
 
 import os
 
-
 __author__ = ["Joseph Kenny"]
 __copyright__ = "ETH Zurich, Princeton University"
 __license__ = "MIT License"

@@ -1,5 +1,5 @@
-from compas_timber.planning import SimpleSequenceGenerator
 from compas_timber.planning import BuildingPlan
+from compas_timber.planning import SimpleSequenceGenerator
 from compas_timber.planning import Step
 
 
