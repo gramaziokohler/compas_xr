@@ -6,6 +6,8 @@ A custom Compas Eve MQTT Subscriber component for receiving exacution requests f
 COMPAS XR v0.1.0
 """
 
+import threading
+
 import scriptcontext as sc
 from compas_eve import Subscriber
 from compas_eve import Topic
@@ -46,8 +48,8 @@ class BackgroundTaskComponent(component):
             return None
 
         self.worker = BackgroundWorker.instance_by_component(
-            ghenv, start_server, dispose_function=stop_server, force_new=reset, auto_set_done=False, args=(options,)
-        )  # noqa: F821
+            ghenv, start_server, dispose_function=stop_server, force_new=reset, auto_set_done=False, args=(options,)  # noqa: F821
+        )
 
         if not self.worker.is_working() and not self.worker.is_done() and reset:
             self.worker.start_work()

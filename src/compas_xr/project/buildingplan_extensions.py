@@ -57,7 +57,7 @@ class BuildingPlanExtensions(object):
                         break
 
         return building_plan
-    
+
     def create_buildingplan_from_with_custom_sequence(self, assembly, sequenced_keys, data_type, robot_keys, priority_keys_lists):
         """
         Create a compas_timber.planning.BuildingPlan based on the sequence of the assembly parts.
@@ -83,13 +83,13 @@ class BuildingPlanExtensions(object):
         """
         data_type_list = ["0.Cylinder", "1.Box", "2.ObjFile"]
         graph_data = assembly.graph.__data__
-        node_data = graph_data['node']
+        node_data = graph_data["node"]
         building_plan = BuildingPlan()
 
         for key in sequenced_keys:
             step = Step(key)
             # TODO: This is dumb, but the element_ids are generated incorrectly so they are overwritten here
-            step.element_ids = [key]            
+            step.element_ids = [key]
             step.geometry = data_type_list[data_type]
             # TODO: These are unused for now, but are expeted on the application side
             step.instructions = ["none"]
