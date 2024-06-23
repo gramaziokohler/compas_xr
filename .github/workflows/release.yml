@@ -1,7 +1,7 @@
 on:
   push:
     tags:
-      - 'v*'
+      - "v*"
 
 name: Create Release
 
@@ -11,7 +11,7 @@ jobs:
     strategy:
       matrix:
         os: [macos-latest, windows-latest, ubuntu-latest]
-        python: ['3.10', '3.11']
+        python: ["3.10", "3.11"]
 
     steps:
       - uses: compas-dev/compas-actions.build@v4
