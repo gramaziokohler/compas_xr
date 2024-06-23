@@ -2,7 +2,7 @@
 API Reference
 ********************************************************************************
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Compas XR - Python Library for CAD Functionalities
+COMPAS XR - Python Library for CAD Functionalities
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. toctree::
@@ -11,7 +11,7 @@ Compas XR - Python Library for CAD Functionalities
     api/compas_xr
 
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Compas XR Unity - Application & Unity File
+COMPAS XR Unity - Application & Unity File
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 """"""""""""""""

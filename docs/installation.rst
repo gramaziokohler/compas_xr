@@ -58,7 +58,7 @@ After verification of installation you can run the command below to install all 
 ::
     python -m compas_rhino.install
 
-Compas XR Unity - Phone Based AR Application
+COMPAS XR Unity - Phone Based AR Application
 ============================================
 
 This chapter provides a step-by-step guide for installing compas_xr_unity on your device. The use and installation of
