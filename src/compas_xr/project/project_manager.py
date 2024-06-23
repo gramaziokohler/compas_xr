@@ -65,7 +65,7 @@ class ProjectManager(object):
             The assembly in which data will be extracted from.
         building_plan : compas_timber.planning.BuildingPlan
             The BuildingPlan in which data will be extracted from.
-        qr_frames_list : list of compas.geometry.Frame
+        qr_frames_list : list of :class:`compas.geometry.Frame`
             List of frames at specific locations for application localization data.
 
         Returns
@@ -121,7 +121,7 @@ class ProjectManager(object):
             The assembly in which data will be extracted from.
         building_plan : compas_timber.planning.BuildingPlan
             The BuildingPlan in which data will be extracted from.
-        qr_frames_list : list of compas.geometry.Frame
+        qr_frames_list : list of :class:`compas.geometry.Frame`
             List of frames at specific locations for application localization data.
         project_name : str
             The name of the project under which the data will be stored.
@@ -140,7 +140,7 @@ class ProjectManager(object):
 
         Parameters
         ----------
-        qr_frames_list : list of compas.geometry.Frame
+        qr_frames_list : list of :class:`compas.geometry.Frame`
             List of frames at specific locations for application localization data.
         project_name : str
             The name of the project under which the data will be stored.
