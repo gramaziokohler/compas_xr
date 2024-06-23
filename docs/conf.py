@@ -7,7 +7,7 @@ import sphinx_compas2_theme
 # -- General configuration ------------------------------------------------
 
 project = "COMPAS XR"
-copyright = "Gramazio Kohler Research"
+copyright = "ETH Zurich, Princeton University"
 author = "Joseph Kenny"
 organization = "gramaziokohler"
 package = "compas_xr"
