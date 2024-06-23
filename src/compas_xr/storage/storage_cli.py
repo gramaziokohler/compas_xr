@@ -25,9 +25,7 @@ clr.AddReference("Firebase.Auth.dll")
 clr.AddReference("Firebase.dll")
 clr.AddReference("Firebase.Storage.dll")
 
-from Firebase.Auth import FirebaseAuthClient
-from Firebase.Auth import FirebaseAuthConfig
-from Firebase.Storage import FirebaseStorage
+from Firebase.Storage import FirebaseStorage  # noqa: E402
 
 
 class Storage(StorageInterface):
@@ -94,13 +92,12 @@ class Storage(StorageInterface):
         It also checks if the data is None or == null (firebase return if no data)
         """
         try:
-            get = urlopen(url).read()
+            file_content = urlopen(url).read()
+        except Exception as e:
+            raise Exception("Unable to get file from url {}. Error={}".format(url, str(e)))
 
-        except:
-            raise Exception("unable to get file from url {}".format(url))
-
-        if get is not None and get != "null":
-            return get
+        if file_content is not None and file_content != "null":
+            return file_content
 
         else:
             raise Exception("unable to get file from url {}".format(url))

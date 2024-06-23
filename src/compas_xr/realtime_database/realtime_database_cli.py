@@ -23,10 +23,8 @@ clr.AddReference("Firebase.dll")
 clr.AddReference("LiteDB.dll")
 clr.AddReference("System.Reactive.dll")
 
-from Firebase.Auth import FirebaseAuthClient
-from Firebase.Auth import FirebaseAuthConfig
-from Firebase.Database import FirebaseClient
-from Firebase.Database.Query import QueryExtensions
+from Firebase.Database import FirebaseClient  # noqa: E402
+from Firebase.Database.Query import QueryExtensions  # noqa: E402
 
 
 class RealtimeDatabase(RealtimeDatabaseInterface):
@@ -96,11 +94,12 @@ class RealtimeDatabase(RealtimeDatabaseInterface):
         It also checks if the data is None or == null (firebase return if no data)
         """
         try:
-            get = urlopen(url).read()
-        except:
-            raise Exception("unable to get file from url {}".format(url))
-        if get is not None and get != "null":
-            return get
+            file_content = urlopen(url).read()
+        except Exception as e:
+            raise Exception("Unable to get file from url {}. Error={}".format(url, str(e)))
+
+        if file_content is not None and file_content != "null":
+            return file_content
         else:
             raise Exception("unable to get file from url {}".format(url))
 

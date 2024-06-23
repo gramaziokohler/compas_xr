@@ -10,9 +10,7 @@ class FirebaseConfig(object):
         return str(self)
 
     def __str__(self):
-        return "FirebaseConfig, api_key={}, auth_domain={}, database_url={}, storage_bucket={}".format(
-            self.api_key, self.auth_domain, self.database_url, self.storage_bucket
-        )
+        return "FirebaseConfig, api_key={}, auth_domain={}, database_url={}, storage_bucket={}".format(self.api_key, self.auth_domain, self.database_url, self.storage_bucket)
 
     def __data__(self):
         return {

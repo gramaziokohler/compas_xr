@@ -67,8 +67,8 @@ class Storage(StorageInterface):
         """
         try:
             file_content = urlopen(url).read().decode()
-        except:
-            raise Exception("unable to get file from url {}".format(url))
+        except Exception as e:
+            raise Exception("Unable to get file from url {}. Error={}".format(url, str(e)))
 
         if file_content is not None and file_content != "null":
             return file_content

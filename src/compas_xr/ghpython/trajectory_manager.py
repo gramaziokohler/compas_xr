@@ -1,6 +1,3 @@
-from compas_robots import Configuration
-
-
 class TrajectoryResultManager(object):
     trajectory = None
     requested_element_id = None
@@ -10,9 +7,7 @@ class TrajectoryResultManager(object):
         return str(self)
 
     def __str__(self):
-        return "Planning result for element {} with {} points".format(
-            self.requested_element_id, len(self.trajectory.points)
-        )
+        return "Planning result for element {} with {} points".format(self.requested_element_id, len(self.trajectory.points))
 
     def format_trajectory(self, trajectory, robot_name):
         configs_dicts = []

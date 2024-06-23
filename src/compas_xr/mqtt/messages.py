@@ -103,9 +103,7 @@ class Header(Message):
     _shared_response_id_counter = None
     _device_id = None
 
-    def __init__(
-        self, increment_response_ID=False, sequence_id=None, response_id=None, device_id=None, time_stamp=None
-    ):
+    def __init__(self, increment_response_ID=False, sequence_id=None, response_id=None, device_id=None, time_stamp=None):
         super(Header, self).__init__()
         self["sequence_id"] = sequence_id or self._ensure_sequence_id()
         self["response_id"] = response_id or self._ensure_response_id(increment_response_ID)
