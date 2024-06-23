@@ -322,6 +322,9 @@ class ProjectManager(object):
         else:
             last_built_index = None
 
+        if "PriorityTreeDictionary" in current_state_data:
+            current_state_data.pop("PriorityTreeDictionary")
+
         building_plan = BuildingPlan.__from_data__(current_state_data)
         for step in building_plan.steps:
             step_data = step["data"]
@@ -393,6 +396,9 @@ class ProjectManager(object):
         else:
             last_built_index = None
 
+        if "PriorityTreeDictionary" in current_state_data:
+            current_state_data.pop("PriorityTreeDictionary")
+
         building_plan = BuildingPlan.__from_data__(current_state_data)
         for step in building_plan.steps:
             step_data = step["data"]
@@ -402,17 +408,19 @@ class ProjectManager(object):
             step = Step.__from_data__(step["data"])
             step_locations.append(Frame.__from_data__(step.location))
             assembly_element_id = step.element_ids[0]
-            part = nodes[assembly_element_id]["part"]
-            print(part)
+            part = nodes[str(assembly_element_id)]["part"]
+
             if step.actor == "HUMAN":
                 # TODO: I am not sure if this works in all scenarios of Part
                 if step.is_built:
                     built_human.append(part)
                 else:
                     unbuilt_human.append(part)
-            else:
+            elif step.actor == "ROBOT":
                 if step.is_built:
                     built_robot.append(part)
                 else:
                     unbuilt_robot.append(part)
+            else:
+                raise Exception("Part actor is Unknown!")
         return last_built_index, step_locations, built_human, unbuilt_human, built_robot, unbuilt_robot
