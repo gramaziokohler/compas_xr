@@ -1343,7 +1343,7 @@ detail in the Main Game User Interface section of the documentation.
 Main Game User Interface
 ------------------------
 
-The user interface and interaction methods of `compas_xr` can be directly subdivided into 3 categories.
+The user interface and interaction methods of ``compas_xr`` can be directly subdivided into 3 categories.
 Although these methods are directly correlated to the UI layout of the interaction process are also provided
 via these three properties.
 

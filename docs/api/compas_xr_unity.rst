@@ -3,7 +3,7 @@
 COMPAS XR Unity
 ^^^^^^^^^^^^^^^
 
-The COMPAS XR Unity package contains an application & Unity file that work together with the `compas_xr` Python library.
+The COMPAS XR Unity package contains an application & Unity file that work together with the ``compas_xr`` Python library.
 
 """"""""""""""""
 Initialize.unity
