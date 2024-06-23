@@ -29,6 +29,7 @@ For utilizing the COMPAS XR package for your project, follow these 7 steps:
 
 
 .. _assembly-definition:
+
 ===========================
 Step 1: Assembly Definition
 ===========================
@@ -49,34 +50,38 @@ Here are some key aspects of constructing assemblies in COMPAS for COMPAS XR Vis
 should come from each user depending on the assembly in which they would like to visualize and construct.
 
 Only Assemblies of the Geometry types listed below are acceptable for visualization and assembly:
-::
-    #COMPAS Geometries that can be used to create assemblies
+
+.. code-block:: python
+
+    # COMPAS Geometries that can be used to create assemblies
     compas.geometry.Box
     compas.geometry.Cylinder
 
-    #COMPAS Assemblies that Require .obj export for COMPAS XR Visualization
+    # COMPAS Assemblies that Require .obj export for COMPAS XR Visualization
     compas_timber.assembly.TimberAssemblies
     compas.datastructures.Mesh
 
 Only assemblies constructed with the processes below allow visualization in COMPAS XR Unity App:
-::
+
+.. code-block:: python
+
     # Import the Assembly, Part, and Mesh classes from the compas.datastructures
     from compas.datastructures import Assembly, Part, Mesh
 
     # Import the Box and Cylinder classes from the compas.geometry module
     from compas.geometry import Box, Cylinder
 
-    #For Geometry Assemblies acceptable add part methods
+    # For Geometry Assemblies acceptable add part methods
     box_assembly.add_part (box)
     box_assembly.add_part(box, frame=frame)
     cylinder_assembly.add_part(cylinder)
     cylinder_assembly.add_part(cylinder, frame=frame)
 
-    #For Custom Meshes, meshes must be added as type Part
+    # For Custom Meshes, meshes must be added as type Part
     part = Part(frame= frame, shape = mesh)
     part_assembly.add_part(part)
 
-    #For all Box, Cylinder, or Mesh Assemblies made of class type Part
+    # For all Box, Cylinder, or Mesh Assemblies made of class type Part
     part = Part(name=..., frame=..., shape= GEO)
     part = Part(frame=..., shape = GEO)
     part_assembly.add_part(part)
@@ -85,6 +90,7 @@ Only assemblies constructed with the processes below allow visualization in COMP
 defined in any other Unit, it will result in incorrectly scaled visualization on the application side.
 
 .. _database-initialization:
+
 ===============================
 Step 2: Database Initialization
 ===============================
@@ -144,7 +150,7 @@ a wide range of tools and services that help developers build high-quality apps 
    :figclass: figure
    :class: figure-img img-fluid
 
-   .. figure:: /_images/firebase_9.png
+.. figure:: /_images/firebase_9.png
    :figclass: figure
    :class: figure-img img-fluid
 
@@ -245,6 +251,7 @@ as a `.json` file type.
 - The end point for Firebase Cloud storage file uploads.
 
 .. _data-creation:
+
 =====================
 Step 3: Data Creation
 =====================
@@ -268,7 +275,9 @@ Building Plan data contains the order of steps for assembly with additional info
 building plan directly from an assembly sequence provided through the COMPAS XR library and is demonstrated in the
 example below. However the **Building Plan** and **COMPAS XR Unity** provide flexibility to create building steps from assembly
 parts in any sequence order as long as all steps have the complete information as seen above.
-::
+
+.. code-block:: python
+
     # Import the BuildingPlanExtensions class from the compas_xr.project module
     from compas_xr.project import BuildingPlanExtensions
 
@@ -385,6 +394,7 @@ a single project, and will only work with the particular images found at this `l
 exactly **15 cm x 15 cm.**
 
 .. _uploading-visualizing-data:
+
 ======================================
 Step 4: Uploading and Visualizing Data
 ======================================
@@ -414,7 +424,9 @@ Step 4.1: Upload to the Firebase Storage (Assembly Dependent)
 If you are using COMPAS Timber Assemblies or COMPAS Assemblies made of meshes you are required to export and upload meshes
 to FirebaseStorage as .obj files. This can be handled directly through the COMPAS XR python library, and can be handled at
 any point priority to visualization on the application side.
-::
+
+.. code-block:: python
+
     # Import the AssemblyExtensions class from the compas_xr.project module
     from compas_xr.project import AssemblyExtensions
 
@@ -434,7 +446,9 @@ Step 4.2: Upload Project Data to the Realtime Database
 As previously mentioned, project information stored under a specific firebase project name that comes directly from rhino
 upload information consists of QRFrames, Assembly, BuildingPlan, Joints, & Parts. Additionally the library allows
 functionality of uploading all required COMPAS class objects.
-::
+
+.. code-block:: python
+
     # Import Project Manager class from compas_xr
     from compas_xr.project import ProjectManager
 
@@ -454,7 +468,9 @@ Step 4.3: Upload Application Settings
 
 The application settings writer is used as a global constant that is pulled on the user device every time that the
 application is started. Additionally it requires a specific structure, and should be written from `compas_xr library` as follows:
-::
+
+.. code-block:: python
+
     # Import Project Manager class from compas_xr
     from compas_xr.project import ProjectManager
 
@@ -496,7 +512,9 @@ If frames for QR-Codes need to be added to the Realtime Database throughout the 
 helpful in particular assemblies of large scale).  Then it should be handled via the compas_xr library
 functionalities listed below, as the order and data structure of uploading localization information to
 the database is particular.
-::
+
+.. code-block:: python
+
     # Import Project Manager class from compas_xr
     from compas_xr.project import ProjectManager
 
@@ -506,9 +524,9 @@ the database is particular.
     # Call upload QR frames to project method
     pm.upload_qr_frames_to_project(project_name, qr_frames)
 
------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------
 Step 4.5: Reading and Visualizing Firebase Realtime Database Information on CAD (As needed)
------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------
 
 When needed, the Project Data can be read from the Realtime Database and visualized in Grasshopper.
 With a Custom-Preview Component, the output generated can be colored and displayed in Rhino.
@@ -535,7 +553,9 @@ Outputs: last_built_index, step_locations, built_human, unbuilt_human, built_rob
 
 **unbuilt_robot:** list of compas.Geometry
 - A list of elements in the current project data that have not been built by the robot yet.
-::
+
+.. code-block:: python
+
     # Import Project Manager class from compas_xr
     from compas_xr.project import ProjectManager
 
@@ -550,6 +570,7 @@ Outputs: last_built_index, step_locations, built_human, unbuilt_human, built_rob
 Each time the component is triggered, it will result in the current state of the project data on the firebase.
 
 .. _robotic-assembly-strategy:
+
 ========================================
 Step 5: Define Robotic Assembly Strategy
 ========================================
@@ -585,9 +606,9 @@ by all users and the robotic trajectory can be sent to the Robot.
 **NOTE:** As the messages are uniform across both the Unity C# and Python Classes. Any modifications to the structure will
 require modification in both compas_xr_unity and compas_xr classes.
 
------------------------------
+---------------------------------------
 Step 5.1: Application Request Overview:
------------------------------
+---------------------------------------
 
 There is a set routine that the application follows to successfully review, approve, and execute the trajectory. This routine
 involves several critical steps to ensure accuracy and collaboration between all Users.
@@ -599,8 +620,10 @@ Step 5.1.1: Select Robot
 The application includes a drop down for simple robot selection and visualizatio, offering users the opportunity to evaluate
 different robots for completing the task at hand. Users can browse through various robotic options, each with detailed visual
 representations
-::
-    //COMPAS XR Default Robot List
+
+.. code-block:: csharp
+
+    // COMPAS XR Default Robot List
     RobotURDFList = new List<string> {"UR3", "UR5", "UR10e", "ETHZurichRFL"};
 
 **NOTE:** COMPAS XR currently defines base robot models for the robots listed above. Additionally, it is important to note that
@@ -666,9 +689,9 @@ by the Robot.
    :figclass: figure
    :class: figure-img img-fluid
 
----------------------------
+-------------------------------------
 Step 5.2: CAD SetUp and Requirements:
----------------------------
+-------------------------------------
 
 COMPAS XR does not provide the complete planning routine; however, it offers the necessary messaging services for
 visualizing robotic trajectories in the Augmented Reality space. Below are the required components and steps to
@@ -703,8 +726,10 @@ in order to receive the messages.
 
 **robot_name:** string
 - The name of the robot intended to complete the task.
-::
-    #COMPAS XR Default Robot List
+
+.. code-block:: python
+
+    # COMPAS XR Default Robot List
     robot_list = ["UR3", "UR5", "UR10e", "ETHZurichRFL"]
 
 **NOTE:** COMPAS XR does not include all robot models, and the currently available robot models are listed above.
@@ -739,9 +764,11 @@ If the component is not restarted in the beginning of operation no request will 
 
 Additionally the components will require specific topic creation in order to ensure that the application and CAD are
 only receiving messages intended. The custom topic creation example can be found below
-::
-    #COMPAS XR Get Trajectory Result Topic
-    topic = ‘compas_xr/get_trajectory_request/project_name’
+
+.. code-block:: python
+
+    # COMPAS XR Get Trajectory Result Topic
+    topic = 'compas_xr/get_trajectory_request/project_name'
 
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Step 5.2.3: Get Trajectory Result Publisher
@@ -798,9 +825,11 @@ processed and coordinated, is made available to the application.
 
 Additionally the components will require specific topic creation in order to ensure that the application and CAD
 are only receiving messages intended. The custom topic creation example can be found below
-::
-    #COMPAS XR Get Trajectory Result Topic
-    topic = ‘compas_xr/get_trajectory_result/project_name’
+
+.. code-block:: python
+
+    # COMPAS XR Get Trajectory Result Topic
+    topic = 'compas_xr/get_trajectory_result/project_name'
 
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Step 5.2.4: Send Trajectory Subscriber
@@ -828,9 +857,11 @@ application. If the component is not restarted in the beginning of operation no 
 
 Additionally the components will require specific topic creation in order to ensure that the application and CAD
 are only receiving messages intended. The custom topic creation example can be found below
-::
-    #COMPAS XR Send Trajectory Topic
-    topic = ‘compas_xr/send_trajectory/project_name’
+
+.. code-block:: python
+
+    # COMPAS XR Send Trajectory Topic
+    topic = 'compas_xr/send_trajectory/project_name'
 
 --------------------------------------------------
 Step 5.3: Adding a Custom Robot to the Application
@@ -876,8 +907,10 @@ Step 5.3.1: Reading Robot Description and Unity Game Object Creation.
    :class: figure-img img-fluid
 
 6. It is very important to check the settings... and are listed below:
+
 ::
-    #Unity URDF GameObject Import Settings
+
+    # Unity URDF GameObject Import Settings
 
     Address: ws://localhost:9090 (Basically just telling it to read the container that is running on my computer.
     Protocol: Web Socket Sharp
@@ -918,9 +951,11 @@ and its child game object RobotPrefab.
 3. Navigate to the TrajectoryVisualzier.cs file located in Assets/Scripts/TrajectoryVisualizer.cs of the
 COMPAS XR Unity
 file, and input your robot name into the RobotURDFList.
-::
-    //COMPAS XR Default Robot List
-    RobotURDFList = new List<string> {"UR3", "UR5", "UR10e", "ETHZurichRFL", “MyCustomURDF”};
+
+.. code-block:: csharp
+
+    // COMPAS XR Default Robot List
+    RobotURDFList = new List<string> {"UR3", "UR5", "UR10e", "ETHZurichRFL", "MyCustomURDF"};
 
 4. The URDF should be added to the Default Robots list and available for use in the application at
 runtime upon next build.
@@ -930,6 +965,7 @@ as it is fully dependent on the structure of the URDF. It is very important to t
 the import process. Additionally adding custom robots will require testing to ensure that everything is working properly.
 
 .. _release-procedures:
+
 ==========================
 Step 6: Release Procedures
 ==========================
@@ -1069,12 +1105,16 @@ Most likely it will fail and you will need to do the following fixes:
 **Solution A:** in Terminal
 
 Set the export path for gems as follows:
-::
+
+.. code-block:: bash
+
    export PATH="/Users/username/.gem/ruby/2.6.0/bin:$PATH"
    Install gem active support: gem install activesupport -v 6.1.7.6 --user-install
 
 Install gem active support:
-::
+
+.. code-block:: bash
+
    gem install activesupport -v 6.1.7.6 --user-install
 
 
@@ -1201,6 +1241,7 @@ Download the Build folder from the given link, unzip and install as described ab
 
 
 .. _user-interaction:
+
 ===========================
 Step 7: User Interaction
 ===========================
@@ -1235,8 +1276,8 @@ User Inputs
 **Optional:**
 
 - **MQTT Topic:** If you wish to send the firebase information from grasshopper you will
-need to input the particular topic name in which you would like to subscribe, and start the
-subscription.
+  need to input the particular topic name in which you would like to subscribe, and start the
+  subscription.
 
 **Required:**
 

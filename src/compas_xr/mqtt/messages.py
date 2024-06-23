@@ -213,7 +213,7 @@ class GetTrajectoryRequest(Message):
     robot_name : str
         The name of the robot associated with the trajectory.
     trajectory_id : str
-        The ID of the trajectory. Default is "trajectory_id_" + str(element_id).
+        The ID of the trajectory. Default is ``"trajectory_id_" + str(element_id)``.
     """
 
     def __init__(self, element_id, robot_name, header=None, *args, **kwargs):
@@ -260,7 +260,7 @@ class GetTrajectoryResult(Message):
     robot_base_frame : compas.geometry.Frame
         The base frame of the robot.
     trajectory_id : str
-        The ID of the trajectory. Default is "trajectory_id_" + str(element_id).
+        The ID of the trajectory. Default is ``"trajectory_id_" + str(element_id)``.
     trajectory : dict of joint names and joint values
         The trajectory information computed for the request.
     """
@@ -315,7 +315,7 @@ class ApproveTrajectory(Message):
     robot_name : str
         The name of the robot associated with the trajectory.
     trajectory_id : str
-        The ID of the trajectory. Default is "trajectory_id_" + str(element_id).
+        The ID of the trajectory. Default is ``"trajectory_id_" + str(element_id)``.
     trajectory : dict of joint names and joint values
         The approved trajectory.
     approval_status : int
@@ -365,7 +365,7 @@ class ApprovalCounterRequest(Message):
     element_id : str
         The ID of the element associated with the approval counter.
     trajectory_id : str
-        The ID of the trajectory. Default is "trajectory_id_" + str(element_id).
+        The ID of the trajectory. Default is ``"trajectory_id_" + str(element_id)``.
     """
 
     def __init__(self, element_id, header=None):
@@ -409,7 +409,7 @@ class ApprovalCounterResult(Message):
     element_id : str
         The ID of the element associated with the approval counter.
     trajectory_id : str
-        The ID of the trajectory. Default is "trajectory_id_" + str(element_id).
+        The ID of the trajectory. Default is ``"trajectory_id_" + str(element_id)``.
     """
 
     def __init__(self, element_id, header=None):
@@ -451,7 +451,7 @@ class SendTrajectory(Message):
     robot_name : str
         The name of the robot associated with the trajectory.
     trajectory_id : str
-        The ID of the trajectory. Default is "trajectory_id_" + str(element_id).
+        The ID of the trajectory. Default is ``"trajectory_id_" + str(element_id)``.
     trajectory : dict of joint names and joint values
         The trajectory to be sent.
     """

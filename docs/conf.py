@@ -145,7 +145,7 @@ html_theme_options = {
         "image_dark": "_static/compas_icon_white.png",
         "text": "COMPAS XR",
     },
-    "navigation_depth": 2,
+    "navigation_depth": 3,
 }
 
 html_context = {

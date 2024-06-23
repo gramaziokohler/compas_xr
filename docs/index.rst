@@ -105,7 +105,6 @@ Table of Contents
    Introduction <self>
    installation
    userguide
-   examples
    api
    license
    citing
