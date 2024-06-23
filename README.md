@@ -50,4 +50,4 @@ for more details.
 
 ## Credits
 
-`compas_xr` is currently developed by Gramazio Kohler Research at ETH Zurich and Princeton University. See the [list of authors](https://github.com/gramaziokohler/compas_xr/blob/main/AUTHORS.md) for a complete overview.
+`compas_xr` is currently developed by ETH Zurich (Gramazio Kohler Research) and Princeton University. See the [list of authors](https://github.com/gramaziokohler/compas_xr/blob/main/AUTHORS.md) for a complete overview.
