@@ -1,6 +1,6 @@
 # compas_xr
 
-COMPAS XR facilitates XR workflows to foster the application of XR technologies both in research and teaching.
+COMPAS XR streamlines extended reality workflows to ease the implementation of human-machine collaborative applications in architectural research and educational environments.
 
 
 ## Getting started with this project

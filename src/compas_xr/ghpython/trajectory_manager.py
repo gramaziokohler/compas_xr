@@ -1,5 +1,6 @@
 from compas_robots import Configuration
 
+
 class TrajectoryResultManager(object):
     trajectory = None
     requested_element_id = None
@@ -16,9 +17,9 @@ class TrajectoryResultManager(object):
     def format_trajectory(self, trajectory, robot_name):
         configs_dicts = []
         for point in trajectory.points:
-            if robot_name == "ETHZurichRFL":
-                start_config = trajectory.start_configuration
-                point = start_config.merged(point)
+            # Merge trajectory point with start config to make sure they are all full configurations
+            # In the past, this was hardcoded only for the RFL, but it makes sense to do it for all
+            point = trajectory.start_configuration.merged(point)
             joints_dict = point.joint_dict
             configs_dicts.append(joints_dict)
         return configs_dicts

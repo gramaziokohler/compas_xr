@@ -161,6 +161,7 @@ class StorageInterface(object):
         file_name = os.path.basename(file_path)
         new_path_list = deepcopy(cloud_path_list)
         new_path_list.append(file_name)
+
         storage_reference = self.construct_reference_from_list(new_path_list)
         self.upload_bytes_to_reference_from_local_file(file_path, storage_reference)
 

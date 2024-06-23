@@ -10,7 +10,7 @@ class AppSettings(object):
 
     def __str__(self):
         return "AppSettings, project_name={}, storage_folder={}, z_to_y_remap={}".format(
-            self.project_name, self.storage_folder, self.z_to_y_remap, self.storage_bucket
+            self.project_name, self.storage_folder, self.z_to_y_remap
         )
 
     def __data__(self):

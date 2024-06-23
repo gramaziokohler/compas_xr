@@ -57,15 +57,15 @@ class ProjectManager(object):
 
     def create_project_data_from_compas(self, assembly, building_plan, qr_frames_list):
         """
-        Formats data structure from Compas Class Objects.
+        Formats data structure from COMPAS Class Objects.
 
         Parameters
         ----------
-        assembly : compas.datastructures.Assembly or compas_timber.assembly.TimberAssembly
+        assembly : :class:`compas.datastructures.Assembly` or :class:`compas_timber.assembly.TimberAssembly`
             The assembly in which data will be extracted from.
-        building_plan : compas_timber.planning.BuildingPlan
+        building_plan : :class:`compas_timber.planning.BuildingPlan`
             The BuildingPlan in which data will be extracted from.
-        qr_frames_list : list of compas.geometry.Frame
+        qr_frames_list : list of :class:`compas.geometry.Frame`
             List of frames at specific locations for application localization data.
 
         Returns
@@ -113,15 +113,15 @@ class ProjectManager(object):
 
     def upload_project_data_from_compas(self, project_name, assembly, building_plan, qr_frames_list):
         """
-        Formats data structure from Compas Class Objects and uploads them to the RealtimeDatabase under project name.
+        Formats data structure from COMPAS Class Objects and uploads them to the RealtimeDatabase under project name.
 
         Parameters
         ----------
-        assembly : compas.datastructures.Assembly or compas_timber.assembly.TimberAssembly
+        assembly : :class:`compas.datastructures.Assembly` or :class:`compas_timber.assembly.TimberAssembly`
             The assembly in which data will be extracted from.
-        building_plan : compas_timber.planning.BuildingPlan
+        building_plan : :class:`compas_timber.planning.BuildingPlan`
             The BuildingPlan in which data will be extracted from.
-        qr_frames_list : list of compas.geometry.Frame
+        qr_frames_list : list of :class:`compas.geometry.Frame`
             List of frames at specific locations for application localization data.
         project_name : str
             The name of the project under which the data will be stored.
@@ -140,7 +140,7 @@ class ProjectManager(object):
 
         Parameters
         ----------
-        qr_frames_list : list of compas.geometry.Frame
+        qr_frames_list : list of :class:`compas.geometry.Frame`
             List of frames at specific locations for application localization data.
         project_name : str
             The name of the project under which the data will be stored.
@@ -238,7 +238,7 @@ class ProjectManager(object):
 
         Returns
         -------
-        assembly : compas.datastructures.Assembly or compas_timber.assembly.TimberAssembly
+        assembly : :class:`compas.datastructures.Assembly` or :class:`compas_timber.assembly.TimberAssembly`
             The assembly retrieved from the storage.
 
         """
@@ -282,7 +282,7 @@ class ProjectManager(object):
 
         Parameters
         ----------
-        timber_assembly : compas_timbers.assembly.TimberAssembly
+        timber_assembly : :class:`compas_timbers.assembly.TimberAssembly`
             The assembly in which the project is based off of: Used for part visulization.
         project_name : str
             The name of the project under which the data will be stored.
@@ -291,15 +291,15 @@ class ProjectManager(object):
         -------
         last_built_index : int
             The index of the last built part in the project.
-        step_locations : list of compas.geometry.Frame
+        step_locations : list of :class:`compas.geometry.Frame`
             The locations of the building plan steps.
-        built_human : list of compas_timber.beam.Blank
+        built_human : list of :class:`compas_timber.beam.Blank`
             The parts that have been built by a human.
-        unbuilt_human : list of compas_timber.beam.Blank
+        unbuilt_human : list of :class:`compas_timber.beam.Blank`
             The parts that have not been built by a human.
-        built_robot : list of compas_timber.beam.Blank
+        built_robot : list of :class:`compas_timber.beam.Blank`
             The parts that have been built by a robot.
-        unbuilt_robot : list of compas_timber.beam.Blank
+        unbuilt_robot : list of :class:`compas_timber.beam.Blank`
             The parts that have not been built by a robot.
 
         """
@@ -324,6 +324,9 @@ class ProjectManager(object):
         if "PriorityTreeDictionary" in current_state_data:
             current_state_data.pop("PriorityTreeDictionary")
 
+
+        if "PriorityTreeDictionary" in current_state_data:
+            current_state_data.pop("PriorityTreeDictionary")
 
         building_plan = BuildingPlan.__from_data__(current_state_data)
         for step in building_plan.steps:
@@ -357,7 +360,7 @@ class ProjectManager(object):
 
         Parameters
         ----------
-        assembly : compas.datastructure.Assembly
+        assembly : :class:`compas.datastructure.Assembly`
             The assembly in which the project is based off of: Used for part visulization.
         project_name : str
             The name of the project under which the data is stored.
@@ -366,15 +369,15 @@ class ProjectManager(object):
         -------
         last_built_index : int
             The index of the last built part in the project.
-        step_locations : list of compas.geometry.Frame
+        step_locations : list of :class:`compas.geometry.Frame`
             The locations of the building plan steps.
-        built_human : list of compas.datastructures.Part
+        built_human : list of :class:`compas.datastructures.Part`
             The parts that have been built by a human.
-        unbuilt_human : list of compas.datastructures.Part
+        unbuilt_human : list of :class:`compas.datastructures.Part`
             The parts that have not been built by a human.
-        built_robot : list of compas.datastructures.Part
+        built_robot : list of :class:`compas.datastructures.Part`
             The parts that have been built by a robot.
-        unbuilt_robot : list of compas.datastructures.Part
+        unbuilt_robot : list of :class:`compas.datastructures.Part`
             The parts that have not been built by a robot.
 
         """
@@ -398,6 +401,9 @@ class ProjectManager(object):
         if "PriorityTreeDictionary" in current_state_data:
             current_state_data.pop("PriorityTreeDictionary")
 
+
+        if "PriorityTreeDictionary" in current_state_data:
+            current_state_data.pop("PriorityTreeDictionary")
 
         building_plan = BuildingPlan.__from_data__(current_state_data)
         for step in building_plan.steps:

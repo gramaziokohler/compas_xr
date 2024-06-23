@@ -12,17 +12,18 @@ import Grasshopper, GhPython
 import System
 import Rhino
 import rhinoscriptsyntax as rs
+import scriptcontext as sc
 import time
 import threading
 
+from compas.data import json_dump
 from compas_eve import Message
 from compas_eve import Topic
 from compas_eve import Subscriber
 from compas_eve.mqtt import MqttTransport
 from compas_eve.ghpython import BackgroundWorker
-
 from compas_xr.mqtt import GetTrajectoryRequest
-from compas.data import json_dump
+
 
 def start_server(worker, options):
     topic_name_request = 'compas_xr/get_trajectory_request/' + options.project_name
