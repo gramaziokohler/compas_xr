@@ -921,7 +921,7 @@ Step 5.3.1: Reading Robot Description and Unity Game Object Creation.
 
 7.  Press the Read Robot Description button.
 
-8.  This should prompt a window that says "Do you want to generate a default GameObject now?
+8.  This should prompt a window that says "Do you want to generate a default GameObject now?"
 
 .. figure:: /_images/Docker_6.png
    :figclass: figure
