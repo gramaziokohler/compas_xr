@@ -35,7 +35,7 @@ Step 1: Assembly Definition
 
 This section provides a quick overview of assemblies. In COMPAS, an assembly is a fundamental data structure used to
 represent a collection of geometric parts or elements within computational design and engineering workflows. An assembly
-provides a structured way to organize, manage, and interact with these parts as a cohesive unit. 
+provides a structured way to organize, manage, and interact with these parts as a cohesive unit.
 
 This section will only provide specific information about assemblies for COMPAS XR. For a more detailed instruction and
 implementation strategy for COMPAS Assemblies please refer to the documentation for COMPAS Assemblies
@@ -98,7 +98,7 @@ Set up Firebase
    :class: figure-img img-fluid
 
 Firebase (FB) is a comprehensive mobile and web application development platform provided by Google. It offers
-a wide range of tools and services that help developers build high-quality apps more efficiently. 
+a wide range of tools and services that help developers build high-quality apps more efficiently.
 
 1. Login with you Google-Account on https://console.firebase.google.com/ and create a new project.
 
@@ -122,7 +122,7 @@ a wide range of tools and services that help developers build high-quality apps 
    :figclass: figure
    :class: figure-img img-fluid
 
-4. Set up the Realtime Database. This will allow you to store and sync data in real-time across multiple clients. 
+4. Set up the Realtime Database. This will allow you to store and sync data in real-time across multiple clients.
 
 .. figure:: /_images/firebase_5.png
    :figclass: figure
@@ -375,7 +375,7 @@ visualization of objects in the real world space.
 
 Additionally the order of QR images is determined by the list order upon upload from user, and defines the relationship
 in which Images should be placed in the physical space. Also the app does not allow for more then 30 QR images within
-a single project, and will only work with the particular images found at this `link <https://github.com/gramaziokohler>`_.
+a single project, and will only work with the particular images found at this `link <https://github.com/gramaziokohler/compas_xr>`_.
 
 .. figure:: /_images/Frame.png
    :figclass: figure
@@ -448,9 +448,9 @@ functionality of uploading all required COMPAS class objects.
 application is reading from and provides the only specific reference for individual Firebase projects. Additionally, the
 project name cannot include any extension of "." this will signify a file type (ex: .json) and result in an error on upload.
 
------------------------------------
+-------------------------------------
 Step 4.3: Upload Application Settings
------------------------------------
+-------------------------------------
 
 The application settings writer is used as a global constant that is pulled on the user device every time that the
 application is started. Additionally it requires a specific structure, and should be written from `compas_xr library` as follows:
@@ -598,7 +598,7 @@ Step 5.1.1: Select Robot
 
 The application includes a drop down for simple robot selection and visualizatio, offering users the opportunity to evaluate
 different robots for completing the task at hand. Users can browse through various robotic options, each with detailed visual
-representations 
+representations
 ::
     //COMPAS XR Default Robot List
     RobotURDFList = new List<string> {"UR3", "UR5", "UR10e", "ETHZurichRFL"};
@@ -719,7 +719,7 @@ The Planning Request Subscriber is used to manage GetTrajectoryRequest messages 
 component updates and transmits additional information for each request, ensuring that the CAD system receives all
 necessary details to process and respond accurately. By handling these requests, the Planning Request Subscriber plays
 a crucial role in facilitating effective communication and coordination between the application and the CAD system,
-thereby supporting the overall planning and execution workflow. 
+thereby supporting the overall planning and execution workflow.
 
 .. figure:: /_images/Grasshopper_4.png
    :figclass: figure
@@ -808,7 +808,7 @@ Step 5.2.4: Send Trajectory Subscriber
 
 The Execution Service component is a custom subscriber for **SendTrajectory** Message sent from the Application to the CAD,
 and is used to send the approved trajectory from the application to the robot for execution. Upon receiving user approval,
-this component transmits the trajectory details, ensuring the robot receives the precise instructions needed for execution. 
+this component transmits the trajectory details, ensuring the robot receives the precise instructions needed for execution.
 
 .. figure:: /_images/Grasshopper_7.png
    :figclass: figure
@@ -1107,7 +1107,7 @@ Install gem active support:
 .. figure:: /_images/ios_6.png
    :figclass: figure
    :class: figure-img img-fluid
-   
+
 .. figure:: /_images/ios_7.png
    :figclass: figure
    :class: figure-img img-fluid
@@ -1128,7 +1128,7 @@ settings depicted below:
 .. figure:: /_images/ios_9.png
    :figclass: figure
    :class: figure-img img-fluid
-   
+
 .. figure:: /_images/ios_10.png
    :figclass: figure
    :class: figure-img img-fluid
@@ -1159,7 +1159,7 @@ installation
    :class: figure-img img-fluid
 
 **In Xcode:**
-	
+
 - In Xcode click the file's name on the left column to open the Settings
 - Under Signing and Capabilities > All, tick Automatically manage signing and confirm Enable Automatic
 
@@ -1249,7 +1249,7 @@ subscription.
 - **storage bucket:** The end point for Firebase Cloud storage file uploads & Downloads.
 
 - **project Id:** The end point for Firebase Cloud storage file uploads & Downloads.
-	
+
 ^^^^^^^^^^^^
 User Options
 ^^^^^^^^^^^^
@@ -1262,14 +1262,14 @@ User Options
 or it can result in a failure to connect or visualization of incorrect information. These
 connection settings can be found in the same location as noted in the Connect Grasshopper to
 Firebase section. However Additionally the App ID can be found by selecting the particular app
-created in the Create Apps on Firebase portion of the documentation. 
+created in the Create Apps on Firebase portion of the documentation.
 
 --------------------
 Step 7.2: User Login
 --------------------
 
 This scene is used to establish a user and device record with particular user names.
-Additionally, it will record each user's login to the firebase in the **Firebase Realtime Database.** 
+Additionally, it will record each user's login to the firebase in the **Firebase Realtime Database.**
 
 ^^^^^^^^^^^
 User Inputs
@@ -1278,7 +1278,7 @@ User Inputs
 **Required:**
 
 - **Username:** This is the username that you wish to record with your firebase entry. By inputting the same username with each instance of the application, each user will record their devices and time records.
-	
+
 ^^^^^^^^^^^^
 User Options
 ^^^^^^^^^^^^
@@ -1308,9 +1308,9 @@ via these three properties.
 
 **Primary User Interface:** all buttons and functionalities essential for the assembly process and are constantly
 in the active view area.
- 
+
 **Visualization Menu:** (bottom right) All buttons and functionalities that are used to visualize additional
-design information. These buttons are designed to be turned on simultaneously and in any combination. 
+design information. These buttons are designed to be turned on simultaneously and in any combination.
 
 **Menu button:** (bottom left) All buttons and functionalities that are related to the editing, reloading,
 reestablishing, & comprehension of information within the application.
