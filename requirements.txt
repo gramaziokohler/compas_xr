@@ -1,5 +1,6 @@
-compas >=2.0.4
-compas_timber >=0.7
-compas_eve >=0.5.0
-compas_fab >=1.0.2
+numpy >= 1.15.4, < 2
+compas >=2.0.4,<3.0
+compas_timber ~=0.7.0
+compas_eve >=1,<2
+compas_fab >=1.0.2,<2
 pyrebase4 >=4.7.1
