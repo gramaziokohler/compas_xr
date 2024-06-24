@@ -4,12 +4,12 @@ Settings for Firebase.
 COMPAS XR v0.8.0
 """
 
-import os
 import json
-
-from compas_xr.ghpython.firebase_config import FirebaseConfig
+import os
 
 from ghpythonlib.componentbase import executingcomponent as component
+
+from compas_xr.ghpython.firebase_config import FirebaseConfig
 
 
 class FirebaseConfigComponent(component):

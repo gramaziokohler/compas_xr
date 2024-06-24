@@ -6,9 +6,9 @@ The Sync Result component is used to consolidate all user-defined inputs for the
 COMPAS XR v0.8.0
 """
 
-from compas_xr.ghpython import TrajectoryResultManager
-
 from ghpythonlib.componentbase import executingcomponent as component
+
+from compas_xr.ghpython import TrajectoryResultManager
 
 
 class SyncResultComponent(component):

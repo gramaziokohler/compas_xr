@@ -5,6 +5,7 @@ COMPAS XR v0.8.0
 """
 
 from ghpythonlib.componentbase import executingcomponent as component
+
 from compas_xr.ghpython import MqttMessageOptionsXR
 
 

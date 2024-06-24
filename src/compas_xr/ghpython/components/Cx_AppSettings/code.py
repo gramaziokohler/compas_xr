@@ -4,10 +4,10 @@ Application Settings.
 COMPAS XR v0.8.0
 """
 
-from compas_xr.project import ProjectManager
-from compas_xr.ghpython.app_settings import AppSettings
-
 from ghpythonlib.componentbase import executingcomponent as component
+
+from compas_xr.ghpython.app_settings import AppSettings
+from compas_xr.project import ProjectManager
 
 
 class ApplicationSettingsComponent(component):
