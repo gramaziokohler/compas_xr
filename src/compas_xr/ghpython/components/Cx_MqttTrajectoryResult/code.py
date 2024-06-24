@@ -3,7 +3,7 @@ Sync Results.
 
 The Sync Result component is used to consolidate all user-defined inputs for the resulting trajectory and coordinate them into a single, unified trajectory.
 
-COMPAS XR v0.9.0
+COMPAS XR v0.9.1
 """
 
 from ghpythonlib.componentbase import executingcomponent as component

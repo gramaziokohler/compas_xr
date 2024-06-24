@@ -1,7 +1,7 @@
 """
 Planning service response.
 
-COMPAS XR v0.9.0
+COMPAS XR v0.9.1
 """
 
 from compas_eve import Publisher
