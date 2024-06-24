@@ -18,6 +18,7 @@ lib_dir = os.path.join(os.path.dirname(__file__), "..", "dependencies")
 if lib_dir not in sys.path:
     sys.path.append(lib_dir)
 
+clr.AddReference("Newtonsoft.Json.dll")
 clr.AddReference("Firebase.Auth.dll")
 clr.AddReference("Firebase.dll")
 clr.AddReference("LiteDB.dll")
