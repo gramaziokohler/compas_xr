@@ -7,18 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
-### Added
-
-### Changed
-
-### Removed
-
+* Zenodo DOI generation
 
 ## [0.9.0] 2024-06-24
 
-### Added
-
-### Changed
-
-### Removed
+* Initial release
 
