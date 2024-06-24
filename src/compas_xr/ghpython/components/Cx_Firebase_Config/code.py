@@ -1,7 +1,7 @@
 """
 Settings for Firebase.
 
-COMPAS XR v0.9.1
+COMPAS XR v0.9.2
 """
 
 import json

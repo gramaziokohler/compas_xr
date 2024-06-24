@@ -1,7 +1,7 @@
 """
 Application Settings.
 
-COMPAS XR v0.9.1
+COMPAS XR v0.9.2
 """
 
 from ghpythonlib.componentbase import executingcomponent as component
