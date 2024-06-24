@@ -1,7 +1,7 @@
 """
 Component to define COMPAS XR options.
 
-COMPAS XR v0.8.0
+COMPAS XR v0.9.0
 """
 
 from ghpythonlib.componentbase import executingcomponent as component
