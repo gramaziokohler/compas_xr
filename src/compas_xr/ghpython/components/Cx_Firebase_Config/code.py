@@ -14,7 +14,6 @@ from ghpythonlib.componentbase import executingcomponent as component
 
 class FirebaseConfigComponent(component):
     def RunScript(self, filepath, filename, api_key, auth_domain, database_url, storage_bucket):
-
         if not (api_key and auth_domain and database_url and storage_bucket):
             self.Message = "You are missing some config information"
             raise Exception("Missing Config Info")
