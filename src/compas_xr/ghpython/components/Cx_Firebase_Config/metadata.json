@@ -1,0 +1,52 @@
+{
+    "name": "Firebase Options",
+    "nickname": "Firebase",
+    "category": "COMPAS XR",
+    "subcategory": "2 Options",
+    "description": "Settings for Firebase database",
+    "exposure": 4,
+
+    "ghpython": {
+        "isAdvancedMode": true,
+        "iconDisplay": 2,
+        "inputParameters": [
+            {
+                "name": "filepath",
+                "description": "Directory where you wish to store the Firebase settings.",
+                "typeHintID": "str"
+            },
+            {
+                "name": "filename",
+                "description": "Name of the Firebase settings file.",
+                "typeHintID": "str"
+            },
+            {
+                "name": "api_key",
+                "description": "API Key to access Firebase.",
+                "typeHintID": "str"
+            },
+            {
+                "name": "auth_domain",
+                "description": "Auth domain for Firebase.",
+                "typeHintID": "str"
+            },
+            {
+                "name": "database_url",
+                "description": "URL of the Firebase database.",
+                "typeHintID": "str"
+            },
+            {
+                "name": "storage_bucket",
+                "description": "Name of the storage bucket.",
+                "typeHintID": "str"
+            }
+
+        ],
+        "outputParameters": [
+            {
+                "name": "config_path",
+                "description": "Path where the configuration was stored."
+            }
+        ]
+    }
+}

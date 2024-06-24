@@ -1,34 +1,38 @@
 {
-    "name": "Background Task",
-    "nickname": "BG Task",
+    "name": "Planning Request",
+    "nickname": "Planning Request",
     "category": "COMPAS XR",
-    "subcategory": "Tasks",
-    "description": "Launch long-running background tasks.",
-    "exposure": 4,
+    "subcategory": "1 Plan",
+    "description": "Start a planning request",
+    "exposure": 2,
 
     "ghpython": {
         "isAdvancedMode": true,
         "iconDisplay": 2,
         "inputParameters": [
             {
-                "name": "reset",
-                "description": "Resets the background worker."
+                "name": "options",
+                "description": "XR options.",
+                "wireDisplay": 2
             },
             {
-                "name": "task",
-                "description": "A Python function that will be executed by the background worker. The function does not need to return quickly, it can even have an infinite loop and keep running, it will not block the UI."
+                "name": "reset",
+                "description": "Resets the component."
             },
             {
                 "name": "on",
-                "description": "Turn ON or OFF the background worker.",
+                "description": "Turn ON or OFF the subscriber for planning requests.",
                 "typeHintID": "bool"
             }
-
         ],
         "outputParameters": [
             {
-                "name": "result",
-                "description": "The result of the long-running task."
+                "name": "requested_element_id",
+                "description": "The request element ID."
+            },
+            {
+                "name": "requested_robot",
+                "description": "The name of the robot."
             }
         ]
     }

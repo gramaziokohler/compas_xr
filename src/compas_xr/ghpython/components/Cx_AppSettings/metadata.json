@@ -1,0 +1,42 @@
+{
+    "name": "App Settings",
+    "nickname": "App Settings",
+    "category": "COMPAS XR",
+    "subcategory": "2 Options",
+    "description": "Application settings",
+    "exposure": 4,
+
+    "ghpython": {
+        "isAdvancedMode": true,
+        "iconDisplay": 2,
+        "inputParameters": [
+            {
+                "name": "config_filepath",
+                "description": "Directory where you wish to store the Firebase settings.",
+                "typeHintID": "str",
+                "wireDisplay": 2
+            },
+            {
+                "name": "project_name",
+                "description": "Name of the project where the app will look for information.",
+                "typeHintID": "str"
+            },
+            {
+                "name": "storage_folder",
+                "description": "Name of the storage folder.",
+                "typeHintID": "str"
+            },
+            {
+                "name": "z_to_y_remap",
+                "description": "Remap Z and Y axes.",
+                "typeHintID": "bool"
+            },
+            {
+                "name": "write",
+                "description": "True to write the settings to disc.",
+                "typeHintID": "bool"
+            }            
+        ],
+        "outputParameters": []
+    }
+}

@@ -1,0 +1,36 @@
+{
+    "name": "XR Options",
+    "nickname": "Options",
+    "category": "COMPAS XR",
+    "subcategory": "2 Options",
+    "description": "Creates an instance of COMPAS XR MQTT Options",
+    "exposure": 2,
+
+    "ghpython": {
+        "isAdvancedMode": true,
+        "iconDisplay": 2,
+        "inputParameters": [
+            {
+                "name": "host",
+                "description": "MQTT host to use for communication.",
+                "typeHintID": "str"
+            },
+            {
+                "name": "project_name",
+                "description": "Name of the project.",
+                "typeHintID": "str"
+            },
+            {
+                "name": "robot_name",
+                "description": "Name of the robot.",
+                "typeHintID": "str"
+            }
+        ],
+        "outputParameters": [
+            {
+                "name": "options",
+                "description": "XR Options."
+            }
+        ]
+    }
+}

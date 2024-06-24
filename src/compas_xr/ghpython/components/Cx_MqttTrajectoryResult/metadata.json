@@ -1,0 +1,53 @@
+{
+    "name": "Sync Result",
+    "nickname": "Sync",
+    "category": "COMPAS XR",
+    "subcategory": "1 Plan",
+    "description": "Consolidates all user-defined inputs for the resulting trajectory and coordinate them into a single, unified trajectory.",
+    "exposure": 4,
+
+    "ghpython": {
+        "isAdvancedMode": true,
+        "iconDisplay": 2,
+        "inputParameters": [
+            {
+                "name": "element_id",
+                "description": "The number of the BuildingPlan Step that the trajectory is intended for.",
+                "typeHintID": "str"
+            },
+            {
+                "name": "trajectory",
+                "description": " trajectory that is intended to be published."
+            },
+            {
+                "name": "robot_base_fame",
+                "description": "The location of the robot in relation to the design object."
+            },
+            {
+                "name": "pick_and_place",
+                "description": "Notifies the application if the trajectory is intended to attach a building element in the process.",
+                "typeHintID": "bool"
+            },
+            {
+                "name": "pick_index",
+                "description": "The index in the trajectory in which the element should be attached to the robot.",
+                "typeHintID": "int"
+            },
+            {
+                "name": "ee_link_name",
+                "description": "The link name in which the element should be attached to.",
+                "typeHintID": "str"
+            },
+            {
+                "name": "options",
+                "description": "Information passed from the COMPAS XR Options Component."
+            }
+        ],
+        "outputParameters": [
+            {
+                "name": "result",
+                "description": "Resulting trajectory."
+            }
+        ]
+    }
+}

@@ -1,0 +1,30 @@
+{
+    "name": "Publish plan",
+    "nickname": "Publish trajectory",
+    "category": "COMPAS XR",
+    "subcategory": "1 Plan",
+    "description": "Publishes a planned trajectory for execution.",
+    "exposure": 2,
+
+    "ghpython": {
+        "isAdvancedMode": true,
+        "iconDisplay": 2,
+        "inputParameters": [
+            {
+                "name": "options",
+                "description": "XR options.",
+                "wireDisplay": 2
+            },
+            {
+                "name": "result",
+                "description": "Resulting trajectory."
+            },
+            {
+                "name": "publish",
+                "description": "Send the trajectory.",
+                "typeHintID": "bool"
+            }
+        ],
+        "outputParameters": []
+    }
+}

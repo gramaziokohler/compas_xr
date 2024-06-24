@@ -1,9 +1,9 @@
 {
-    "name": "Background Task",
-    "nickname": "BG Task",
+    "name": "Execution Service",
+    "nickname": "Execute",
     "category": "COMPAS XR",
-    "subcategory": "Tasks",
-    "description": "Launch long-running background tasks.",
+    "subcategory": "1 Plan",
+    "description": "Service that receives trajectories to be executed by the robot.",
     "exposure": 4,
 
     "ghpython": {
@@ -11,24 +11,28 @@
         "iconDisplay": 2,
         "inputParameters": [
             {
-                "name": "reset",
-                "description": "Resets the background worker."
+                "name": "options",
+                "description": "XR options.",
+                "wireDisplay": 2
             },
             {
-                "name": "task",
-                "description": "A Python function that will be executed by the background worker. The function does not need to return quickly, it can even have an infinite loop and keep running, it will not block the UI."
+                "name": "reset",
+                "description": "Resets the trajectory execution service."
             },
             {
                 "name": "on",
-                "description": "Turn ON or OFF the background worker.",
+                "description": "Turn ON or OFF the trajectory execution service.",
                 "typeHintID": "bool"
             }
-
         ],
         "outputParameters": [
             {
-                "name": "result",
-                "description": "The result of the long-running task."
+                "name": "execute_element_id",
+                "description": "The element ID associated with the trajectory."
+            },
+            {
+                "name": "execution_robot",
+                "description": "The name of the robot that executed the trajectory."
             }
         ]
     }

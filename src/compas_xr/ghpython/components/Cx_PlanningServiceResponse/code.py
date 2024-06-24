@@ -1,9 +1,7 @@
 """
-Get Trajectory Request Component.
+Planning service response.
 
-A custom Compas Eve MQTT Publisher component for publishing the planning result to all devices.
-
-COMPAS XR v0.1.0
+COMPAS XR v0.8.0
 """
 
 from compas_eve import Publisher
@@ -15,7 +13,6 @@ from compas_xr.mqtt import GetTrajectoryResult
 
 
 class PlanningServiceResponseComponent(component):
-
     def RunScript(self, options, result, publish):
         if not result:
             self.Message = "Null Result, unable to publish"
