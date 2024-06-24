@@ -1,7 +1,7 @@
 """
 Get Trajectory Request Component.
 
-COMPAS XR v0.9.4
+COMPAS XR v0.9.5
 """
 
 from compas_eve import Subscriber
