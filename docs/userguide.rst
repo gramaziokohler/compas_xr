@@ -384,7 +384,7 @@ visualization of objects in the real world space.
 
 Additionally the order of QR images is determined by the list order upon upload from user, and defines the relationship
 in which Images should be placed in the physical space. Also the app does not allow for more then 30 QR images within
-a single project, and will only work with the particular images found at this `link <https://github.com/gramaziokohler/compas_xr>`_.
+a single project, and will only work with the particular images found at this :download:`link <_static/qr_codes/compas_xr_qrs.pdf>`.
 
 .. figure:: /_images/Frame.png
    :figclass: figure
