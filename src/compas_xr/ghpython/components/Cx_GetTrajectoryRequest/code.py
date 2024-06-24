@@ -43,7 +43,12 @@ class GetTrajectoryRequestComponent(component):
             return None
 
         self.worker = BackgroundWorker.instance_by_component(
-            ghenv, start_server, dispose_function=stop_server, force_new=reset, auto_set_done=False, args=(options,)  # noqa: F821
+            ghenv,  # noqa: F821
+            start_server,
+            dispose_function=stop_server,
+            force_new=reset,
+            auto_set_done=False,
+            args=(options,),
         )
 
         if not self.worker.is_working() and not self.worker.is_done() and reset:

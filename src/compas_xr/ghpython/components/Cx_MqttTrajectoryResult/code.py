@@ -18,7 +18,7 @@ class SyncResultComponent(component):
             result.requested_element_id = element_id
             result.robot_base_frame = robot_base_frame
             result.trajectory = result.format_trajectory(trajectory)
-            if pick_and_place != None:
+            if pick_and_place is not None:
                 result.pick_and_place = pick_and_place
                 if pick_and_place:
                     result.pick_index = pick_index
