@@ -33,7 +33,7 @@ jobs:
           curl -o compas_eve.tar.gz -LJO https://pypi.debian.net/compas_eve/latest
 
           echo "Downloading compas_timber..."
-          curl -o compas_timber.tar.gz -LJO https://pypi.debian.net/compas_timber/latest
+          curl -o compas_timber.tar.gz -LJO https://pypi.debian.net/compas_timber/compas_timber-0.7.0.tar.gz
 
           echo "Setting up IronPython environment..."
           ipy -X:Frames -m ensurepip
