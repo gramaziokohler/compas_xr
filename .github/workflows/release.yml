@@ -28,3 +28,9 @@ jobs:
         with:
           pypi_token: ${{ secrets.PYPI }}
           github_token: ${{ secrets.GITHUB_TOKEN }}
+          build_ghpython_components: true
+          gh_source: src/compas_xr/ghpython/components
+          gh_target: src/compas_xr/ghpython/components/ghuser
+          gh_prefix: "COMPAS XR: "
+          gh_interpreter: "ironpython"
+          release_name_prefix: COMPAS XR
