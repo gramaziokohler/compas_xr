@@ -7,18 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
-### Added
-
 ### Changed
 
-### Removed
-
+* Fixed missing dependency for GH.
 
 ## [0.9.3] 2024-06-24
 
 ### Added
 
-* Add GH components to release
+* Add GH components to release.
 
 
 ## [0.9.2] 2024-06-24
@@ -32,9 +29,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.9.1] 2024-06-24
 
-* Zenodo DOI generation
+* Zenodo DOI generation.
 
 ## [0.9.0] 2024-06-24
 
-* Initial release
+* Initial release.
 
