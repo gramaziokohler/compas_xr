@@ -63,7 +63,7 @@ COMPAS XR Unity - Phone Based AR Application
 
 This chapter provides a step-by-step guide for installing compas_xr_unity on your device. The use and installation of
 the application is supported by both Android and ios devices. If you would like to install the application without
-functionality or code modifications Android .apk file, and ios xcode build can be found `here <https://github.com/gramaziokohler>`_.
+functionality or code modifications Android .apk file, and ios xcode build can be found `here <https://nextcloud.ethz.ch/s/QyGgN84yx3LBfNs>`_.
 
 However, if you would like to modify any application functionalities or anything the entire code base for the application
 can be found and cloned from our `repository <https://github.com/gramaziokohler/compas_xr>`_.

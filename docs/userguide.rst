@@ -1235,10 +1235,7 @@ installation
 
 **Link for Installable Xcode Build:**
 
-Download the Build folder from the given link, unzip and install as described above.
-::
-   LINK?
-
+Download the Build folder from `this link <https://nextcloud.ethz.ch/s/QyGgN84yx3LBfNs>`_, unzip and install as described above.
 
 .. _user-interaction:
 
