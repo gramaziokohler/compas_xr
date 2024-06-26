@@ -5,7 +5,12 @@
     "url": "https://gramaziokohler.github.io/compas_xr/latest/"
   },
   {
-    "name": "0.9.4 (stable)",
+    "name": "1.0.0 (stable)",
+    "version": "1.0.0",
+    "url": "https://gramaziokohler.github.io/compas_xr/1.0.0/"
+  },
+  {
+    "name": "0.9.4",
     "version": "0.9.4",
     "url": "https://gramaziokohler.github.io/compas_xr/0.9.4/"
   }
