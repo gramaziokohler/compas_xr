@@ -10,7 +10,7 @@ create your own models.
 
 For utilizing the COMPAS XR package for your project, follow these 7 steps:
 
-1. [Assembly Definition](#step-1-assembly-definition): Dependent on the assembly in which you would like to visualize
+1. [Model Definition](#step-1-model-definition): Define the model to visualize
 2. [Database Initialization](#step-2-database-initialization): Creating and connecting a cloud-based database at Firebase
 3. [Data Creation](#step-3-data-creation): Types and requirements for various assembly types + Creation of Building Plan and Localization with Frame Positions
 4. [Uploading and Visualizing Data](#step-4-uploading-and-visualizing-data): Uploading Data to Firebase and Visualization in Rhino
@@ -20,59 +20,45 @@ For utilizing the COMPAS XR package for your project, follow these 7 steps:
 
 ![Workflow](_images/workflow.png)
 
-## Step 1: Assembly Definition
+## Step 1: Model Definition
 
-This section provides a quick overview of assemblies. In COMPAS, an assembly is a fundamental data structure used to
-represent a collection of geometric parts or elements within computational design and engineering workflows. An assembly
-provides a structured way to organize, manage, and interact with these parts as a cohesive unit.
+COMPAS XR uses `compas_model.models.Model` to organize geometric elements and their relationships. The old
+`compas.datastructures.Assembly` and `Part` API is no longer supported.
 
-This section will only provide specific information about assemblies for COMPAS XR. For a more detailed instruction and
-implementation strategy for COMPAS Assemblies please refer to the documentation for COMPAS Assemblies
-found [here](https://compas.dev/compas/latest/api/generated/compas.datastructures.Assembly.html).
+For the complete API and element hierarchy, refer to the
+[COMPAS Model documentation](https://blockresearchgroup.github.io/compas_model/).
 
-### COMPAS XR Assembly Information
+### COMPAS XR Model Information
 
-Here are some key aspects of constructing assemblies in COMPAS for COMPAS XR Visualization. Additionally, the definition
-should come from each user depending on the assembly in which they would like to visualize and construct.
+The model definition is project-specific and should contain the elements users need to visualize and construct.
 
-Only Assemblies of the Geometry types listed below are acceptable for visualization and assembly:
+Models can contain serializable `compas_model` element types, including elements backed by mesh geometry. Timber projects
+use `compas_timber.model.TimberModel`, which is a specialized `Model`.
 
 ```python
-# COMPAS Geometries that can be used to create assemblies
-compas.geometry.Box
-compas.geometry.Cylinder
-
-# COMPAS Assemblies that Require .obj export for COMPAS XR Visualization
-compas_timber.assembly.TimberAssemblies
-compas.datastructures.Mesh
+compas_model.models.Model
+compas_model.elements.Element
+compas_timber.model.TimberModel
 ```
 
-Only assemblies constructed with the processes below allow visualization in COMPAS XR Unity App:
+Create a model by adding elements. Element GUIDs are used as stable IDs throughout the building plan and XR data:
 
 ```python
-# Import the Assembly, Part, and Mesh classes from the compas.datastructures
-from compas.datastructures import Assembly, Part, Mesh
+from compas.geometry import Transformation
+from compas_model.elements import BeamElement
+from compas_model.models import Model
 
-# Import the Box and Cylinder classes from the compas.geometry module
-from compas.geometry import Box, Cylinder
-
-# For Geometry Assemblies acceptable add part methods
-box_assembly.add_part (box)
-box_assembly.add_part(box, frame=frame)
-cylinder_assembly.add_part(cylinder)
-cylinder_assembly.add_part(cylinder, frame=frame)
-
-# For Custom Meshes, meshes must be added as type Part
-part = Part(frame= frame, shape = mesh)
-part_assembly.add_part(part)
-
-# For all Box, Cylinder, or Mesh Assemblies made of class type Part
-part = Part(name=..., frame=..., shape= GEO)
-part = Part(frame=..., shape = GEO)
-part_assembly.add_part(part)
+model = Model()
+element = BeamElement(
+    width=0.1,
+    depth=0.2,
+    length=3.0,
+    transformation=Transformation.from_frame(frame),
+)
+model.add_element(element)
 ```
 
-**NOTE:** COMPAS XR Unity is only designed to work with Assemblies that are defined in Meters. If the assembly is
+**NOTE:** COMPAS XR Unity is only designed to work with models that are defined in meters. If the model is
 defined in any other Unit, it will result in incorrectly scaled visualization on the application side.
 
 ## Step 2: Database Initialization
@@ -190,8 +176,8 @@ as a `.json` file type.
 
 ### Generate Building Plan
 
-COMPAS XR utilizes the and requires data structures of both COMPAS Assembly and BuildingPlan. The primary difference
-in implementation and utilization of both data structures is as follows. The Assembly serves as a data representation
+COMPAS XR requires both a COMPAS Model and a BuildingPlan. The primary difference
+in implementation and utilization of both data structures is as follows. The Model serves as a data representation
 of a collection of geometric objects in space. While the BuildingPlan sequentially reconstructs the building process
 as a list of Steps or actions needed to complete assembly.
 
@@ -210,20 +196,19 @@ from compas_xr.project import BuildingPlanExtensions
 # Initialize an instance of the BuildingPlanExtensions class
 bpe = BuildingPlanExtensions()
 
-# Generate a building plan based on an assembly sequence
-building_plan = bpe.create_buildingplan_from_assembly_sequence(assembly, data_type, robot_keys, priority_lists)
+# Generate a building plan based on model element order
+building_plan = bpe.create_buildingplan_from_model_sequence(model, data_type, robot_keys, priority_lists)
 ```
 
-**NOTE:** While this will generate a usable BuildingPlan, the sequence will be a direct result of the order of assembly
-will be dictated by the order in which parts were added to the assembly. Additionally, robot_keys & priority_lists inputs
-are optional inputs that are assembly specific. If they are not input directly by the user, by default each steps actor
+**NOTE:** While this will generate a usable BuildingPlan, the sequence follows the order in which elements were added to
+the model. Additionally, `robot_keys` and `priority_lists` are model-specific optional inputs. By default each step's actor
 will be assigned HUMAN and priority will be assigned 0.
 
-**assembly:** compas.datastructures.Assembly or compas_timber.assembly.TimberAssembly
+**model:** compas_model.models.Model or compas_timber.model.TimberModel
 
-- The assembly a user would like to create a building plan from.
+- The model from which to create a building plan.
 
-**data_type:** int (The type of geometry from the input assembly)
+**data_type:** int (The type of geometry from the input model)
 
 - 0 == Cylinder (Assembly made of cylinders)
 - 1 == Box (Assembly made of Boxes)
@@ -239,11 +224,11 @@ will be assigned HUMAN and priority will be assigned 0.
 - The overall list represents the order in which parts need to be assembled.
 - The internal lists reprepresent parts that can be built in parallel within the overall list
 
-**Assembly Data Structure Example Diagram**
+**Model Data Structure Example Diagram**
 
 ![Data Structure Example](_images/Data_Structure_Example.png)
 
-**NOTE:** The Assembly Data Structure is used to provide geometric, and locational information for a collection of
+**NOTE:** The Model data structure provides geometric and locational information for a collection of
 objects in space. It is used as a data structure to provide the information of what is where.
 
 **Building Plan Data Structure Example**
@@ -252,7 +237,7 @@ objects in space. It is used as a data structure to provide the information of w
 
 **NOTE:** The BuildingPlan Data Structure is used to provide topological information that is used to coordinate,
 distribute, and coordinate the building Process. Information such as actor, is_built, and priority. Additionally
-it provides the opportunity to resequence elements from the Assembly model into logical sequential building processes.
+it provides the opportunity to resequence elements from the Model into logical sequential building processes.
 
 **Building Plan Priority Illustration**
 
@@ -311,7 +296,7 @@ Firebase storage if instructed by the Application Settings data.
 
 **Project Specific Information:** All information used to describe one project to the unity application.
 
-**Rhino Only Written Information:** QRFrames, assembly, joints, & parts
+**Rhino Only Written Information:** QRFrames, model, joints, & elements
 **Application only Written Information:** UserCurrentStep
 **Written by Application & Rhino:** building_plan
 
@@ -324,23 +309,23 @@ to FirebaseStorage as .obj files. This can be handled directly through the COMPA
 any point priority to visualization on the application side.
 
 ```python
-# Import the AssemblyExtensions class from the compas_xr.project module
-from compas_xr.project import AssemblyExtensions
+# Import the ModelExtensions class from the compas_xr.project module
+from compas_xr.project import ModelExtensions
 
-# Initialize an instance of the AssemblyExtensions class
-ae = AssemblyExtensions()
+# Initialize an instance of the ModelExtensions class
+extensions = ModelExtensions()
 
-# Export mesh objects from assembly as .obj files
-ae.export_mesh_assembly_objs(assembly, folder_path, new_folder_name, False)
+# Export mesh objects from a model as .obj files
+extensions.export_mesh_model_objs(model, folder_path, new_folder_name, False)
 
-# Export Beam objects from TimberAssembly as .obj files
-ae.export_timberassembly_objs(timber_assembly, folder_path, new_folder_name, False)
+# Export beam objects from a TimberModel as .obj files
+extensions.export_timber_model_objs(timber_model, folder_path, new_folder_name, False)
 ```
 
 ### Step 4.2: Upload Project Data to the Realtime Database
 
 As previously mentioned, project information stored under a specific firebase project name that comes directly from rhino
-upload information consists of QRFrames, Assembly, BuildingPlan, Joints, & Parts. Additionally the library allows
+upload information consists of QRFrames, Model, BuildingPlan, Joints, and Elements. Additionally the library allows
 functionality of uploading all required COMPAS class objects.
 
 ```python
@@ -351,7 +336,7 @@ from compas_xr.project import ProjectManager
 pm = ProjectManager(config_filepath)
 
 # Call upload project data method
-pm.upload_project_data_from_compas(project_name, assembly, building_plan, qr_frames)
+pm.upload_project_data_from_compas(project_name, model, building_plan, qr_frames)
 ```
 
 **NOTE:** It is key to clear naming conventions for the project name, as it is used to define the information that the
@@ -385,12 +370,12 @@ Example File Component:
 
 **storage_folder:** str (ONLY FOR .obj files)
 - The name of the storage folder which the project specific .obj files are stored
-- **NOTE:** This is only used for assembly types of TimberAssembly & Mesh (WIP)
+- **NOTE:** This is only used for `TimberModel` and mesh-backed models (WIP)
 - **NOTE:** If no input: default == "None"
 
 **z_to_y_remap:** bool
 - If remap is applied to the objects on export or not.
-- **NOTE:** Only required for .obj files (TimberAssemblies & Mesh)
+- **NOTE:** Only required for OBJ files (`TimberModel` and mesh-backed models)
 - **NOTE:** default == False
 
 ### Step 4.4: Uploading QR-Frames Data During Assembly Process (Only as needed)
@@ -445,7 +430,7 @@ from compas_xr.project import ProjectManager
 pm = ProjectManager(config_filepath)
 
 # Call Method from Project Manager Class to Return Firebase Current State
-last_built_index, step_locations, built_human, unbuilt_human, built_robot, unbuilt_robot = pm.visualize_project_state(assembly, project_name)
+last_built_index, step_locations, built_human, unbuilt_human, built_robot, unbuilt_robot = pm.visualize_project_state(model, project_name)
 ```
 
 **NOTE:** This component is not event based, and will need to be triggered to be updated with project information.

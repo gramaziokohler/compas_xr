@@ -1,15 +1,14 @@
 import os
 from typing import Any
-from typing import Union
 
-from compas.datastructures import Assembly
 from compas.geometry import Box
 from compas.geometry import Frame
-from compas_timber.assembly import TimberAssembly
+from compas_model.models import Model
+from compas_timber.model import TimberModel
 from compas_timber.planning import BuildingPlan
 from compas_timber.planning import Step
 
-from compas_xr.project.assembly_extensions import AssemblyExtensions
+from compas_xr.project.model_extensions import ModelExtensions
 from compas_xr.realtime_database import RealtimeDatabase
 from compas_xr.storage import Storage
 
@@ -56,7 +55,7 @@ class ProjectManager:
 
     def create_project_data_from_compas(
         self,
-        assembly: Union[TimberAssembly, Assembly],
+        model: Model,
         building_plan: BuildingPlan,
         qr_frames_list: list[Frame],
     ) -> dict:
@@ -65,28 +64,28 @@ class ProjectManager:
 
         Parameters
         ----------
-        assembly
-            The assembly in which data will be extracted from.
+        model
+            The model from which data will be extracted.
         building_plan
             The BuildingPlan in which data will be extracted from.
         qr_frames_list
             List of frames at specific locations for application localization data.
 
         """
-        qr_assembly = AssemblyExtensions().create_qr_assembly(qr_frames_list)
-        if isinstance(assembly, TimberAssembly):
+        qr_model = ModelExtensions().create_qr_model(qr_frames_list)
+        if isinstance(model, TimberModel):
             data = {
-                "QRFrames": qr_assembly.__data__,
-                "assembly": assembly.__data__,
-                "beams": {beam.key: beam for beam in assembly.beams},
-                "joints": {joint.key: joint for joint in assembly.joints},
+                "QRFrames": qr_model.__data__,
+                "model": model.__data__,
+                "beams": {str(beam.guid): beam for beam in model.beams},
+                "joints": {str(joint.guid): joint for joint in model.joints},
                 "building_plan": building_plan,
             }
         else:
             data = {
-                "QRFrames": qr_assembly.__data__,
-                "assembly": assembly.__data__,
-                "parts": {part.key: part for part in assembly.parts()},
+                "QRFrames": qr_model.__data__,
+                "model": model.__data__,
+                "elements": {str(element.guid): element for element in model.elements()},
                 "building_plan": building_plan,
             }
         return data
@@ -110,7 +109,7 @@ class ProjectManager:
     def upload_project_data_from_compas(
         self,
         project_name: str,
-        assembly: Union[TimberAssembly, Assembly],
+        model: Model,
         building_plan: BuildingPlan,
         qr_frames_list: list[Frame],
     ) -> None:
@@ -121,14 +120,14 @@ class ProjectManager:
         ----------
         project_name
             The name of the project under which the data will be stored.
-        assembly
-            The assembly in which data will be extracted from.
+        model
+            The model from which data will be extracted.
         building_plan
             The BuildingPlan in which data will be extracted from.
         qr_frames_list
             List of frames at specific locations for application localization data.
         """
-        data = self.create_project_data_from_compas(assembly, building_plan, qr_frames_list)
+        data = self.create_project_data_from_compas(model, building_plan, qr_frames_list)
         self.database.upload_data(data, project_name)
 
     def upload_qr_frames_to_project(self, project_name: str, qr_frames_list: list[Frame]) -> None:
@@ -142,8 +141,8 @@ class ProjectManager:
         qr_frames_list : list[Frame]
             List of frames at specific locations for application localization data.
         """
-        qr_assembly = AssemblyExtensions().create_qr_assembly(qr_frames_list)
-        data = qr_assembly.__data__
+        qr_model = ModelExtensions().create_qr_model(qr_frames_list)
+        data = qr_model.__data__
         path = "{}/{}".format(project_name, "QRFrames")
         self.database.upload_data(data, path)
 
@@ -200,7 +199,7 @@ class ProjectManager:
 
     def upload_compas_object_to_storage(self, compas_object: Any, cloud_file_name: str, pretty: bool = True) -> None:
         """
-        Uploads an assembly to the Firebase Storage.
+        Uploads a COMPAS object to Firebase Storage.
 
         Parameters
         ----------
@@ -212,9 +211,9 @@ class ProjectManager:
         """
         self.storage.upload_data(compas_object, cloud_file_name, pretty=pretty)
 
-    def get_assembly_from_storage(self, cloud_file_name: str) -> Union[TimberAssembly, Assembly]:
+    def get_model_from_storage(self, cloud_file_name: str) -> Model:
         """
-        Retrieves an assembly from the Firebase Storage.
+        Retrieve a model from Firebase Storage.
 
         Parameters
         ----------
@@ -223,8 +222,8 @@ class ProjectManager:
 
         Returns
         -------
-        Union[TimberAssembly, Assembly]
-            The assembly retrieved from the storage.
+        Model
+            The model retrieved from storage.
 
         """
         return self.storage.get_data(cloud_file_name)
@@ -265,9 +264,9 @@ class ProjectManager:
         current_data["priority"] = priority
         self.database.upload_data(current_data, database_path)
 
-    def visualize_project_state_timbers(
+    def visualize_timber_model_state(
         self,
-        timber_assembly: TimberAssembly,
+        timber_model: TimberModel,
         project_name: str,
     ) -> (int, list[Frame], list[Box], list[Box], list[Box], list[Box]):
         """
@@ -275,8 +274,8 @@ class ProjectManager:
 
         Parameters
         ----------
-        timber_assembly
-            The assembly in which the project is based off of: Used for part visulization.
+        timber_model
+            The timber model on which the project is based.
         project_name
             The name of the project under which the data will be stored.
 
@@ -296,7 +295,6 @@ class ProjectManager:
             The parts that have not been built by a robot.
 
         """
-        nodes = timber_assembly.graph.__data__["node"]
         building_plan_data_path = "{}/building_plan/data".format(project_name)
         current_state_data = self.database.get_data(building_plan_data_path)
 
@@ -328,32 +326,30 @@ class ProjectManager:
                 step_data.pop("device_id")
             step = Step.__from_data__(step["data"])
             step_locations.append(Frame.__from_data__(step.location))
-            assembly_element_id = step.element_ids[0]
-            # TODO: Tried to write like this, but find_by_key returns a NoneType object
-            """
-            part = timber_assembly.find_by_key(assembly_element_id)
-            """
-            part = nodes[assembly_element_id]["part"]
+            element_id = str(step.element_ids[0])
+            element = timber_model.get_element(element_id)
+            if element is None:
+                raise KeyError("Element {} is not in the timber model.".format(element_id))
             if step.actor == "HUMAN":
                 if step.is_built:
-                    built_human.append(part.blank)
+                    built_human.append(element.blank)
                 else:
-                    unbuilt_human.append(part.blank)
+                    unbuilt_human.append(element.blank)
             else:
                 if step.is_built:
-                    built_robot.append(part.blank)
+                    built_robot.append(element.blank)
                 else:
-                    unbuilt_robot.append(part.blank)
+                    unbuilt_robot.append(element.blank)
         return last_built_index, step_locations, built_human, unbuilt_human, built_robot, unbuilt_robot
 
-    def visualize_project_state(self, assembly: Assembly, project_name: str):
+    def visualize_project_state(self, model: Model, project_name: str):
         """
         Retrieves and visualizes data from the Firebase RealtimeDatabase under the specified project name.
 
         Parameters
         ----------
-        assembly
-            The assembly in which the project is based off of: Used for part visulization.
+        model
+            The model on which the project is based.
         project_name : str
             The name of the project under which the data is stored.
 
@@ -363,19 +359,19 @@ class ProjectManager:
             The index of the last built part in the project.
         step_locations : list[Frame]
             The locations of the building plan steps.
-        built_human : list[Part]
-            The parts that have been built by a human.
-        unbuilt_human : list[Part]
-            The parts that have not been built by a human.
-        built_robot : list[Part]
-            The parts that have been built by a robot.
-        unbuilt_robot : list[Part]
-            The parts that have not been built by a robot.
+        built_human : list[Element]
+            The elements that have been built by a human.
+        unbuilt_human : list[Element]
+            The elements that have not been built by a human.
+        built_robot : list[Element]
+            The elements that have been built by a robot.
+        unbuilt_robot : list[Element]
+            The elements that have not been built by a robot.
 
         """
         building_plan_data_path = "{}/building_plan/data".format(project_name)
         current_state_data = self.database.get_data(building_plan_data_path)
-        nodes = assembly.graph.__data__["node"]
+        elements = {str(element.guid): element for element in model.elements()}
 
         built_human = []
         unbuilt_human = []
@@ -404,20 +400,22 @@ class ProjectManager:
                 step_data.pop("device_id")
             step = Step.__from_data__(step["data"])
             step_locations.append(Frame.__from_data__(step.location))
-            assembly_element_id = step.element_ids[0]
-            part = nodes[str(assembly_element_id)]["part"]
+            element_id = str(step.element_ids[0])
+            try:
+                element = elements[element_id]
+            except KeyError:
+                raise KeyError("Element {} is not in the model.".format(element_id))
 
             if step.actor == "HUMAN":
-                # TODO: I am not sure if this works in all scenarios of Part
                 if step.is_built:
-                    built_human.append(part)
+                    built_human.append(element)
                 else:
-                    unbuilt_human.append(part)
+                    unbuilt_human.append(element)
             elif step.actor == "ROBOT":
                 if step.is_built:
-                    built_robot.append(part)
+                    built_robot.append(element)
                 else:
-                    unbuilt_robot.append(part)
+                    unbuilt_robot.append(element)
             else:
-                raise Exception("Part actor is Unknown!")
+                raise ValueError("Element actor is unknown.")
         return last_built_index, step_locations, built_human, unbuilt_human, built_robot, unbuilt_robot

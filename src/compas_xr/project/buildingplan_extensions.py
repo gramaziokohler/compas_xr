@@ -1,7 +1,4 @@
-from typing import Union
-
-from compas.datastructures import Assembly
-from compas_timber.assembly import TimberAssembly
+from compas_model.models import Model
 from compas_timber.planning import BuildingPlan
 from compas_timber.planning import SimpleSequenceGenerator
 from compas_timber.planning import Step
@@ -11,40 +8,40 @@ class BuildingPlanExtensions:
     """
     Extensions for the [BuildingPlan][] class.
 
-    This class provides functionalities to create a building plan from an established assembly sequence.
+    This class provides functionality to create a building plan from an established model sequence.
     """
 
     # TODO: This makes the building plan in a very manual way
     # TODO: but this needs to be resolved in tandem with building plan revisions.
-    def create_buildingplan_from_assembly_sequence(
+    def create_buildingplan_from_model_sequence(
         self,
-        assembly: Union[TimberAssembly, Assembly],
+        model: Model,
         data_type: int,
         robot_keys: list[str] = None,
         priority_keys_lists: list[list[str]] = None,
     ) -> BuildingPlan:
         """
-        Create a [BuildingPlan][] based on the sequence of the assembly parts.
+        Create a [BuildingPlan][] based on the sequence of the model elements.
 
         Parameters
         ----------
-        assembly
-            The assembly that you want to generate the buiding plan for.
+        model
+            The model for which to generate the building plan.
         data_type
             List index of which data type will be loaded on the application side [0: 'Cylinder', 1: 'Box', 2: 'ObjFile']
         robot_keys
             List of keys that are intended to be built by the robot.
         priority_keys_lists
-            List in assembly order of lists of assembly keys that can be built in parallel.
+            Lists of element GUIDs that can be built in parallel, in model order.
 
         Returns
         -------
         [BuildingPlan][]
-            The building plan generated from the assembly sequence.
+            The building plan generated from the model sequence.
 
         """
         data_type_list = ["0.Cylinder", "1.Box", "2.ObjFile"]
-        building_plan = SimpleSequenceGenerator(assembly=assembly).result
+        building_plan = SimpleSequenceGenerator(model=model).result
 
         for step in building_plan.steps:
             step.geometry = data_type_list[data_type]
@@ -67,50 +64,52 @@ class BuildingPlanExtensions:
 
         return building_plan
 
-    def create_buildingplan_from_with_custom_sequence(
+    def create_buildingplan_from_custom_sequence(
         self,
-        assembly: Union[TimberAssembly, Assembly],
+        model: Model,
         sequenced_keys: list[str],
         data_type: int,
         robot_keys: list[str],
         priority_keys_lists: list[list[str]],
     ) -> BuildingPlan:
         """
-        Create a [BuildingPlan][] based on the sequence of the assembly parts.
+        Create a [BuildingPlan][] based on a custom sequence of model elements.
 
         Parameters
         ----------
-        assembly
-            The assembly that you want to generate the buiding plan for.
+        model
+            The model for which to generate the building plan.
         sequenced_keys
-            List of keys that are intended to be built in the order provided.
+            List of element GUIDs in the intended build order.
         data_type
             List index of which data type will be loaded on the application side [0: 'Cylinder', 1: 'Box', 2: 'ObjFile']
         robot_keys
             List of keys that are intended to be built by the robot.
         priority_keys_lists
-            List in assembly order of lists of assembly keys that can be built in parallel.
+            Lists of element GUIDs that can be built in parallel, in model order.
 
         Returns
         -------
         [BuildingPlan][]
-            The building plan generated from the assembly sequence.
+            The building plan generated from the custom model sequence.
 
         """
         data_type_list = ["0.Cylinder", "1.Box", "2.ObjFile"]
-        graph_data = assembly.graph.__data__
-        node_data = graph_data["node"]
+        elements = {str(element.guid): element for element in model.elements()}
         building_plan = BuildingPlan()
 
         for key in sequenced_keys:
-            step = Step(key)
-            # TODO: This is dumb, but the element_ids are generated incorrectly so they are overwritten here
-            step.element_ids = [key]
+            try:
+                element = elements[str(key)]
+            except KeyError:
+                raise KeyError("Element {} is not in the model.".format(key))
+
+            step = Step([str(key)])
             step.geometry = data_type_list[data_type]
             # TODO: These are unused for now, but are expeted on the application side
             step.instructions = ["none"]
             step.elements_held = [0]
-            step.location = node_data[str(key)]["part"].frame
+            step.location = element.frame
 
             if robot_keys:
                 if key in robot_keys:
