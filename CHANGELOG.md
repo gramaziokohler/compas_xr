@@ -16,6 +16,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 * Update Grasshopper components to build as CPython 3.x components
 * Migrated documentation to Mkdocs format
+* Upgraded `compas_pb` to 1.1 and `compas_timber` to its Model-based API.
+* Replaced the legacy `compas.datastructures.Assembly`/`Part` integration with `compas_model.models.Model`/`Element`.
 
 ### Removed
 
@@ -23,6 +25,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Refactored RealtimeDatabase and Storage Classes to path based references.
 * Removes dependency on `compas_fab`
 * Removed Rhino 7 post installation hooks
+* Removed the legacy `AssemblyExtensions` API in favor of `ModelExtensions`.
 
 ## [1.0.0] 2024-06-26
 
@@ -71,4 +74,3 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.9.0] 2024-06-24
 
 * Initial release.
-
