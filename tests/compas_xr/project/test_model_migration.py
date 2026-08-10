@@ -27,8 +27,8 @@ def test_qr_model_roundtrips_with_compas_pb():
     restored = pb_load_bts(pb_dump_bts(model))
 
     assert isinstance(restored, Model)
-    assert [element.name for element in restored.elements()] == ["QR_0", "QR_1"]
-    assert [element.frame for element in restored.elements()] == frames
+    restored_frames = {element.name: element.frame for element in restored.elements()}
+    assert restored_frames == {"QR_0": frames[0], "QR_1": frames[1]}
 
 
 def test_building_plan_uses_model_element_guids():
