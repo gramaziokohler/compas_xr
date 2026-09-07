@@ -1,0 +1,120 @@
+syntax = "proto3";
+
+package compas_xr.v1;
+
+import "compas_pb/generated/geometry.proto";
+
+// ============================================================================
+// Coordination
+// ============================================================================
+
+// Coordination information carried by every COMPAS XR message.
+//
+// Devices use the header to correlate requests with responses and to ignore
+// messages they sent themselves.
+message Header {
+  // Atomic counter, incremented once per message sent by a device.
+  int64 sequence_id = 1;
+
+  // Incremented once per request/response routine, so a response can be
+  // matched to the request that triggered it.
+  int64 response_id = 2;
+
+  // Unique identifier of the device that sent the message.
+  string device_id = 3;
+
+  // Time the message was sent.
+  string time_stamp = 4;
+}
+
+// Approval decision for a trajectory.
+enum ApprovalStatus {
+  APPROVAL_STATUS_NOT_APPROVED = 0;
+  APPROVAL_STATUS_APPROVED = 1;
+  APPROVAL_STATUS_CONSENSUS_APPROVAL = 2;
+  APPROVAL_STATUS_CANCELLATION = 3;
+}
+
+// ============================================================================
+// Trajectories
+// ============================================================================
+
+// One waypoint of a robot trajectory.
+//
+// joint_names and joint_values are parallel arrays: joint_values[i] is the
+// value for joint_names[i]. They must be the same length.
+message JointTrajectoryPoint {
+  repeated string joint_names = 1;
+  repeated double joint_values = 2;
+
+  // Offset from the start of the trajectory, in seconds. Absent when the
+  // trajectory carries no timing.
+  optional double time_from_start = 3;
+}
+
+// An ordered sequence of waypoints.
+//
+// This replaces the untyped "dict of joint names and joint values" that
+// travelled as JSON, so both the Python and C# sides agree on the shape
+// without depending on compas_fab.
+message JointTrajectory {
+  repeated JointTrajectoryPoint points = 1;
+}
+
+// ============================================================================
+// Messages
+// ============================================================================
+
+// Published by a user to request a trajectory for a building element.
+message GetTrajectoryRequest {
+  Header header = 1;
+  string element_id = 2;
+  string robot_name = 3;
+  string trajectory_id = 4;
+}
+
+// Published by the CAD to all active devices with the computed trajectory.
+message GetTrajectoryResult {
+  Header header = 1;
+  string element_id = 2;
+  string robot_name = 3;
+  compas_pb.data.FrameData robot_base_frame = 4;
+  string trajectory_id = 5;
+  JointTrajectory trajectory = 6;
+  bool pick_and_place = 7;
+  optional int32 pick_index = 8;
+  optional string end_effector_link_name = 9;
+}
+
+// Published by each user to signal approval or rejection of a trajectory.
+message ApproveTrajectory {
+  Header header = 1;
+  string element_id = 2;
+  string robot_name = 3;
+  string trajectory_id = 4;
+  JointTrajectory trajectory = 5;
+  ApprovalStatus approval_status = 6;
+}
+
+// Published by one user to count the active devices.
+message ApprovalCounterRequest {
+  Header header = 1;
+  string element_id = 2;
+  string trajectory_id = 3;
+}
+
+// Published by each active device in response to an ApprovalCounterRequest.
+message ApprovalCounterResult {
+  Header header = 1;
+  string element_id = 2;
+  string trajectory_id = 3;
+}
+
+// Published by a user to release an approved trajectory for execution.
+message SendTrajectory {
+  Header header = 1;
+  string element_id = 2;
+  string robot_name = 3;
+  string trajectory_id = 4;
+  JointTrajectory trajectory = 5;
+}
