@@ -117,9 +117,7 @@ class Header(Message):
         # ``is None`` rather than falsiness: sequence_id and response_id are counters that
         # legitimately start at 0, and ``0 or default`` would silently discard them.
         self["sequence_id"] = sequence_id if sequence_id is not None else self._ensure_sequence_id()
-        self["response_id"] = (
-            response_id if response_id is not None else self._ensure_response_id(increment_response_ID)
-        )
+        self["response_id"] = response_id if response_id is not None else self._ensure_response_id(increment_response_ID)
         self["device_id"] = device_id if device_id is not None else self._get_device_id()
         self["time_stamp"] = time_stamp if time_stamp is not None else self._get_time_stamp()
 
@@ -132,11 +130,7 @@ class Header(Message):
         # Header instance when a message is re-parsed locally. Unwrap to the plain mapping.
         value = getattr(value, "data", value)
 
-        missing = [
-            key
-            for key in ("sequence_id", "response_id", "device_id", "time_stamp")
-            if value.get(key) is None
-        ]
+        missing = [key for key in ("sequence_id", "response_id", "device_id", "time_stamp") if value.get(key) is None]
         if missing:
             raise ValueError("Information for Header parsing missing: {}.".format(", ".join(missing)))
 

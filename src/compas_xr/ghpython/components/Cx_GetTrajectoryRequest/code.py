@@ -8,6 +8,7 @@ COMPAS XR v1.0.0
 import Grasshopper
 from compas_eve import Subscriber
 from compas_eve import Topic
+from compas_eve.codecs import ProtobufMessageCodec
 from compas_eve.ghpython import BackgroundWorker
 from compas_eve.mqtt import MqttTransport
 
@@ -24,7 +25,7 @@ def start_server(worker, options):
         worker.display_message("Request #{} started".format(worker.count))
         worker.update_result(request_message, 10)
 
-    tx = MqttTransport(options.host)
+    tx = MqttTransport(options.host, codec=ProtobufMessageCodec())
     topic = Topic(topic_name_request, GetTrajectoryRequest)
     worker.subscriber = Subscriber(topic, callback=get_trajectory_requested, transport=tx)
     worker.subscriber.subscribe()

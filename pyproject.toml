@@ -36,6 +36,11 @@ Changelog = "https://github.com/compas-dev/compas_xr/blob/main/CHANGELOG.md"
 Issues = "https://github.com/compas-dev/compas_xr/issues"
 Forum = "https://forum.compas-framework.org/"
 
+# compas_pb discovers conversion registrations through this entry point group and imports
+# the module for its side effects, so nothing has to import it explicitly.
+[project.entry-points."compas_pb.plugins"]
+serializers = "compas_xr.mqtt.conversions"
+
 # ============================================================================
 # setuptools config
 # ============================================================================

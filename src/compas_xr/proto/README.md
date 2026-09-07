@@ -27,4 +27,6 @@ and consume those bindings rather than regenerating from a git checkout.
 
 Messages import `compas_pb/generated/geometry.proto` so COMPAS geometry (such as the robot
 base frame) travels as a typed `compas_pb.data.FrameData` rather than an untyped blob.
-Registration with the `compas_pb` codec lives in `compas_xr/mqtt/conversions.py`.
+Registration with the `compas_pb` codec lives in `compas_xr/mqtt/conversions.py`, which
+`compas_pb` discovers through the `compas_pb.plugins` entry point declared in
+`pyproject.toml` — no module has to import it explicitly.
