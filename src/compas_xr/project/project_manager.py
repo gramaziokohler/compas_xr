@@ -73,21 +73,23 @@ class ProjectManager:
 
         """
         qr_model = ModelExtensions().create_qr_model(qr_frames_list)
+
+        # The envelope is defined in terms of a plain compas_model Model: every consumer,
+        # including the C# runtime, reads "model" and "elements". Keep that shape for every
+        # model type so a TimberModel never produces a different contract.
+        data = {
+            "QRFrames": qr_model.__data__,
+            "model": model.__data__,
+            "elements": {str(element.guid): element for element in model.elements()},
+            "building_plan": building_plan,
+        }
+
+        # compas_timber exposes beams and joints as named views over those same elements.
+        # They are additive extras for timber-aware consumers, never a replacement.
         if isinstance(model, TimberModel):
-            data = {
-                "QRFrames": qr_model.__data__,
-                "model": model.__data__,
-                "beams": {str(beam.guid): beam for beam in model.beams},
-                "joints": {str(joint.guid): joint for joint in model.joints},
-                "building_plan": building_plan,
-            }
-        else:
-            data = {
-                "QRFrames": qr_model.__data__,
-                "model": model.__data__,
-                "elements": {str(element.guid): element for element in model.elements()},
-                "building_plan": building_plan,
-            }
+            data["beams"] = {str(beam.guid): beam for beam in model.beams}
+            data["joints"] = {str(joint.guid): joint for joint in model.joints}
+
         return data
 
     def upload_data_to_project(self, data: Any, project_name: str, data_name: str) -> None:
