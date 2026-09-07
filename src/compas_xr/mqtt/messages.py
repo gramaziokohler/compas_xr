@@ -114,17 +114,40 @@ class Header(Message):
         time_stamp: str = None,
     ):
         super(Header, self).__init__()
-        self["sequence_id"] = sequence_id or self._ensure_sequence_id()
-        self["response_id"] = response_id or self._ensure_response_id(increment_response_ID)
-        self["device_id"] = device_id or self._get_device_id()
-        self["time_stamp"] = time_stamp or self._get_time_stamp()
+        # ``is None`` rather than falsiness: sequence_id and response_id are counters that
+        # legitimately start at 0, and ``0 or default`` would silently discard them.
+        self["sequence_id"] = sequence_id if sequence_id is not None else self._ensure_sequence_id()
+        self["response_id"] = (
+            response_id if response_id is not None else self._ensure_response_id(increment_response_ID)
+        )
+        self["device_id"] = device_id if device_id is not None else self._get_device_id()
+        self["time_stamp"] = time_stamp if time_stamp is not None else self._get_time_stamp()
 
     @classmethod
     def parse(cls, value):
         """Parse the header information
         from the input value
         """
-        instance = cls(value["sequence_id"], value["response_id"], value["device_id"], value["time_stamp"])
+        # ``parse`` is called with the decoded JSON dict off the wire, but also with a
+        # Header instance when a message is re-parsed locally. Unwrap to the plain mapping.
+        value = getattr(value, "data", value)
+
+        missing = [
+            key
+            for key in ("sequence_id", "response_id", "device_id", "time_stamp")
+            if value.get(key) is None
+        ]
+        if missing:
+            raise ValueError("Information for Header parsing missing: {}.".format(", ".join(missing)))
+
+        # Keyword arguments on purpose: the first positional parameter is
+        # ``increment_response_ID``, so passing these positionally shifts every field.
+        instance = cls(
+            sequence_id=value["sequence_id"],
+            response_id=value["response_id"],
+            device_id=value["device_id"],
+            time_stamp=value["time_stamp"],
+        )
         instance._update_sequence_counter_from_message(value["sequence_id"])
         instance._update_response_id_from_message(value["response_id"])
         return instance
