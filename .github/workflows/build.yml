@@ -23,3 +23,6 @@ jobs:
           invoke_lint: true
           invoke_test: true
           python: ${{ matrix.python }}
+          # The protobuf bindings are generated, not committed, so they have to be
+          # built before anything imports compas_xr.mqtt.
+          run_prebuild: true
