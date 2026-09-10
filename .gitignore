@@ -120,3 +120,8 @@ docs/api/generated/
 conda.recipe/
 
 scripts/firebase_config.json
+
+# Generated protobuf bindings — regenerate with `invoke generate-proto-classes`.
+# Only the .proto files are the source of truth and stay under version control.
+*_pb2.py
+*_pb2.pyi

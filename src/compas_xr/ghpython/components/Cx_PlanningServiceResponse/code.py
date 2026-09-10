@@ -8,6 +8,7 @@ COMPAS XR v1.0.0
 import Grasshopper
 from compas_eve import Publisher
 from compas_eve import Topic
+from compas_eve.codecs import ProtobufMessageCodec
 from compas_eve.mqtt import MqttTransport
 
 from compas_xr.mqtt import GetTrajectoryResult
@@ -22,7 +23,7 @@ class PlanningServiceResponseComponent(Grasshopper.Kernel.GH_ScriptInstance):
         if publish:
             topic_name_result = "compas_xr/get_trajectory_result/" + options.project_name
             topic = Topic(topic_name_result, GetTrajectoryResult)
-            tx = MqttTransport(options.host)
+            tx = MqttTransport(options.host, codec=ProtobufMessageCodec())
             publisher = Publisher(topic, transport=tx)
             message = GetTrajectoryResult(
                 element_id=result.requested_element_id,

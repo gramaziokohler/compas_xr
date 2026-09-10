@@ -566,16 +566,16 @@ wheels = [
 
 [[package]]
 name = "compas-pb"
-version = "1.1.0"
+version = "1.2.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "compas" },
     { name = "importlib-metadata", marker = "python_full_version < '3.10'" },
     { name = "protobuf" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/70/2e/717e34c6ae830f1f5adec3d6859fb6d91a42df64b0f1db9158341678e29c/compas_pb-1.1.0.tar.gz", hash = "sha256:d63b791fc709499e19f0c8d2754d7d35ad0e893fa373ca6aa220969eb55470f1", size = 44732, upload-time = "2026-08-10T12:17:59.335Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/2a/a3/85f7e5d9e0a979ad3c333db2734a04a66b1951fd5294014553f6b0771b44/compas_pb-1.2.0.tar.gz", hash = "sha256:116c1bf53cc34175345b507848b29f146e2ed853a987504ae96226e51dd992f5", size = 46240, upload-time = "2026-08-19T08:50:12.776Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/8d/1d/c87e42f7b8907ec2971fbd8d80272eae315dfb26afc9f6e816faf9be856b/compas_pb-1.1.0-py3-none-any.whl", hash = "sha256:1f5739ff246f8a2b3d70a690670a2fae603c0183120ada9e51023991c08f0d17", size = 37106, upload-time = "2026-08-10T12:17:58.21Z" },
+    { url = "https://files.pythonhosted.org/packages/e2/b5/0714d85ba6759c1bbf0f2137b462542d33d31d077149989fb7b2cc397fba/compas_pb-1.2.0-py3-none-any.whl", hash = "sha256:26bfbe2ea7d616d9cb9dcb3a288656778580da49159c5d75bca1955e958f9326", size = 38602, upload-time = "2026-08-19T08:50:11.616Z" },
 ]
 
 [[package]]
@@ -634,7 +634,7 @@ requires-dist = [
     { name = "compas-eve", specifier = ">=2,<3" },
     { name = "compas-invocations2", extras = ["mkdocs"], marker = "extra == 'dev'", specifier = ">1" },
     { name = "compas-model", specifier = "==0.9.2" },
-    { name = "compas-pb", specifier = ">=1.1,<2" },
+    { name = "compas-pb", specifier = ">=1.2,<2" },
     { name = "compas-timber", specifier = ">=2.1.1rc0,<3" },
     { name = "invoke", marker = "extra == 'dev'", specifier = ">=0.14" },
     { name = "pyrebase4", specifier = ">=4.7.1" },

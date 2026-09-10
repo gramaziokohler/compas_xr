@@ -18,8 +18,11 @@ jobs:
         python: ["3.9", "3.10", "3.11", "3.12"]
 
     steps:
-      - uses: compas-dev/compas-actions.build@v4
+      - uses: compas-dev/compas-actions.build@v5
         with:
           invoke_lint: true
           invoke_test: true
           python: ${{ matrix.python }}
+          # The protobuf bindings are generated, not committed, so they have to be
+          # built before anything imports compas_xr.mqtt.
+          run_prebuild: true
