@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 * Added Stream Realtime Database Methods and Component
 * Added type hints to all public methods and functions
+* Added `compas_xr.proto/compas_xr.proto`, the protobuf schema for the MQTT messages, published as a release asset together with the generated bindings for each supported language.
+* Added an explicit `JointTrajectory` message, replacing the untyped dict of joint names and values.
 
 ### Changed
 
@@ -18,6 +20,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Migrated documentation to Mkdocs format
 * Upgraded `compas_pb` to 1.1 and `compas_timber` to its Model-based API.
 * Replaced the legacy `compas.datastructures.Assembly`/`Part` integration with `compas_model.models.Model`/`Element`.
+* Upgraded `compas_pb` to 1.2, which is where the proto bundling tasks landed.
+* **Breaking:** MQTT messages now travel as protobuf instead of COMPAS JSON. A publisher on the new wire cannot be read by a subscriber still on JSON, so every participant in a project has to move together. Pass `JsonMessageCodec()` explicitly to keep the old wire.
+* Fixed `Header.parse`, which shifted every field by one and regenerated the timestamp, so device coordination ran on scrambled values.
+* Fixed `create_project_data_from_compas`, which emitted `beams`/`joints` instead of `elements` for a `TimberModel`, leaving consumers with a model that appeared to have no elements.
 
 ### Removed
 
