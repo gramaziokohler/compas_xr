@@ -13,8 +13,10 @@ from compas_xr.project import ModelExtensions
 from compas_xr.project import ProjectManager
 
 
-def test_compas_pb_1_1_is_installed():
-    assert version("compas_pb").startswith("1.1.")
+def test_compas_pb_1_x_is_installed():
+    # requirements.txt allows >=1.1,<2, and the C# runtime targets 1.2. Pinning the test
+    # to 1.1 specifically would fail on a legitimate, wire-compatible upgrade.
+    assert version("compas_pb").startswith("1.")
 
 
 def test_qr_model_roundtrips_with_compas_pb():
@@ -81,3 +83,23 @@ def test_project_data_uses_model_and_elements_keys():
 
     assert set(data) == {"QRFrames", "model", "elements", "building_plan"}
     assert set(data["elements"]) == {str(element.guid) for element in model.elements()}
+
+
+def test_project_data_keeps_elements_for_timber_models():
+    """A TimberModel used to emit beams/joints *instead of* elements, so the C# runtime,
+    which reads "model" and "elements", silently saw a model with no elements."""
+    from compas_timber.elements import Beam
+    from compas_timber.model import TimberModel
+
+    model = TimberModel()
+    model.add_element(Beam(Frame.worldXY(), length=1.0, width=0.1, height=0.2))
+    plan = BuildingPlanExtensions().create_buildingplan_from_model_sequence(model, data_type=0)
+    manager = ProjectManager.__new__(ProjectManager)
+
+    data = manager.create_project_data_from_compas(model, plan, [Frame.worldXY()])
+
+    assert "elements" in data
+    assert set(data["elements"]) == {str(element.guid) for element in model.elements()}
+    # timber-specific views stay available, but only as extras
+    assert "beams" in data
+    assert "joints" in data
