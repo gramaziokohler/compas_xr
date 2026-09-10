@@ -1,5 +1,7 @@
 """Round-trip every MQTT message through the compas_pb protobuf codec."""
 
+import pytest
+
 from compas.geometry import Frame
 from compas.geometry import Point
 from compas.geometry import Vector
@@ -12,6 +14,8 @@ from compas_xr.mqtt import ApproveTrajectory
 from compas_xr.mqtt import GetTrajectoryRequest
 from compas_xr.mqtt import GetTrajectoryResult
 from compas_xr.mqtt import SendTrajectory
+from compas_xr.mqtt.conversions import get_trajectory_request_from_pb
+from compas_xr.mqtt.conversions import get_trajectory_request_to_pb
 from compas_xr.mqtt.conversions import trajectory_from_pb
 from compas_xr.mqtt.conversions import trajectory_to_pb
 
@@ -163,3 +167,52 @@ def test_conversions_are_registered_through_an_entry_point():
     registered = {ep.value for ep in entry_points(group="compas_pb.plugins")}
 
     assert "compas_xr.mqtt.conversions" in registered
+
+
+def test_trajectory_id_survives_when_it_is_not_the_derived_value():
+    """trajectory_id is on the wire, so it must come back off it. The constructors
+    derive it from element_id, which would silently replace whatever the sender said."""
+    sent = SendTrajectory(element_id="elem-7", robot_name="ur10e", trajectory=TRAJECTORY)
+    sent["trajectory_id"] = "trajectory_id_from_a_different_scheme"
+
+    received = roundtrip(sent)
+
+    assert received["trajectory_id"] == "trajectory_id_from_a_different_scheme"
+
+
+def test_trajectory_id_falls_back_to_the_derived_value():
+    """An empty field on the wire means the sender never set one."""
+    message = get_trajectory_request_to_pb(GetTrajectoryRequest(element_id="elem-7", robot_name="ur10e"))
+    message.ClearField("trajectory_id")
+
+    received = get_trajectory_request_from_pb(message)
+
+    assert received["trajectory_id"] == "trajectory_id_elem-7"
+
+
+@pytest.mark.parametrize(
+    "names, values",
+    [
+        (["j1", "j2"], [0.0]),
+        (["j1"], [0.0, 1.0]),
+        ([], [0.0]),
+    ],
+)
+def test_mismatched_point_is_rejected_before_serialization(names, values):
+    trajectory = {"points": [{"joint_names": names, "joint_values": values}]}
+
+    with pytest.raises(ValueError, match="Trajectory point 0"):
+        trajectory_to_pb(trajectory)
+
+
+def test_mismatched_point_error_names_the_offending_index():
+    trajectory = {
+        "points": [
+            {"joint_names": ["j1", "j2"], "joint_values": [0.0, 1.0]},
+            {"joint_names": ["j1", "j2"], "joint_values": [0.0, 1.0]},
+            {"joint_names": ["j1", "j2"], "joint_values": [0.0]},
+        ]
+    }
+
+    with pytest.raises(ValueError, match=r"Trajectory point 2 has 2 joint names but 1 joint values"):
+        trajectory_to_pb(trajectory)

@@ -116,12 +116,22 @@ def _time_from_start(point):
 
 
 def trajectory_to_pb(trajectory):
-    """Convert a planner trajectory into a :class:`compas_xr.v1.JointTrajectory`."""
+    """Convert a planner trajectory into a :class:`compas_xr.v1.JointTrajectory`.
+
+    Raises
+    ------
+    ValueError
+        If a waypoint carries a different number of joint names and joint values. They
+        are parallel arrays on the wire, so a mismatch would reach the reader as a
+        silently misaligned trajectory rather than an error.
+    """
     message = pb.JointTrajectory()
     if trajectory is None:
         return message
 
-    for joint_names, joint_values, time_from_start in _iter_points(trajectory):
+    for index, (joint_names, joint_values, time_from_start) in enumerate(_iter_points(trajectory)):
+        if len(joint_names) != len(joint_values):
+            raise ValueError("Trajectory point {} has {} joint names but {} joint values; they must be parallel.".format(index, len(joint_names), len(joint_values)))
         point = message.points.add()
         point.joint_names.extend(joint_names)
         point.joint_values.extend(joint_values)
@@ -144,6 +154,19 @@ def trajectory_from_pb(message):
     return {"points": points}
 
 
+def _restore_trajectory_id(instance, message):
+    """Carry the wire's ``trajectory_id`` onto a freshly constructed message.
+
+    Every message class derives ``trajectory_id`` from ``element_id`` in its
+    constructor, so a value that arrived on the wire would otherwise be dropped and
+    silently replaced by the derived one. Falls back to the derived value when the
+    sender left the field empty.
+    """
+    if message.trajectory_id:
+        instance["trajectory_id"] = message.trajectory_id
+    return instance
+
+
 # ============================================================================
 # GetTrajectoryRequest
 # ============================================================================
@@ -161,11 +184,12 @@ def get_trajectory_request_to_pb(message):
 
 @pb_deserializer(pb.GetTrajectoryRequest)
 def get_trajectory_request_from_pb(message):
-    return GetTrajectoryRequest(
+    instance = GetTrajectoryRequest(
         element_id=message.element_id,
         robot_name=message.robot_name,
         header=_header_from_pb(message.header),
     )
+    return _restore_trajectory_id(instance, message)
 
 
 # ============================================================================
@@ -194,7 +218,7 @@ def get_trajectory_result_to_pb(message):
 
 @pb_deserializer(pb.GetTrajectoryResult)
 def get_trajectory_result_from_pb(message):
-    return GetTrajectoryResult(
+    instance = GetTrajectoryResult(
         element_id=message.element_id,
         robot_name=message.robot_name,
         robot_base_frame=frame_from_pb(message.robot_base_frame) if message.HasField("robot_base_frame") else None,
@@ -204,6 +228,7 @@ def get_trajectory_result_from_pb(message):
         end_effector_link_name=(message.end_effector_link_name if message.HasField("end_effector_link_name") else None),
         header=_header_from_pb(message.header),
     )
+    return _restore_trajectory_id(instance, message)
 
 
 # ============================================================================
@@ -225,13 +250,14 @@ def approve_trajectory_to_pb(message):
 
 @pb_deserializer(pb.ApproveTrajectory)
 def approve_trajectory_from_pb(message):
-    return ApproveTrajectory(
+    instance = ApproveTrajectory(
         element_id=message.element_id,
         robot_name=message.robot_name,
         trajectory=trajectory_from_pb(message.trajectory),
         approval_status=message.approval_status,
         header=_header_from_pb(message.header),
     )
+    return _restore_trajectory_id(instance, message)
 
 
 # ============================================================================
@@ -250,10 +276,11 @@ def approval_counter_request_to_pb(message):
 
 @pb_deserializer(pb.ApprovalCounterRequest)
 def approval_counter_request_from_pb(message):
-    return ApprovalCounterRequest(
+    instance = ApprovalCounterRequest(
         element_id=message.element_id,
         header=_header_from_pb(message.header),
     )
+    return _restore_trajectory_id(instance, message)
 
 
 @pb_serializer(ApprovalCounterResult)
@@ -267,10 +294,11 @@ def approval_counter_result_to_pb(message):
 
 @pb_deserializer(pb.ApprovalCounterResult)
 def approval_counter_result_from_pb(message):
-    return ApprovalCounterResult(
+    instance = ApprovalCounterResult(
         element_id=message.element_id,
         header=_header_from_pb(message.header),
     )
+    return _restore_trajectory_id(instance, message)
 
 
 # ============================================================================
@@ -291,9 +319,10 @@ def send_trajectory_to_pb(message):
 
 @pb_deserializer(pb.SendTrajectory)
 def send_trajectory_from_pb(message):
-    return SendTrajectory(
+    instance = SendTrajectory(
         element_id=message.element_id,
         robot_name=message.robot_name,
         trajectory=trajectory_from_pb(message.trajectory),
         header=_header_from_pb(message.header),
     )
+    return _restore_trajectory_id(instance, message)
